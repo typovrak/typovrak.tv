@@ -11,6 +11,7 @@ import (
 func main() {
 	app.RequireEnv()
 
+	routes.Metrics()
 	routes.Assets()
 	routes.Index()
 

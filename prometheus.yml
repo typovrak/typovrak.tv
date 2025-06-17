@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+scrape_configs:
+  - job_name: prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['prometheus:8082']
+  - job_name: app
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['app:8080']
+  - job_name: grafana
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['grafana:8083']
+  - job_name: node_exporter
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['node_exporter:8084']
