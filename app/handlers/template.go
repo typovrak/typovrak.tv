@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
@@ -30,6 +31,9 @@ type TemplateFile struct {
 }
 
 var TemplateFiles = struct {
+	Globals struct {
+		Pico TemplateFile
+	}
 	Layout struct {
 		Base   TemplateFile
 		Header TemplateFile
@@ -41,6 +45,16 @@ var TemplateFiles = struct {
 		User     TemplateFile
 	}
 }{
+	Globals: struct {
+		Pico TemplateFile
+	}{
+		Pico: TemplateFile{
+			Path: "globals/pico",
+			Html: false,
+			Css:  true,
+			Js:   false,
+		},
+	},
 	Layout: struct {
 		Base   TemplateFile
 		Header TemplateFile
@@ -55,14 +69,14 @@ var TemplateFiles = struct {
 		Header: TemplateFile{
 			Path: "layouts/header",
 			Html: true,
-			Css:  true,
-			Js:   true,
+			Css:  false,
+			Js:   false,
 		},
 		Footer: TemplateFile{
 			Path: "layouts/footer",
 			Html: true,
-			Css:  true,
-			Js:   true,
+			Css:  false,
+			Js:   false,
 		},
 	},
 	View: struct {
@@ -121,11 +135,53 @@ func renderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 	}
 }
 
+type GitHubRepo struct {
+	Name        string
+	Html_url    string
+	Description string
+	Topics      []string
+
+	Created_at string
+	Updated_at string
+	Pushed_at  string
+
+	Stargazers_count int
+	Forks_count      int
+}
+
 func GetIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
 		GetNotFound(w, r)
 		return
 	}
+
+	req, _ := http.NewRequest("GET", "https://api.github.com/users/typovrak/repos?per_page=100", nil)
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("GITHUB_TOKEN"))
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer res.Body.Close()
+
+	var repos []GitHubRepo
+	if err := json.NewDecoder(res.Body).Decode(&repos); err != nil {
+		log.Fatal(err)
+	}
+
+	starsCount := 0
+	forksCount := 0
+	var nixosRepos []GitHubRepo
+	for i := 0; i < len(repos); i++ {
+		if len(repos[i].Name) >= 5 && repos[i].Name[:5] == "nixos" {
+			starsCount += repos[i].Stargazers_count
+			forksCount += repos[i].Forks_count
+			nixosRepos = append(nixosRepos, repos[i])
+		}
+	}
+
+	log.Println(nixosRepos)
+	log.Println(starsCount)
+	log.Println(forksCount)
 
 	renderTemplate(w, TemplateParameters{
 		Name: "base",
@@ -134,6 +190,7 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 			MetaDescription: "HOME meta description",
 		},
 		Files: []TemplateFile{
+			TemplateFiles.Globals.Pico,
 			TemplateFiles.Layout.Base,
 			TemplateFiles.Layout.Header,
 			TemplateFiles.Layout.Footer,
@@ -150,6 +207,7 @@ func GetNotFound(w http.ResponseWriter, _ *http.Request) {
 			MetaDescription: "NOT FOUND meta description",
 		},
 		Files: []TemplateFile{
+			TemplateFiles.Globals.Pico,
 			TemplateFiles.Layout.Base,
 			TemplateFiles.Layout.Header,
 			TemplateFiles.Layout.Footer,

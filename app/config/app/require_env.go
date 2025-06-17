@@ -9,6 +9,7 @@ func RequireEnv() {
 	envs := []string{
 		"APP_PORT",
 		"APP_URL",
+		"GITHUB_TOKEN",
 	}
 
 	for i := 0; i < len(envs); i++ {
