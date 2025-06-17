@@ -15,3 +15,67 @@ services:
       - type: bind
         source: ./app
         target: /app
+    networks:
+      - prometheus
+
+  prometheus:
+    container_name: ${PROMETHEUS_CONTAINER}
+    image: prom/prometheus:v3.4.1
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.listen-address=0.0.0.0:${PROMETHEUS_PORT}'
+      - '--storage.tsdb.retention.time=1y'
+      - '--storage.tsdb.retention.size=1GB'
+    ports:
+      - ${PROMETHEUS_PORT}:${PROMETHEUS_PORT}
+    restart: unless-stopped
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus:/prometheus
+    networks:
+      - prometheus
+
+  grafana:
+    container_name: ${GRAFANA_CONTAINER}
+    image: grafana/grafana-oss
+    environment:
+      - GF_SERVER_ROOT_URL=${GRAFANA_HOST}
+      - GF_SERVER_HTTP_PORT=${GRAFANA_PORT}
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_SMTP_ENABLED=${GRAFANA_SMTP_ENABLED}
+      - GF_SMTP_HOST=${GRAFANA_SMTP_HOST}
+      - GF_SMTP_USER=${GRAFANA_SMTP_USER}
+      - GF_SMTP_PASSWORD=${GRAFANA_SMTP_PASSWORD}
+    user: '${GRAFANA_USER_ID}'
+    ports:
+      - ${GRAFANA_PORT}:${GRAFANA_PORT}
+    restart: unless-stopped
+    volumes:
+      - grafana:/var/lib/grafana
+    networks:
+      - prometheus
+
+  node_exporter:
+    container_name: ${NODE_EXPORTER_CONTAINER}
+    image: prom/node-exporter:v1.8.2
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=:${NODE_EXPORTER_PORT}'
+    restart: unless-stopped
+    networks:
+      - prometheus
+    volumes:
+      - '/:/host:ro,rslave'
+
+volumes:
+  prometheus:
+    name: ${PROMETHEUS_CONTAINER}
+  grafana:
+    name: ${GRAFANA_CONTAINER}
+
+networks:
+  prometheus:
+    name: ${PROMETHEUS_CONTAINER}
+    driver: bridge

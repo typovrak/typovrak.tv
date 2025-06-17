@@ -10,6 +10,7 @@ import (
 
 type TemplateName string
 
+// WARN: always use snake_case, kebab-case don't work with html/template
 const (
 	TemplateNameIndex    TemplateName = "index"
 	TemplateNameNotFound TemplateName = "not_found"
