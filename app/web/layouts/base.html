@@ -1,0 +1,32 @@
+{{ define "base" }}
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="icon" href="/favicon.ico" />
+
+		<title>{{ .Head.MetaTitle }}</title>
+		<meta name="description" content="{{ .Head.MetaDescription }}"/>
+
+		{{ range .Files }}
+			{{ if .Css }}
+				<link rel="stylesheet" href="/assets/css/{{ .Path }}.css" />
+			{{ end }}
+		{{ end }}
+	</head>
+	<body>
+		{{ template "header" . }}
+		
+		<main>{{ block "main" . }}{{ end }}</main>
+
+		{{ template "footer" . }}
+		
+		{{ range .Files }}
+			{{ if .Js }}
+				<script src="/assets/js/{{ .Path }}.js" defer></script>
+			{{ end }}
+		{{ end }}
+	</body>
+</html>
+{{ end }}
