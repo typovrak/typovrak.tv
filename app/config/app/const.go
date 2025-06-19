@@ -11,8 +11,12 @@ const (
 	TikTokURL    string = "https://www.tiktok.com/@typovrak"
 )
 
-var WebPath string
+var (
+	WebPath string
+	GoTest  bool
+)
 
-func InitWebPath() {
+func InitConst() {
 	WebPath = "./web/"
+	GoTest = false
 }

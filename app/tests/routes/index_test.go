@@ -9,6 +9,7 @@ import (
 )
 
 func TestIndex(t *testing.T) {
+	app.GoTest = true
 	app.WebPath = "../../web/"
 
 	routes.Index()

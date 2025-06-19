@@ -14,21 +14,23 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	repos, err := services.FetchGitHubRepos(http.DefaultClient, "", 100)
-	if err != nil {
-		http.Error(w, "error while fetching github repos : "+err.Error(), 500)
-		return
-	}
+	if app.GoTest == false {
+		repos, err := services.FetchGitHubRepos(http.DefaultClient, "", 100)
+		if err != nil {
+			http.Error(w, "error while fetching github repos : "+err.Error(), 500)
+			return
+		}
 
-	nixosRepos, starsCount, forksCount, err := services.FilterNixosRepos(repos)
-	if err != nil {
-		http.Error(w, "error while filtering nixos repos : "+err.Error(), 500)
-		return
-	}
+		nixosRepos, starsCount, forksCount, err := services.FilterNixosRepos(repos)
+		if err != nil {
+			http.Error(w, "error while filtering nixos repos : "+err.Error(), 500)
+			return
+		}
 
-	log.Println(nixosRepos)
-	log.Println(starsCount)
-	log.Println(forksCount)
+		log.Println(nixosRepos)
+		log.Println(starsCount)
+		log.Println(forksCount)
+	}
 
 	services.RenderTemplate(w, services.TemplateParameters{
 		Name: "base",

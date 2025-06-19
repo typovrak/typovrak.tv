@@ -7,6 +7,8 @@ import (
 )
 
 func GetNotFound(w http.ResponseWriter, _ *http.Request) {
+	w.WriteHeader(404)
+
 	services.RenderTemplate(w, services.TemplateParameters{
 		Name: services.TemplateNameNotFound,
 		Head: services.TemplateHead{
