@@ -4,10 +4,13 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"typovraktv/config/app"
 	"typovraktv/routes"
 )
 
 func TestIndex(t *testing.T) {
+	app.WebPath = "../../web/"
+
 	routes.Index()
 	route := "/"
 

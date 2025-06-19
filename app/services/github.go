@@ -9,21 +9,26 @@ import (
 )
 
 type GitHubRepo struct {
-	Name        string
-	Html_url    string
-	Description string
-	Topics      []string
+	Name        string   `json:"name"`
+	Html_url    string   `json:"html_url"`
+	Description string   `json:"description"`
+	Topics      []string `json:"topics"`
 
-	Created_at string
-	Updated_at string
-	Pushed_at  string
+	Created_at string `json:"created_at"`
+	Updated_at string `json:"updated_at"`
+	Pushed_at  string `json:"pushed_at"`
 
-	Stargazers_count int
-	Forks_count      int
+	Stargazers_count int `json:"stargazers_count"`
+	Forks_count      int `json:"forks_count"`
 }
 
-func FetchGitHubRepos(client *http.Client, per_page int) ([]GitHubRepo, error) {
-	req, err := http.NewRequest("GET", "https://api.github.com/users/typovrak/repos?per_page="+strconv.Itoa(per_page), nil)
+func FetchGitHubRepos(client *http.Client, url string, per_page int) ([]GitHubRepo, error) {
+	// url can be mocked for testing
+	if url == "" {
+		url = "https://api.github.com/users/typovrak/repos"
+	}
+
+	req, err := http.NewRequest("GET", url+"?per_page="+strconv.Itoa(per_page), nil)
 	if err != nil {
 		return nil, err
 	}

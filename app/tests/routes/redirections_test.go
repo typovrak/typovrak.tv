@@ -26,7 +26,7 @@ func TestYouTube(t *testing.T) {
 
 	location := res.Header.Get("Location")
 	if location != locationWanted {
-		t.Errorf("expected Location header %q, got %q", locationWanted, location)
+		t.Errorf("expected location header %q, got %q", locationWanted, location)
 	}
 }
 

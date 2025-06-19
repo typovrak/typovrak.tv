@@ -4,9 +4,14 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"typovraktv/config/app"
+	"typovraktv/routes"
 )
 
 func TestNotFound(t *testing.T) {
+	app.WebPath = "../../web/"
+
+	routes.NotFound()
 	route := "/404"
 
 	req := httptest.NewRequest("GET", route, nil)

@@ -10,6 +10,7 @@ import (
 
 func main() {
 	app.RequireEnv()
+	app.InitWebPath()
 
 	routes.Metrics()
 	routes.Assets()
@@ -24,6 +25,6 @@ func main() {
 
 	log.Println("Server listening on port :", os.Getenv("APP_PORT"))
 	if err := http.ListenAndServe(":"+os.Getenv("APP_PORT"), nil); err != nil {
-		log.Fatal(err)
+		log.Fatal("error while listening and serving the http server : " + err.Error())
 	}
 }

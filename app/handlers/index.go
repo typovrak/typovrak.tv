@@ -14,15 +14,15 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	repos, err := services.FetchGitHubRepos(http.DefaultClient, 100)
+	repos, err := services.FetchGitHubRepos(http.DefaultClient, "", 100)
 	if err != nil {
-		http.Error(w, "Error handlers.FetchGitHubRepos(http.DefaultClient, 100) : "+err.Error(), 500)
+		http.Error(w, "error while fetching github repos : "+err.Error(), 500)
 		return
 	}
 
 	nixosRepos, starsCount, forksCount, err := services.FilterNixosRepos(repos)
 	if err != nil {
-		http.Error(w, "Error handlers.FilterNixosRepos(repos) : "+err.Error(), 500)
+		http.Error(w, "error while filtering nixos repos : "+err.Error(), 500)
 		return
 	}
 

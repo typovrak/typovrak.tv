@@ -15,7 +15,7 @@ func RequireEnv() {
 	for i := 0; i < len(envs); i++ {
 		_, defined := os.LookupEnv(envs[i])
 		if !defined {
-			log.Fatal("Environment variable not defined: " + envs[i])
+			log.Fatal("environment variable not defined : " + envs[i])
 		}
 	}
 

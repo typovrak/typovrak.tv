@@ -112,6 +112,7 @@ type TemplateParametersGlobal struct {
 
 func RenderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 	var parsedFiles []string
+
 	for i := 0; i < len(templateParams.Files); i++ {
 		if templateParams.Files[i].Html {
 			parsedFiles = append(parsedFiles, app.WebPath+templateParams.Files[i].Path+".html")
@@ -129,7 +130,7 @@ func RenderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 
 	err := parsedTemplate.ExecuteTemplate(w, string(templateParamsGlobal.Name), templateParamsGlobal)
 	if err != nil {
-		http.Error(w, "Error parsedTemplate.ExecuteTemplate(w, string(templateParamsGlobal.Name), templateParamsGlobal) : "+err.Error(), 500)
+		http.Error(w, "error while executing the template : "+err.Error(), 500)
 		return
 	}
 }
