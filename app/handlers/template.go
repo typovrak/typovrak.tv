@@ -1,12 +1,12 @@
 package handlers
 
 import (
-	"encoding/json"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"typovraktv/config/app"
+	"typovraktv/handlers"
 )
 
 type TemplateName string
@@ -129,8 +129,9 @@ func renderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 		AppUrl: os.Getenv("APP_URL"),
 	}
 
-	if err := parsedTemplate.ExecuteTemplate(w, string(templateParamsGlobal.Name), templateParamsGlobal); err != nil {
-		log.Fatal(err)
+	err := parsedTemplate.ExecuteTemplate(w, string(templateParamsGlobal.Name), templateParamsGlobal)
+	if err != nil {
+		http.Error(w, "Error parsedTemplate.ExecuteTemplate(w, string(templateParamsGlobal.Name), templateParamsGlobal) : "+err.Error(), 500)
 		return
 	}
 }
@@ -151,32 +152,21 @@ type GitHubRepo struct {
 
 func GetIndex(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
+		log.Println(r.URL.Path)
 		GetNotFound(w, r)
 		return
 	}
 
-	req, _ := http.NewRequest("GET", "https://api.github.com/users/typovrak/repos?per_page=100", nil)
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("GITHUB_TOKEN"))
-	res, err := http.DefaultClient.Do(req)
+	repos, err := handlers.FetchGitHubRepos(http.DefaultClient, 100)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-
-	var repos []GitHubRepo
-	if err := json.NewDecoder(res.Body).Decode(&repos); err != nil {
-		log.Fatal(err)
+		http.Error(w, "Error handlers.FetchGitHubRepos(http.DefaultClient, 100) : "+err.Error(), 500)
+		return
 	}
 
-	starsCount := 0
-	forksCount := 0
-	var nixosRepos []GitHubRepo
-	for i := 0; i < len(repos); i++ {
-		if len(repos[i].Name) >= 5 && repos[i].Name[:5] == "nixos" {
-			starsCount += repos[i].Stargazers_count
-			forksCount += repos[i].Forks_count
-			nixosRepos = append(nixosRepos, repos[i])
-		}
+	nixosRepos, starsCount, forksCount, err := handlers.FilterNixosRepos(repos)
+	if err != nil {
+		http.Error(w, "Error handlers.FilterNixosRepos(repos) : "+err.Error(), 500)
+		return
 	}
 
 	log.Println(nixosRepos)

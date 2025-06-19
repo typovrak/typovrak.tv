@@ -14,6 +14,13 @@ func main() {
 	routes.Metrics()
 	routes.Assets()
 	routes.Index()
+	routes.NotFound()
+
+	routes.YouTube()
+	routes.Discord()
+	routes.Coffee()
+	routes.Instagram()
+	routes.TikTok()
 
 	log.Println("Server listening on port :", os.Getenv("APP_PORT"))
 	if err := http.ListenAndServe(":"+os.Getenv("APP_PORT"), nil); err != nil {

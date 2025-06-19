@@ -5,10 +5,6 @@ import (
 	"typovraktv/handlers"
 )
 
-type GitHubRepo struct {
-	Name string
-}
-
 func Index() {
 	// WARN: all the code before the http.HandleFunc will be executed one time
 
