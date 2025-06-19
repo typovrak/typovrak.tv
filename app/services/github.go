@@ -1,4 +1,4 @@
-package handlers
+package services
 
 import (
 	"encoding/json"
@@ -7,6 +7,20 @@ import (
 	"os"
 	"strconv"
 )
+
+type GitHubRepo struct {
+	Name        string
+	Html_url    string
+	Description string
+	Topics      []string
+
+	Created_at string
+	Updated_at string
+	Pushed_at  string
+
+	Stargazers_count int
+	Forks_count      int
+}
 
 func FetchGitHubRepos(client *http.Client, per_page int) ([]GitHubRepo, error) {
 	req, err := http.NewRequest("GET", "https://api.github.com/users/typovrak/repos?per_page="+strconv.Itoa(per_page), nil)

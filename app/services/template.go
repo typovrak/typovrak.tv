@@ -1,12 +1,10 @@
-package handlers
+package services
 
 import (
 	"html/template"
-	"log"
 	"net/http"
 	"os"
 	"typovraktv/config/app"
-	"typovraktv/handlers"
 )
 
 type TemplateName string
@@ -112,7 +110,7 @@ type TemplateParametersGlobal struct {
 	AppUrl string
 }
 
-func renderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
+func RenderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 	var parsedFiles []string
 	for i := 0; i < len(templateParams.Files); i++ {
 		if templateParams.Files[i].Html {
@@ -134,74 +132,4 @@ func renderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 		http.Error(w, "Error parsedTemplate.ExecuteTemplate(w, string(templateParamsGlobal.Name), templateParamsGlobal) : "+err.Error(), 500)
 		return
 	}
-}
-
-type GitHubRepo struct {
-	Name        string
-	Html_url    string
-	Description string
-	Topics      []string
-
-	Created_at string
-	Updated_at string
-	Pushed_at  string
-
-	Stargazers_count int
-	Forks_count      int
-}
-
-func GetIndex(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/" {
-		log.Println(r.URL.Path)
-		GetNotFound(w, r)
-		return
-	}
-
-	repos, err := handlers.FetchGitHubRepos(http.DefaultClient, 100)
-	if err != nil {
-		http.Error(w, "Error handlers.FetchGitHubRepos(http.DefaultClient, 100) : "+err.Error(), 500)
-		return
-	}
-
-	nixosRepos, starsCount, forksCount, err := handlers.FilterNixosRepos(repos)
-	if err != nil {
-		http.Error(w, "Error handlers.FilterNixosRepos(repos) : "+err.Error(), 500)
-		return
-	}
-
-	log.Println(nixosRepos)
-	log.Println(starsCount)
-	log.Println(forksCount)
-
-	renderTemplate(w, TemplateParameters{
-		Name: "base",
-		Head: TemplateHead{
-			MetaTitle:       "HOME" + app.MetaTitleDelimiter + app.Name,
-			MetaDescription: "HOME meta description",
-		},
-		Files: []TemplateFile{
-			TemplateFiles.Globals.Pico,
-			TemplateFiles.Layout.Base,
-			TemplateFiles.Layout.Header,
-			TemplateFiles.Layout.Footer,
-			TemplateFiles.View.Index,
-		},
-	})
-}
-
-func GetNotFound(w http.ResponseWriter, _ *http.Request) {
-	renderTemplate(w, TemplateParameters{
-		Name: TemplateNameNotFound,
-		Head: TemplateHead{
-			MetaTitle:       "NOT FOUND" + app.MetaTitleDelimiter + app.Name,
-			MetaDescription: "NOT FOUND meta description",
-		},
-		Files: []TemplateFile{
-			TemplateFiles.Globals.Pico,
-			TemplateFiles.Layout.Base,
-			TemplateFiles.Layout.Header,
-			TemplateFiles.Layout.Footer,
-			TemplateFiles.View.NotFound,
-		},
-	})
 }
