@@ -1,9 +1,9 @@
 mode: set
 typovraktv/config/app/require-env.go:9.25,18.33 2 1
 typovraktv/config/app/require-env.go:18.33,20.15 2 1
-typovraktv/config/app/require-env.go:20.15,23.43 2 0
+typovraktv/config/app/require-env.go:20.15,23.43 2 1
 typovraktv/config/app/require-env.go:23.43,25.5 1 0
-typovraktv/config/app/require-env.go:27.4,27.26 1 0
+typovraktv/config/app/require-env.go:27.4,27.26 1 1
 typovraktv/config/app/require-env.go:31.2,31.41 1 1
 typovraktv/config/app/require-env.go:31.41,33.3 1 0
 typovraktv/config/app/require-env.go:35.2,35.12 1 1
@@ -50,4 +50,4 @@ typovraktv/services/template.go:112.79,115.49 2 1
 typovraktv/services/template.go:115.49,116.35 1 1
 typovraktv/services/template.go:116.35,118.4 1 1
 typovraktv/services/template.go:121.2,131.16 4 1
-typovraktv/services/template.go:131.16,134.3 2 0
+typovraktv/services/template.go:131.16,134.3 2 1
