@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  APP_CONTAINER: ${{ vars.APP_CONTAINER || "typovraktv" }}
+  APP_CONTAINER: ${{ vars.APP_CONTAINER || 'typovraktv' }}
   APP_PORT: ${{ vars.APP_PORT || "8080" }}
   APP_URL: ${{ vars.APP_URL || "http://localhost:8080" }}
   APP_WEB_PATH: ${{ vars.APP_WEB_PATH || "./web/" }}
