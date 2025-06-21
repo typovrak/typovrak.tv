@@ -9,3 +9,11 @@ docker-up:
 .PHONY: docker-restart
 docker-restart:
 	docker compose down && docker compose up
+
+.PHONY: leaks
+leaks:
+	gitleaks git -v
+
+.PHONY: trivy
+trivy:
+	trivy image typovraktv-app:latest
