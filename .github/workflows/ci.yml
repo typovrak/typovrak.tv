@@ -1,0 +1,90 @@
+name: ci
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  APP_CONTAINER: ${{ vars.APP_CONTAINER || 'typovraktv' }}
+  APP_PORT: ${{ vars.APP_PORT || '8080' }}
+  APP_URL: ${{ vars.APP_URL || 'http://localhost:8080' }}
+  APP_WEB_PATH: ${{ vars.APP_WEB_PATH || './web/' }}
+  APP_GO_TEST: ${{ vars.APP_GO_TEST || 'false' }}
+  
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN || '' }}
+  
+  PROMETHEUS_CONTAINER: ${{ vars.PROMETHEUS_CONTAINER || 'typovraktvprometheus' }}
+  PROMETHEUS_PORT: ${{ vars.PROMETHEUS_PORT || '8082' }}
+  
+  GRAFANA_CONTAINER: ${{ vars.GRAFANA_CONTAINER || 'typovraktvgrafana' }}
+  GRAFANA_PORT: ${{ vars.GRAFANA_PORT || '8083' }}
+  GRAFANA_HOST: ${{ vars.GRAFANA_HOST || '' }}
+  GRAFANA_USER: ${{ vars.GRAFANA_USER || 'typovrak' }}
+  GRAFANA_PASSWORD: ${{ vars.GRAFANA_PASSWORD || 'typovrak' }}
+  GRAFANA_SMTP_ENABLED: ${{ vars.GRAFANA_SMTP_ENABLED || 'false' }}
+  GRAFANA_SMTP_HOST: ${{vars.GRAFANA_SMTP_HOST || '' }}
+  GRAFANA_SMTP_USER: ${{vars.GRAFANA_SMTP_USER || '' }}
+  GRAFANA_SMTP_PASSWORD: ${{vars.GRAFANA_SMTP_PASSWORD || '' }}
+  GRAFANA_USER_ID: ${{ vars.GRAFANA_USER_ID || '' }}
+  
+  NODE_EXPORTER_CONTAINER: ${{ vars.NODE_EXPORTER_CONTAINER || 'typovraktvnodeexporter' }}
+  NODE_EXPORTER_PORT: ${{ vars.NODE_EXPORTER_PORT || '8084' }}
+  
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23.6'
+
+    - name: build
+      run: cd ./app && go build -v
+
+    - name: test and generate coverage.txt
+      run: cd ./app && make coverage
+
+    - name: format
+      run: if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then exit 1; fi
+        
+    - name: upload coverage reports to codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: typovrak/typovrak.tv
+
+  docker:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Build the Docker image
+      run: docker compose build
+
+    - name: scan for secrets with gitleaks
+      uses: gitleaks/gitleaks-action@v2
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        image-ref: 'typovraktv-app:latest'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
+
+    - name: Analyze image layers with Dive
+      run: |
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest typovraktv-app:latest --ci --lowestEfficiency 0.9
+        if [ $? -ne 0 ]; then
+          echo "dive analysis failed, image efficiency below 90%"
+          exit 1
+        fi
