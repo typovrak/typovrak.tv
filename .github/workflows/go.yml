@@ -1,6 +1,3 @@
-# This workflow will build a golang project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
-
 name: go
 
 on:
@@ -21,8 +18,15 @@ jobs:
       with:
         go-version: '1.23.6'
 
-    - name: Build
+    - name: build
       run: cd ./app && go build -v
 
-    - name: Test
-      run: cd ./app && make test
+    - name: test and generate coverage artifact
+      run: cd ./app && make coverage
+
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: ./app/coverage.out
+        retention-days: 7
