@@ -38,8 +38,19 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
+    
     - name: Build the Docker image
       run: docker compose build
 
-    - name: Scan for secrets with gitleaks
+    - name: scan for secrets with gitleaks
       uses: gitleaks/gitleaks-action@v2
+
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@0.28.0
+      with:
+        image-ref: 'typovraktv-app:latest'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
