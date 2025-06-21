@@ -13,7 +13,7 @@ func mockFetchGitHubRepos(t *testing.T) ([]services.GitHubRepo, error) {
 
 	data, err := os.ReadFile("./services_github_repos.json")
 	if err != nil {
-		t.Fatalf("error while reading github_repos.json : %v", err.Error())
+		t.Errorf("error while reading github_repos.json : %v", err.Error())
 		return nil, err
 	}
 
@@ -29,12 +29,12 @@ func mockFetchGitHubRepos(t *testing.T) ([]services.GitHubRepo, error) {
 
 	repos, err := services.FetchGitHubRepos(http.DefaultClient, mockServer.URL, 100)
 	if err != nil {
-		t.Fatalf("error while fetching github repos : %v", err.Error())
+		t.Errorf("error while fetching github repos : %v", err.Error())
 		return nil, err
 	}
 
 	if len(repos) != reposLenWanted {
-		t.Fatalf("expected len(repos) %d, got %d", reposLenWanted, len(repos))
+		t.Errorf("expected len(repos) %d, got %d", reposLenWanted, len(repos))
 		return nil, err
 	}
 
@@ -54,24 +54,24 @@ func TestServicesGitHub(t *testing.T) {
 
 		repos, err := mockFetchGitHubRepos(t)
 		if err != nil {
-			t.Fatalf("error while geting repos values : %v", err.Error())
+			t.Errorf("error while geting repos values : %v", err.Error())
 		}
 
 		nixosRepos, starsCount, forksCount, err := services.FilterNixosRepos(repos)
 		if err != nil {
-			t.Fatalf("error while filtering nixos repos : %v", err.Error())
+			t.Errorf("error while filtering nixos repos : %v", err.Error())
 		}
 
 		if len(nixosRepos) != nixosReposLenWanted {
-			t.Fatalf("expected len(nixosRepos) %d, got %d", nixosReposLenWanted, len(nixosRepos))
+			t.Errorf("expected len(nixosRepos) %d, got %d", nixosReposLenWanted, len(nixosRepos))
 		}
 
 		if starsCount != starsCountWanted {
-			t.Fatalf("expected starsCount %d, got %d", starsCountWanted, starsCount)
+			t.Errorf("expected starsCount %d, got %d", starsCountWanted, starsCount)
 		}
 
 		if forksCount != forksCountWanted {
-			t.Fatalf("expected forksCount %d, got %d", forksCountWanted, forksCount)
+			t.Errorf("expected forksCount %d, got %d", forksCountWanted, forksCount)
 		}
 	})
 }
