@@ -34,7 +34,7 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	services.RenderTemplate(w, services.TemplateParameters{
-		Name: "base",
+		Name: services.TemplateNameIndex,
 		Head: services.TemplateHead{
 			MetaTitle:       "HOME" + app.MetaTitleDelimiter + app.Name,
 			MetaDescription: "HOME meta description",
