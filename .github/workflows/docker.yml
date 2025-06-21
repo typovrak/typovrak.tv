@@ -1,0 +1,41 @@
+name: docker
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  APP_CONTAINER: ${{ vars.APP_CONTAINER || "typovraktv" }}
+  APP_PORT: ${{ vars.APP_PORT || "8080" }}
+  APP_URL: ${{ vars.APP_URL || "http://localhost:8080" }}
+  APP_WEB_PATH: ${{ vars.APP_WEB_PATH || "./web/" }}
+  APP_GO_TEST: ${{ vars.APP_GO_TEST || "false" }}
+  
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN || "" }}
+  
+  PROMETHEUS_CONTAINER: ${{ vars.PROMETHEUS_CONTAINER || "typovraktvprometheus" }}
+  PROMETHEUS_PORT: ${{ vars.PROMETHEUS_PORT || "8082" }}
+  
+  GRAFANA_CONTAINER: ${{ vars.GRAFANA_CONTAINER || "typovraktvgrafana" }}
+  GRAFANA_PORT: ${{ vars.GRAFANA_PORT || "8083" }}
+  GRAFANA_HOST: ${{ vars.GRAFANA_HOST || "" }}
+  GRAFANA_USER: ${{ vars.GRAFANA_USER || "typovrak" }}
+  GRAFANA_PASSWORD: ${{ vars.GRAFANA_PASSWORD || "typovrak" }}
+  GRAFANA_SMTP_ENABLED: ${{ vars.GRAFANA_SMTP_ENABLED || "false" }}
+  GRAFANA_SMTP_HOST: ${{vars.GRAFANA_SMTP_HOST || "" }}
+  GRAFANA_SMTP_USER: ${{vars.GRAFANA_SMTP_USER || "" }}
+  GRAFANA_SMTP_PASSWORD: ${{vars.GRAFANA_SMTP_PASSWORD || "" }}
+  GRAFANA_USER_ID: ${{ vars.GRAFANA_USER_ID || "" }}
+  
+  NODE_EXPORTER_CONTAINER: ${{ vars.NODE_EXPORTER_CONTAINER || "typovraktvnodeexporter" }}
+  NODE_EXPORTER_PORT: ${{ vars.NODE_EXPORTER_PORT || "8084" }}
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Build the Docker image
+      run: docker compose build
