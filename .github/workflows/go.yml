@@ -7,12 +7,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
+    
     steps:
     - uses: actions/checkout@v4
-
+    
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
@@ -21,15 +21,11 @@ jobs:
     - name: build
       run: cd ./app && go build -v
 
-    - name: test and generate coverage artifact
+    - name: test and generate coverage.txt
       run: cd ./app && make coverage
 
-    # - name: upload coverage report
-    #   uses: actions/upload-artifact@v4
-    #   with:
-    #     name: coverage-report
-    #     path: ./app/coverage.out
-    #     retention-days: 7
+    - name: format
+      run: if [ "$(gofmt -s -l . | wc -l)" -gt 0 ]; then exit 1; fi
         
     - name: upload coverage reports to codecov
       uses: codecov/codecov-action@v5
