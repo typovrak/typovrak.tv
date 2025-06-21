@@ -30,3 +30,7 @@ jobs:
         name: coverage-report
         path: ./app/coverage.out
         retention-days: 7
+        
+    - name: Upload to Codecov
+      uses: codecov/codecov-action@v3
+      if: success()
