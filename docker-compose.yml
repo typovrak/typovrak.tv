@@ -8,6 +8,8 @@ services:
     environment:
       APP_PORT: ${APP_PORT}
       APP_URL: ${APP_URL}
+      APP_WEB_PATH: ${APP_WEB_PATH}
+      APP_GO_TEST: ${APP_GO_TEST}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - '${APP_PORT}:${APP_PORT}'
