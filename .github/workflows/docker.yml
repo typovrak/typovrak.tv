@@ -57,9 +57,8 @@ jobs:
 
     - name: Analyze image layers with Dive
       run: |
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest typovraktv-app:latest --ci
-        # Seuil de 80% d'efficacité (ajustable)
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive:latest typovraktv-app:latest --ci --lowestEfficiency 0.9
         if [ $? -ne 0 ]; then
-          echo "Dive analysis failed - image efficiency too low"
+          echo "dive analysis failed, image efficiency below 90%"
           exit 1
         fi
