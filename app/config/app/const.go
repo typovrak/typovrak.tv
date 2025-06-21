@@ -10,13 +10,3 @@ const (
 	InstagramURL string = "https://www.instagram.com/typovrak"
 	TikTokURL    string = "https://www.tiktok.com/@typovrak"
 )
-
-var (
-	WebPath string
-	GoTest  bool
-)
-
-func InitConst() {
-	WebPath = "./web/"
-	GoTest = false
-}

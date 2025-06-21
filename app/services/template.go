@@ -4,7 +4,6 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"typovraktv/config/app"
 )
 
 type TemplateName string
@@ -115,7 +114,7 @@ func RenderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 
 	for i := 0; i < len(templateParams.Files); i++ {
 		if templateParams.Files[i].Html {
-			parsedFiles = append(parsedFiles, app.WebPath+templateParams.Files[i].Path+".html")
+			parsedFiles = append(parsedFiles, os.Getenv("APP_WEB_PATH")+templateParams.Files[i].Path+".html")
 		}
 	}
 

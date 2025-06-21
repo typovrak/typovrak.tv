@@ -2,9 +2,9 @@ package routes
 
 import (
 	"net/http"
-	"typovraktv/config/app"
+	"os"
 )
 
 func Assets() {
-	http.Handle("GET /assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(app.WebPath+"assets/"))))
+	http.Handle("GET /assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir(os.Getenv("APP_WEB_PATH")+"assets/"))))
 }

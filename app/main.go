@@ -10,7 +10,6 @@ import (
 
 func main() {
 	app.RequireEnv()
-	app.InitConst()
 
 	routes.Metrics()
 	routes.Assets()

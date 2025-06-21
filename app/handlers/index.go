@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"os"
 	"typovraktv/config/app"
 	"typovraktv/services"
 )
@@ -14,7 +15,7 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if app.GoTest == false {
+	if os.Getenv("APP_GO_TEST") == "false" {
 		repos, err := services.FetchGitHubRepos(http.DefaultClient, "", 100)
 		if err != nil {
 			http.Error(w, "error while fetching github repos : "+err.Error(), 500)
