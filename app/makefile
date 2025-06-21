@@ -1,5 +1,5 @@
 CURRENT_DATE=$(shell date +%Y-%m-%dT%H:%M:%S%z)
-COVERAGE_FILE=./coverage.out
+COVERAGE_FILE=./coverage.txt
 
 .PHONY: test
 test:
