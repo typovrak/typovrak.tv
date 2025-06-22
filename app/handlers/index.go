@@ -28,9 +28,7 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println(nixosRepos)
-		log.Println(starsCount)
-		log.Println(forksCount)
+		log.Println(nixosRepos, starsCount, forksCount)
 	}
 
 	services.RenderTemplate(w, services.TemplateParameters{
@@ -40,7 +38,8 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 			MetaDescription: "HOME meta description",
 		},
 		Files: []services.TemplateFile{
-			services.TemplateFiles.Globals.Pico,
+			services.TemplateFiles.Component.IconGitHub,
+			services.TemplateFiles.Component.ButtonIcon,
 			services.TemplateFiles.Layout.Base,
 			services.TemplateFiles.Layout.Header,
 			services.TemplateFiles.Layout.Footer,
