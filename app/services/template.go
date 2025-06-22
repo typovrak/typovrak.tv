@@ -29,9 +29,10 @@ type TemplateFile struct {
 
 var TemplateFiles = struct {
 	Global struct {
-		Pico   TemplateFile
-		Reset  TemplateFile
-		Config TemplateFile
+		Pico      TemplateFile
+		Reset     TemplateFile
+		Config    TemplateFile
+		Variables TemplateFile
 	}
 	Layout struct {
 		Base   TemplateFile
@@ -49,9 +50,10 @@ var TemplateFiles = struct {
 	}
 }{
 	Global: struct {
-		Pico   TemplateFile
-		Reset  TemplateFile
-		Config TemplateFile
+		Pico      TemplateFile
+		Reset     TemplateFile
+		Config    TemplateFile
+		Variables TemplateFile
 	}{
 		Pico: TemplateFile{
 			Path: "globals/pico",
@@ -67,6 +69,12 @@ var TemplateFiles = struct {
 		},
 		Config: TemplateFile{
 			Path: "globals/config",
+			Html: false,
+			Css:  true,
+			Js:   false,
+		},
+		Variables: TemplateFile{
+			Path: "globals/variables",
 			Html: false,
 			Css:  true,
 			Js:   false,

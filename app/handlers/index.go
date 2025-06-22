@@ -43,6 +43,9 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 			services.TemplateFiles.Layout.Base,
 			services.TemplateFiles.Layout.Header,
 			services.TemplateFiles.Layout.Footer,
+			services.TemplateFiles.Global.Reset,
+			services.TemplateFiles.Global.Variables,
+			services.TemplateFiles.Global.Config,
 			services.TemplateFiles.View.Index,
 		},
 	})

@@ -1,3 +1,50 @@
 .button-icon {
-	background: red;
+	--size: 40px;
+	--gap: 4px;
+	--size-icon: calc(var(--size) - var(--gap) * 4);
+	--font-size: 16px;
+
+	align-items: center;
+	background: rgb(var(--color-cpm-green));
+	border-radius: 6px;
+	box-shadow: rgba(var(--color-cpm-green), 0.3) 0px 10px 15px -3px, rgba(var(--color-cpm-green), 0.3) 0px 4px 6px -2px;
+	display: flex;
+	height: var(--size);
+	justify-content: center;
+	padding: 0 24px;
+	position: relative;
+	transition: box-shadow 0.3s ease-in-out, transform 0.3s ease-in-out;
+	white-space: nowrap;
+
+
+	.button-icon-icon {
+		background: rgb(var(--color-cpm-crust));
+		border-radius: 4px;
+		height: var(--size-icon);
+		left: var(--gap);
+		padding: var(--gap);
+		position: absolute;
+		top: var(--gap);
+		transition: width 0.3s ease-in-out;
+		width: var(--size-icon);
+
+		svg {
+			stroke: rgb(var(--color-cpm-green));
+		}
+	}
+
+	.button-icon-title {
+		color: rgb(var(--color-cpm-crust));
+		font-size: var(--font-size);
+		padding-left: var(--size-icon);
+	}
+
+	&:hover {
+		box-shadow: rgba(var(--color-cpm-green), 0.3) 0px 20px 25px -5px, rgba(var(--color-cpm-green), 0.3) 0px 10px 10px -5px;
+		transform: rotate(1deg);
+
+		.button-icon-icon {
+			width: calc(100% - var(--gap) * 4);
+		}
+	}
 }
