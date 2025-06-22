@@ -28,8 +28,10 @@ type TemplateFile struct {
 }
 
 var TemplateFiles = struct {
-	Globals struct {
-		Pico TemplateFile
+	Global struct {
+		Pico   TemplateFile
+		Reset  TemplateFile
+		Config TemplateFile
 	}
 	Layout struct {
 		Base   TemplateFile
@@ -41,12 +43,30 @@ var TemplateFiles = struct {
 		NotFound TemplateFile
 		User     TemplateFile
 	}
+	Component struct {
+		IconGitHub TemplateFile
+		ButtonIcon TemplateFile
+	}
 }{
-	Globals: struct {
-		Pico TemplateFile
+	Global: struct {
+		Pico   TemplateFile
+		Reset  TemplateFile
+		Config TemplateFile
 	}{
 		Pico: TemplateFile{
 			Path: "globals/pico",
+			Html: false,
+			Css:  true,
+			Js:   false,
+		},
+		Reset: TemplateFile{
+			Path: "globals/reset",
+			Html: false,
+			Css:  true,
+			Js:   false,
+		},
+		Config: TemplateFile{
+			Path: "globals/config",
 			Html: false,
 			Css:  true,
 			Js:   false,
@@ -91,6 +111,23 @@ var TemplateFiles = struct {
 			Path: "views/not_found",
 			Html: true,
 			Css:  false,
+			Js:   false,
+		},
+	},
+	Component: struct {
+		IconGitHub TemplateFile
+		ButtonIcon TemplateFile
+	}{
+		IconGitHub: TemplateFile{
+			Path: "components/icon_github",
+			Html: true,
+			Css:  false,
+			Js:   false,
+		},
+		ButtonIcon: TemplateFile{
+			Path: "components/button_icon",
+			Html: true,
+			Css:  true,
 			Js:   false,
 		},
 	},

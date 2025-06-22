@@ -16,7 +16,7 @@ func GetNotFound(w http.ResponseWriter, _ *http.Request) {
 			MetaDescription: "NOT FOUND meta description",
 		},
 		Files: []services.TemplateFile{
-			services.TemplateFiles.Globals.Pico,
+			services.TemplateFiles.Global.Pico,
 			services.TemplateFiles.Layout.Base,
 			services.TemplateFiles.Layout.Header,
 			services.TemplateFiles.Layout.Footer,
