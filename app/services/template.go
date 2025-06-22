@@ -20,6 +20,10 @@ type TemplateHead struct {
 	OgImage         string
 }
 
+type TemplateHeader struct {
+	ButtonIconGitHub string
+}
+
 type TemplateFile struct {
 	Path string
 	Html bool
@@ -142,15 +146,17 @@ var TemplateFiles = struct {
 }
 
 type TemplateParameters struct {
-	Name  TemplateName
-	Head  TemplateHead
-	Files []TemplateFile
+	Name   TemplateName
+	Head   TemplateHead
+	Files  []TemplateFile
+	Header TemplateHeader
 }
 
 type TemplateParametersGlobal struct {
 	Name   TemplateName
 	Head   TemplateHead
 	Files  []TemplateFile
+	Header TemplateHeader
 	AppUrl string
 }
 
@@ -169,6 +175,7 @@ func RenderTemplate(w http.ResponseWriter, templateParams TemplateParameters) {
 		Name:   templateParams.Name,
 		Head:   templateParams.Head,
 		Files:  templateParams.Files,
+		Header: templateParams.Header,
 		AppUrl: os.Getenv("APP_URL"),
 	}
 

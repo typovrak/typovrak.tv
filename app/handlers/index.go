@@ -48,5 +48,8 @@ func GetIndex(w http.ResponseWriter, r *http.Request) {
 			services.TemplateFiles.Global.Config,
 			services.TemplateFiles.View.Index,
 		},
+		Header: services.TemplateHeader{
+			ButtonIconGitHub: "GitHub",
+		},
 	})
 }
