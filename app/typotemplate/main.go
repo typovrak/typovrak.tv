@@ -44,7 +44,7 @@ type TitleBrandProps struct {
 
 func TitleBrand(props TitleBrandProps) string {
 	return "<a   href=\"/\" class=\"\" >   " +
-		"typovrak" +
+		"typovrakéé`eèè˙çç  ^💜" +
 		props.Suffix +
 		"  </a>"
 }
@@ -85,19 +85,19 @@ func Tokenize(html string) []Token {
 	var tokens []Token
 	var buffer bytes.Buffer
 
+	// TODO: perhaps use rune() here
 	for i := 0; i < len(html); i++ {
-		// TODO: perhaps use rune() here
 		char := html[i]
 
-		switch {
-		case char == '<':
+		switch char {
+		case '<':
 			if buffer.Len() > 0 {
 				tokens = append(tokens, Token{Type: TokenText, Value: buffer.String()})
 				buffer.Reset()
 			}
 
-		case char == '>':
-			tokens = append(tokens, parseTag(buffer.String()))
+		case '>':
+			tokens = parseTag(tokens, buffer.String())
 			buffer.Reset()
 
 		default:
@@ -108,25 +108,42 @@ func Tokenize(html string) []Token {
 	return tokens
 }
 
-func parseTag(tagContent string) Token {
+func parseTag(tokens []Token, tagContent string) []Token {
 	if strings.HasPrefix(tagContent, "/") {
-		return Token{Type: TokenCloseTag, Value: tagContent[1:]}
+		tokens = append(tokens, Token{Type: TokenCloseTag, Value: tagContent[1:]})
+		return tokens
 	}
 
 	parts := strings.Fields(tagContent)
-	tagName := parts[0]
-	// Gérer les attributs ici...
-	return Token{Type: TokenOpenTag, Value: tagName}
+
+	// TEST: key without value
+	for i := 1; i < len(parts); i++ {
+		tokens = append(tokens, Token{Type: TokenAttribute, Value: parts[i]})
+	}
+
+	tokens = append(tokens, Token{Type: TokenOpenTag, Value: parts[0]})
+
+	fmt.Println(tokens)
+
+	fmt.Println("parts", parts)
+
+	return tokens
 }
 
 func minify(tokens []Token) string {
 	var builder strings.Builder
 	for _, token := range tokens {
 		switch token.Type {
+		// TODO: add intag
 		case TokenOpenTag:
 			builder.WriteString("<" + token.Value + ">")
+
 		case TokenCloseTag:
 			builder.WriteString("</" + token.Value + ">")
+
+		case TokenAttribute:
+			builder.WriteString(token.Value)
+
 		case TokenText:
 			builder.WriteString(strings.TrimSpace(token.Value))
 		}
