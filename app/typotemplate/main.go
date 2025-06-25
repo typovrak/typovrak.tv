@@ -46,7 +46,10 @@ func TitleBrand(props TitleBrandProps) string {
 	return "<a   href=\"/\" class=\"\" >   " +
 		"typovrakéé`eèè˙çç  ^💜" +
 		props.Suffix +
-		"  </a>"
+		"  </a>" +
+		"<div class=\"test \"></div>" +
+		"<div    data-content=\"   \" title=\" test \"></div>" +
+		"<p class=\"coucou bonjour  test aurevoir\"></p>"
 }
 
 func PageIndex() string {
@@ -85,7 +88,6 @@ func Tokenize(html string) []Token {
 	var tokens []Token
 	var buffer bytes.Buffer
 
-	// TODO: perhaps use rune() here
 	for i := 0; i < len(html); i++ {
 		char := html[i]
 
@@ -115,37 +117,73 @@ func parseTag(tokens []Token, tagContent string) []Token {
 	}
 
 	parts := strings.Fields(tagContent)
+	tokens = append(tokens, Token{Type: TokenOpenTag, Value: parts[0]})
 
 	// TEST: key without value
 	for i := 1; i < len(parts); i++ {
 		tokens = append(tokens, Token{Type: TokenAttribute, Value: parts[i]})
 	}
 
-	tokens = append(tokens, Token{Type: TokenOpenTag, Value: parts[0]})
-
 	fmt.Println(tokens)
-
 	fmt.Println("parts", parts)
+	fmt.Println()
 
 	return tokens
 }
 
 func minify(tokens []Token) string {
 	var builder strings.Builder
-	for _, token := range tokens {
-		switch token.Type {
+	// lastAttribute := ""
+
+	// WARN: do everything to manage the spacing for the next element.
+	for i := 0; i < len(tokens); i++ {
+		switch tokens[i].Type {
 		// TODO: add intag
 		case TokenOpenTag:
-			builder.WriteString("<" + token.Value + ">")
+			s := "<" + tokens[i].Value
+
+			if tokens[i+1].Type != TokenAttribute {
+				s += ">"
+			} else {
+				s += " "
+			}
+
+			builder.WriteString(s)
 
 		case TokenCloseTag:
-			builder.WriteString("</" + token.Value + ">")
+			builder.WriteString("</" + tokens[i].Value + ">")
 
 		case TokenAttribute:
-			builder.WriteString(token.Value)
+			s := tokens[i].Value
+
+			if tokens[i+1].Type != TokenAttribute {
+				s += ">"
+			} else {
+				s += " "
+			}
+
+			// store attribute name in lastAttribute
+			// split := strings.Split(tokens[i].Value, "=")
+
+			// if len(split) > 0 {
+			//	lastAttribute = split[0]
+
+			//	content := split[:1]
+			//}
+
+			//// check if the other one is an attribute
+			//// remove all whitespaces
+			//// close the attribute
+
+			//if len(tokens[i].Value) >= 5 && tokens[i].Value[:5] == "class" {
+			//	// remove trailing whitespace in class
+			//	tokens[i].Value = "class=\"" + strings.Trim(tokens[i].Value, " \"'") + "\""
+			//}
+
+			builder.WriteString(s)
 
 		case TokenText:
-			builder.WriteString(strings.TrimSpace(token.Value))
+			builder.WriteString(strings.TrimSpace(tokens[i].Value))
 		}
 	}
 	return builder.String()
