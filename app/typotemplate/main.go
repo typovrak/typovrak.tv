@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+// TODO: je veux que le résultat de < useoathueoastn > -> </>
+// < uasthnueo />
+// <img /> <img >
+// node-html-parser
+// regarder le parser html chrome
+
+// WARN: no regex challenge and no depedencies.
+
 // étapes
 // 1. créer un composant
 // 		* qui est une fonction golang
@@ -77,9 +85,12 @@ type Token struct {
 type TokenType int
 
 const (
-	TokenOpenTag TokenType = iota
-	TokenCloseTag
-	TokenAttribute
+	TokenTagOpen TokenType = iota
+	TokenTagClose
+
+	TokenAttributeKey
+	TokenAttributeValue
+
 	TokenText
 )
 
@@ -110,22 +121,65 @@ func Tokenize(html string) []Token {
 	return tokens
 }
 
-func parseTag(tokens []Token, tagContent string) []Token {
-	if strings.HasPrefix(tagContent, "/") {
-		tokens = append(tokens, Token{Type: TokenCloseTag, Value: tagContent[1:]})
+func parseTag(tokens []Token, buffer string) []Token {
+	if strings.HasPrefix(buffer, "/") {
+		tokens = append(tokens, Token{Type: TokenTagClose, Value: buffer[1:]})
 		return tokens
 	}
 
-	parts := strings.Fields(tagContent)
-	tokens = append(tokens, Token{Type: TokenOpenTag, Value: parts[0]})
+	// WARN: string.Fields() this will split attributes and remove whitespace from TokenText also so no terminal cli website...
+	fmt.Println("PARTS:", buffer)
+
+	var bufferParts []string
+
+	// manage \" as non delimiter
+	delimiter := ""
+	currentString := ""
+
+	// DOC: RFC attributes delimiter can only be " or ' (or > for ending)
+	// [Page 14] https://www.ietf.org/rfc/rfc1866.txt
+	for i := 0; i < len(buffer); i++ {
+		char := string(buffer[i])
+
+		// whitespace between tags/attributes
+		if char == " " && delimiter == "" {
+			if len(currentString) > 0 {
+				bufferParts = append(bufferParts, currentString)
+				fmt.Println("currentString:", currentString)
+				currentString = ""
+			}
+
+			continue
+		}
+
+		// start delimiter
+		// based on RFC HTML attributes delimiters
+		if char == "\"" || char == "'" {
+			delimiter = char
+			currentString += "\""
+			continue
+		}
+
+		// end delimiter
+		// based on RFC HTML attributes delimiters
+		if char == "\"" || char == "'" || char == ">" {
+			delimiter = ""
+			currentString += "\""
+			continue
+		}
+
+		currentString += string(buffer[i])
+	}
+
+	tokens = append(tokens, Token{Type: TokenTagOpen, Value: bufferParts[0]})
 
 	// TEST: key without value
-	for i := 1; i < len(parts); i++ {
-		tokens = append(tokens, Token{Type: TokenAttribute, Value: parts[i]})
+	for i := 1; i < len(bufferParts); i++ {
+		tokens = append(tokens, Token{Type: TokenAttribute, Value: bufferParts[i]})
 	}
 
 	fmt.Println(tokens)
-	fmt.Println("parts", parts)
+	fmt.Println("parts", bufferParts)
 	fmt.Println()
 
 	return tokens
@@ -139,7 +193,7 @@ func minify(tokens []Token) string {
 	for i := 0; i < len(tokens); i++ {
 		switch tokens[i].Type {
 		// TODO: add intag
-		case TokenOpenTag:
+		case TokenTagOpen:
 			s := "<" + tokens[i].Value
 
 			if tokens[i+1].Type != TokenAttribute {
@@ -150,7 +204,7 @@ func minify(tokens []Token) string {
 
 			builder.WriteString(s)
 
-		case TokenCloseTag:
+		case TokenTagClose:
 			builder.WriteString("</" + tokens[i].Value + ">")
 
 		case TokenAttribute:
