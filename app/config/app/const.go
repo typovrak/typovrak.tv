@@ -4,9 +4,9 @@ const (
 	Name               string = "Typovrak TV"
 	MetaTitleDelimiter string = " - "
 
-	YouTubeURL   string = "https://www.youtube.com/@typovrak_tv"
+	YouTubeURL   string = "https://www.youtube.com/@typovrak"
 	DiscordURL   string = "https://discord.gg/ZDN7CYAGpx"
-	CoffeeURL    string = "https://coffee.com"
+	CoffeeURL    string = "https://coff.ee/typovrak"
 	InstagramURL string = "https://www.instagram.com/typovrak"
 	TikTokURL    string = "https://www.tiktok.com/@typovrak"
 
