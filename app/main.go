@@ -21,6 +21,10 @@ func main() {
 	routes.Coffee()
 	routes.Instagram()
 	routes.TikTok()
+	routes.GitHub()
+	routes.Malt()
+	routes.LinkedIn()
+	routes.SuperProf()
 
 	log.Println("Server listening on port :", os.Getenv("APP_PORT"))
 	if err := http.ListenAndServe(":"+os.Getenv("APP_PORT"), nil); err != nil {

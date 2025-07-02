@@ -118,4 +118,92 @@ func TestRoutesRedirections(t *testing.T) {
 			t.Errorf("expected Location header %q, got %q", locationWanted, location)
 		}
 	})
+
+	t.Run("redirecting from /github to github account", func(t *testing.T) {
+		routes.GitHub()
+		route := "/github"
+		locationWanted := app.GitHubURL
+
+		req := httptest.NewRequest("GET", route, nil)
+		rec := httptest.NewRecorder()
+
+		http.DefaultServeMux.ServeHTTP(rec, req)
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != 302 {
+			t.Errorf("expected status 302, got %d", res.StatusCode)
+		}
+
+		location := res.Header.Get("Location")
+		if location != locationWanted {
+			t.Errorf("expected Location header %q, got %q", locationWanted, location)
+		}
+	})
+
+	t.Run("redirecting from /malt to malt account", func(t *testing.T) {
+		routes.Malt()
+		route := "/malt"
+		locationWanted := app.MaltURL
+
+		req := httptest.NewRequest("GET", route, nil)
+		rec := httptest.NewRecorder()
+
+		http.DefaultServeMux.ServeHTTP(rec, req)
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != 302 {
+			t.Errorf("expected status 302, got %d", res.StatusCode)
+		}
+
+		location := res.Header.Get("Location")
+		if location != locationWanted {
+			t.Errorf("expected Location header %q, got %q", locationWanted, location)
+		}
+	})
+
+	t.Run("redirecting from /superprof to superprof account", func(t *testing.T) {
+		routes.SuperProf()
+		route := "/superprof"
+		locationWanted := app.SuperProfURL
+
+		req := httptest.NewRequest("GET", route, nil)
+		rec := httptest.NewRecorder()
+
+		http.DefaultServeMux.ServeHTTP(rec, req)
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != 302 {
+			t.Errorf("expected status 302, got %d", res.StatusCode)
+		}
+
+		location := res.Header.Get("Location")
+		if location != locationWanted {
+			t.Errorf("expected Location header %q, got %q", locationWanted, location)
+		}
+	})
+
+	t.Run("redirecting from /linkedin to linkedin account", func(t *testing.T) {
+		routes.LinkedIn()
+		route := "/linkedin"
+		locationWanted := app.LinkedInURL
+
+		req := httptest.NewRequest("GET", route, nil)
+		rec := httptest.NewRecorder()
+
+		http.DefaultServeMux.ServeHTTP(rec, req)
+		res := rec.Result()
+		defer res.Body.Close()
+
+		if res.StatusCode != 302 {
+			t.Errorf("expected status 302, got %d", res.StatusCode)
+		}
+
+		location := res.Header.Get("Location")
+		if location != locationWanted {
+			t.Errorf("expected Location header %q, got %q", locationWanted, location)
+		}
+	})
 }
