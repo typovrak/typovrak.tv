@@ -3,9 +3,11 @@
 - [x] use the catppuccin mocha green theme
 
 - [x] vercel auto-deployment
-- [ ] enable vercel features like RGPD like tracking and core web vitals
+- [x] enable vercel features like RGPD like tracking and core web vitals
+- [ ] replace the current favicon by typovrak's logo
 
 - [ ] create a Supabase database for this project
+- [ ] create .env and .env.example with all needed credentials
 - [ ] legal notice page
 - [ ] accessibility optimization
 

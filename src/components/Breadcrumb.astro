@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
+import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
 import { stripBase, stripLocale } from "@/utils/withBase";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -65,7 +66,10 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
       <a href={getRelativeLocaleUrl(locale, "")} class="opacity-80">
         {t.nav.home}
       </a>
-      <span aria-hidden="true" class="opacity-80">&raquo;</span>
+      <IconChevronRight
+        aria-hidden="true"
+        class="size-4 opacity-80 rtl:rotate-180"
+      />
     </li>
     {
       breadcrumbList.map((breadcrumb, index) =>
@@ -87,9 +91,10 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
             >
               {navLabels[breadcrumb] ?? decodeSegment(breadcrumb)}
             </a>
-            <span aria-hidden="true" class="opacity-70">
-              &raquo;
-            </span>
+            <IconChevronRight
+              aria-hidden="true"
+              class="size-4 opacity-70 rtl:rotate-180"
+            />
           </li>
         )
       )

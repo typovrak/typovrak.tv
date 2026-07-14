@@ -1,5 +1,6 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
+import Logo from "@/assets/brand/typovrak_logo.svg";
 import IconUnderline from "@/assets/icons/IconUnderline.svg";
 import IconMenuDeep from "@/assets/icons/IconMenuDeep.svg";
 import IconArchive from "@/assets/icons/IconArchive.svg";
@@ -50,8 +51,9 @@ const isActive = (path: string) => {
   >
     <a
       href={getRelativeLocaleUrl(locale, "")}
-      class="absolute py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:text-2xl sm:leading-none"
+      class="absolute flex items-center gap-x-2 py-1 text-xl leading-8 font-semibold whitespace-nowrap sm:static sm:my-auto sm:gap-x-2.5 sm:text-2xl sm:leading-none"
     >
+      <Logo aria-hidden="true" class="h-6 w-auto shrink-0 sm:h-7" />
       {site.title}
     </a>
     <nav
