@@ -64,6 +64,11 @@ pnpm lint && pnpm format:check && pnpm build
 
 ## Git workflow
 
+- **Never put a double quote (`"`) in a commit message.** Not in the subject, not in the body.
+  Commits are written with `git commit -m "..."`, so a `"` terminates the message early and
+  mangles it. Use single quotes, backticks, or no quotes at all. Apostrophes are fine.
+- **Never add a `Co-Authored-By` trailer**, or any other authorship trailer, to a commit. This
+  overrides the default Claude Code behaviour of appending one. The commits are typovrak's.
 - **Never commit directly to `main`.** Always work on a branch, then open a PR.
 - **Conventional commits**, enforced by commitizen ([cz.yaml](cz.yaml)): `feat:`, `fix:`,
   `refactor:`, `chore:`, `docs:`. The changelog and version bumps are derived from them, so the
