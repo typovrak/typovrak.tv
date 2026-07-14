@@ -1,5 +1,6 @@
 ---
 import Layout from "./Layout.astro";
+import { serialiseJsonLd } from "@/utils/jsonLd";
 import config from "@/config";
 
 type Props = {
@@ -58,7 +59,7 @@ const structuredData = {
     <script
       type="application/ld+json"
       is:inline
-      set:html={JSON.stringify(structuredData)}
+      set:html={serialiseJsonLd(structuredData)}
     />
   </Fragment>
 

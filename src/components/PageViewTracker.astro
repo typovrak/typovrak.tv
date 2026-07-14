@@ -1,0 +1,33 @@
+---
+// Records a view for every page. Rendered once, in the root layout.
+// Fills any `[data-page-views]` element on the page with the count, so a page
+// that wants to show it costs no extra request.
+---
+
+<script>
+  function trackView() {
+    const path = window.location.pathname;
+
+    fetch("/api/views", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ path }),
+    })
+      .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then(({ views }) => {
+        const format = new Intl.NumberFormat().format(views);
+        document
+          .querySelectorAll("[data-page-views]")
+          .forEach(el => (el.textContent = format));
+      })
+      .catch(() => {
+        document
+          .querySelectorAll("[data-page-views]")
+          .forEach(el => el.closest(".page-views")?.remove());
+      });
+  }
+
+  trackView();
+  // ClientRouter swaps the DOM without a reload, so each navigation is a view.
+  document.addEventListener("astro:after-swap", trackView);
+</script>

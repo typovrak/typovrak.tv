@@ -14,6 +14,7 @@ import ShareLinks from "./_components/ShareLinks.astro";
 import BackButton from "./_components/BackButton.astro";
 import BackToTopButton from "./_components/BackToTopButton.astro";
 import AdjacentPostNav from "./_components/AdjacentPostNav.astro";
+import PageViews from "@/components/PageViews.astro";
 import config from "@/config";
 
 export async function getStaticPaths() {
@@ -120,6 +121,8 @@ const ogImage = ogImageUrl
 
     <div class="my-2 flex items-center gap-2">
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+      <span aria-hidden="true" class="text-muted-foreground">|</span>
+      <PageViews class="text-muted-foreground" />
       <span
         aria-hidden="true"
         class:list={[

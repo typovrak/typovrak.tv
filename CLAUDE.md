@@ -59,6 +59,44 @@ the values. The plain-call form `sql("SELECT ...")` shown in Neon's dashboard is
 snippet and does not type-check here. Use `sql.query("... WHERE slug = $1", [slug])` when the
 query is built at runtime. Never concatenate SQL.
 
+Schema lives in [db/schema.sql](db/schema.sql), applied by hand with `psql`. There is no
+migration tool, so every statement must stay idempotent.
+
+**Table names are singular**: `page_view`, `page_view_event`. A row is one thing, not a set.
+
+**Normalised by default.** Store facts, derive the rest at query time. Do not add a column that
+restates what another table already holds.
+
+**Denormalise only with a reason, and keep it rebuildable.** A cached aggregate is a second
+source of truth, so it may only exist when the read cost genuinely justifies it, and it must be
+reconstructible from the events in one SQL statement (see the rebuild query at the bottom of
+[db/schema.sql](db/schema.sql)). Write it in the same transaction as the event it summarises,
+never in a second round-trip. `page_view` is the standing example: `count(*)` over the event log
+is O(rows) and would run on every single page load, so the aggregate is worth its cost.
+
+On-demand routes are CSRF-protected by Astro: a POST without a matching `Origin` header gets a
+403, so `curl` needs `-H "Origin: ..."` to reach one. This is what stops another site from
+POSTing to the view counter.
+
+## Page views
+
+Every page is tracked, not just posts. `PageViewTracker` sits in [Layout.astro](src/layouts/Layout.astro)
+and POSTs the current pathname to `/api/views`; any `[data-page-views]` element on the page is
+then filled with the returned count, so displaying it costs no second request.
+
+`/api/views` only accepts a path that [knownPaths.ts](src/utils/knownPaths.ts) recognises,
+otherwise anyone could POST junk paths and grow the table without bound. That module derives the
+valid set: static pages come from `import.meta.glob` (a new page is picked up on its own), and
+posts, tag pages and pagination are rebuilt from the collection.
+
+**Those derived paths must match `getStaticPaths` exactly.** They duplicate the route logic, so
+they drift the moment a route changes its pagination or slug rules. When touching either side,
+verify by diffing against the real build output rather than by reading the code:
+
+```sh
+find .vercel/output/static -name '*.html' | sed 's|.vercel/output/static||; s|/index.html$||'
+```
+
 `DATABASE_URL` is declared in the `astro:env` schema as `access: "secret", context: "server"`,
 so importing it from client code is a build error rather than a leak. It lives in `.env`
 locally (gitignored, see [.env.example](.env.example)) and in the Vercel project settings for
@@ -81,6 +119,7 @@ is pnpm-only and a stray `package-lock.json` is a mistake, not a fallback):
 
 ```sh
 pnpm lint          # eslint
+pnpm test          # vitest run
 pnpm format        # prettier --write
 pnpm format:check  # prettier --check (what CI runs)
 pnpm build         # astro check + astro build + pagefind
@@ -88,11 +127,29 @@ pnpm build         # astro check + astro build + pagefind
 
 ## Before proposing a commit
 
-Run all three, and report real results — CI runs exactly these and nothing else:
+Run all four, and report real results — CI runs exactly these and nothing else:
 
 ```sh
-pnpm lint && pnpm format:check && pnpm build
+pnpm lint && pnpm test && pnpm format:check && pnpm build
 ```
+
+## Tests
+
+**Vitest**, no end-to-end. Files are `src/**/*.test.ts`, co-located with what they test.
+
+Tests must not need Astro to boot. That is why the fragile logic lives in plain modules
+([paths.ts](src/utils/paths.ts), [requestInfo.ts](src/utils/requestInfo.ts)) that import nothing
+from `astro:*`, while the modules that do (`knownPaths.ts`, API routes) only wire them together.
+Keep new logic on the testable side of that line rather than reaching for `getViteConfig` and
+mocking the content layer.
+
+Write the test so it can fail. After writing one, break the implementation and check it goes
+red — a test that passes against broken code is worse than no test, because it grants
+confidence it has not earned.
+
+What is worth covering: pagination maths, path normalisation, and the GDPR guarantees (referrer
+reduced to a host, user-agent reduced to a device class). What unit tests **cannot** catch here
+is `knownPaths.ts` drifting from `getStaticPaths` — only the build diff shows that.
 
 ## Git workflow
 
@@ -209,6 +266,62 @@ Banned, because they are what makes text read as AI-written:
 
 The tell to check for: if a sentence exists for *rhythm* rather than *information*, cut it.
 Read it back and ask what fact the reader gained. If none, it goes.
+
+## GDPR
+
+**Hard requirement.** typovrak is in France, so the CNIL is the regulator. When a feature could
+collect anything about a visitor, minimisation wins over usefulness. If a field is not needed
+for a question actually being asked, it is not collected. None of this is legal advice; the
+rules below are the engineering floor, not a compliance sign-off.
+
+The site sets **no cookie and no localStorage** for analytics, and must stay that way. That is
+what keeps ePrivacy art. 5(3) out of scope: consent is only required to read or write on the
+visitor's device. A server-side counter touches nothing, so no consent banner. Introducing any
+client-side identifier (cookie, localStorage id, fingerprint) reopens this and forces a banner.
+
+Never store, whatever the temptation:
+
+- **IP address**, even hashed. Pseudonymised data is still personal data (GDPR recital 26). The
+  CNIL requires truncating at least the last byte if an IP is kept at all. We do not need one.
+- **Full user-agent string.** It is a fingerprinting vector. Coarse derivations (`mobile` vs
+  `desktop`) are fine; the raw string is not.
+- **Full referrer URL.** Query strings carry search terms and private tokens. Keep the host only.
+- Any stable per-visitor identifier, which would turn a counter into tracking.
+
+Safe to store: post slug, timestamp, referrer host, country (`x-vercel-ip-country` is coarse
+enough), and a coarse device class.
+
+Also required:
+
+- **Retention.** The CNIL caps audience-measurement data at 25 months. Purge older rows.
+- **Purpose limitation.** Audience measurement only. Do not cross-reference these rows with
+  anything else, and do not pass them to a third party.
+- **Information and objection.** The privacy page must say what is collected and how to object.
+
+`@vercel/analytics` and `@vercel/speed-insights` are cookieless but are still a processor
+handling visitor data, so they belong in the privacy page.
+
+## Security
+
+**SQL injection.** Every query is a tagged template, which parameterises interpolated values.
+Never build SQL by concatenation, and never use `sql.unsafe()` on anything that reached us from
+a request. `sql.query("... WHERE x = $1", [v])` is the form for a query built at runtime.
+
+**XSS.** Astro escapes `{expr}` in both text and attribute position, including quotes, so
+content cannot break out on its own. The hole is `set:html`, which bypasses that. There is one
+use of it, for the JSON-LD block, and it goes through
+[serialiseJsonLd](src/utils/jsonLd.ts): `JSON.stringify` does not escape `<`, so a post title
+containing `</script>` would otherwise close the tag and inject markup. Do not add another
+`set:html` without a reason, and never with a value that came from a request.
+
+**Request headers are attacker-controlled**, including the `x-vercel-*` ones when a request does
+not come through Vercel's edge. Validate them to a known shape before storing rather than
+trusting them: see `countryCode` and `referrerHost` in [requestInfo.ts](src/utils/requestInfo.ts).
+Parameterised queries stop injection, but they do not stop garbage being stored and read back.
+
+**Do not grep the built HTML for a payload to check for XSS.** It gives false positives: a
+payload sitting inside a quoted attribute or already escaped to `&quot;` still matches. Read the
+rendered tag instead.
 
 ## Answering in chat
 

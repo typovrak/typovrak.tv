@@ -39,6 +39,9 @@ jobs:
       - name: "🔎 Lint code"
         run: pnpm run lint
 
+      - name: "🧪 Run tests"
+        run: pnpm run test
+
       - name: "📝 Checking code format"
         run: pnpm run format:check
 
