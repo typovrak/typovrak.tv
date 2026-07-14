@@ -1,6 +1,11 @@
 MIT License
 
+Copyright (c) 2026 Morgan Scholz (typovrak)
 Copyright (c) 2023 Sat Naing
+
+This site is built on the AstroPaper theme by Sat Naing
+(https://github.com/satnaing/astro-paper), used under the MIT License.
+The original copyright notice is retained above.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

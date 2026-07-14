@@ -10,25 +10,28 @@
   --font-app: var(--font-google-sans-code);
 }
 
-/* Light theme values */
+/* Catppuccin Latte — green accent */
 :root,
 [data-theme="light"] {
-  --background: #fdfdfd;
-  --foreground: #282728;
-  --accent: #006cac;
-  --accent-foreground: #ffffff;
-  --muted: #e6e6e6;
-  --muted-foreground: #6b7280;
-  --border: #ece9e9;
+  --background: #eff1f5; /* base */
+  --foreground: #4c4f69; /* text */
+  /* Latte green (#40a02b) at the same hue and saturation, darkened from 40%
+     to 23% lightness. --accent is used as a text color (post titles, links,
+     tags), and the stock value only reaches 2.96:1 on base — below AA. */
+  --accent: #255c19;
+  --accent-foreground: #eff1f5; /* base */
+  --muted: #ccd0da; /* surface0 */
+  --muted-foreground: #5c5f77; /* subtext1 */
+  --border: #bcc0cc; /* surface1 */
 }
 
-/* Dark theme values */
+/* Catppuccin Mocha — green accent */
 [data-theme="dark"] {
-  --background: #212737;
-  --foreground: #eaedf3;
-  --accent: #ff6b01;
-  --accent-foreground: #ffffff;
-  --muted: #343f60;
-  --muted-foreground: #afb9ca;
-  --border: #ab4b08;
+  --background: #1e1e2e; /* base */
+  --foreground: #cdd6f4; /* text */
+  --accent: #a6e3a1; /* green */
+  --accent-foreground: #11111b; /* crust */
+  --muted: #313244; /* surface0 */
+  --muted-foreground: #a6adc8; /* subtext0 */
+  --border: #45475a; /* surface1 */
 }

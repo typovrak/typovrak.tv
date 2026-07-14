@@ -7,6 +7,11 @@ dist/
 # dependencies
 node_modules/
 
+# this project is pnpm-only
+package-lock.json
+yarn.lock
+bun.lockb
+
 # logs
 npm-debug.log*
 yarn-debug.log*
