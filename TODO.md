@@ -2,7 +2,9 @@
 - [x] cleanup everything that is not needed
 - [x] use the catppuccin mocha green theme
 
-- [ ] vercel auto-deployment
+- [x] vercel auto-deployment
+- [ ] enable vercel features like RGPD like tracking and core web vitals
+
 - [ ] create a Supabase database for this project
 - [ ] legal notice page
 - [ ] accessibility optimization

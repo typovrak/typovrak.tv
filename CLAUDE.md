@@ -73,8 +73,26 @@ pnpm lint && pnpm format:check && pnpm build
 - **Conventional commits**, enforced by commitizen ([cz.yaml](cz.yaml)): `feat:`, `fix:`,
   `refactor:`, `chore:`, `docs:`. The changelog and version bumps are derived from them, so the
   prefix is load-bearing, not cosmetic.
-- Branch naming follows the commit type: `refactor/astro-paper-template`, `feat/...`, `fix/...`.
+- Branch naming follows the commit type: `type/short-description`, e.g. `feat/comments-section`,
+  `fix/og-fallback`, `refactor/astro-paper-template`, `chore/...`, `docs/...`. Lowercase, hyphens,
+  no issue numbers as a prefix. Delete the branch once it is merged.
 - `origin` is `typovrak/typovrak.tv`. `upstream` is the AstroPaper repo — never push there.
+
+### Archived history
+
+Dead work is kept as annotated `archive/*` **tags**, not branches. A tag is a fixed point in
+history, so it never shows up in the branch list, never goes stale, and keeps its commits safe
+from garbage collection. Branches are for work in progress only.
+
+The Go version of the site (wiped by `refactor: fresh start with nothing`) lives in these tags,
+all pre-dating the Astro rewrite:
+
+- `archive/golang-version` — the Go site as it stood before the wipe, also an ancestor of `main`
+- `archive/init-api` — Go API, routing, Prometheus and Grafana. Never merged
+- `archive/finish-testing` — Go test suite, makefiles, coverage. Never merged
+- `archive/go-templating` — Go templating engine experiment. Never merged, abandoned
+
+Restore one with `git switch -c <branch> archive/<tag>`. Never delete these tags.
 
 ## Content
 
