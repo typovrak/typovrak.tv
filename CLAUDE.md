@@ -28,9 +28,41 @@ attribution in [LICENSE](LICENSE) and [README.md](README.md), which must stay.
 
 ## Deployment
 
-**Vercel with SSR.** The project is not yet migrated: it currently builds static and has no
-adapter. The target state is `@astrojs/vercel` with `output: "server"` in [astro.config.ts](astro.config.ts).
-Do not add a different adapter or a `netlify.toml`.
+**Vercel**, via `@astrojs/vercel` with `output: "static"`. Do not add a different adapter or a
+`netlify.toml`, and do not switch to `output: "server"`.
+
+`"static"` does not mean no server. Pages are prerendered by default and a route opts into a
+Vercel function with `export const prerender = false`. A content blog should stay prerendered:
+`output: "server"` would make every page a function and force `prerender = true` everywhere to
+undo it. Only API routes touching the database need to opt out.
+
+Files under `src/pages/` whose name starts with `_` are not routed at all, so an endpoint named
+`_probe.ts` silently produces no function.
+
+## Database
+
+**Neon** (serverless Postgres) via `@neondatabase/serverless`, reached through
+[src/utils/db.ts](src/utils/db.ts). Only ever from routes with `prerender = false`.
+
+Stick to vanilla Postgres. No vendor-specific features, so the host stays swappable via
+`pg_dump`.
+
+The HTTP driver (`neon()`) sends each query as a one-shot fetch, which is what makes it fit
+serverless: nothing to pool, nothing to leak when a function freezes. The trade-off is no
+session, so no LISTEN/NOTIFY, no cursors and no interactive transactions.
+`sql.transaction([...])` batches into one non-interactive transaction, which is enough for a
+read-modify-write counter. If a session is ever genuinely needed, switch to `Pool` from the same
+package.
+
+**Queries must be tagged templates** — `` sql`... WHERE slug = ${slug}` `` — which parameterises
+the values. The plain-call form `sql("SELECT ...")` shown in Neon's dashboard is a JS starter
+snippet and does not type-check here. Use `sql.query("... WHERE slug = $1", [slug])` when the
+query is built at runtime. Never concatenate SQL.
+
+`DATABASE_URL` is declared in the `astro:env` schema as `access: "secret", context: "server"`,
+so importing it from client code is a build error rather than a leak. It lives in `.env`
+locally (gitignored, see [.env.example](.env.example)) and in the Vercel project settings for
+deploys. Never paste a connection string into source, chat or a commit.
 
 Note when touching the build: `pnpm build` runs `astro check && astro build && pagefind --site dist`
 then copies the Pagefind index into `public/`. Pagefind indexes the built output, so search only
@@ -178,9 +210,29 @@ Banned, because they are what makes text read as AI-written:
 The tell to check for: if a sentence exists for *rhythm* rather than *information*, cut it.
 Read it back and ask what fact the reader gained. If none, it goes.
 
+## Answering in chat
+
+Be short. A few sentences, or a handful of bullets. Long walls of text do not get read, so
+detail that is not asked for is wasted, not thorough.
+
+- Lead with the answer. Cut the preamble and the recap of what was just done.
+- Report a check as its result (`build ok`), not as a narrated play-by-play.
+- Mention a caveat only if it changes what to do next. Skip the rest.
+- Expand only when asked, or when a real trap is found.
+
+## Secrets
+
+Never read `.env`, and never print a secret in chat or a tool call. Values reach the code
+through `astro:env`, so nothing ever needs to echo them. A secret that lands in the transcript
+cannot be unsent: the only fix is rotating it.
+
 ## Conventions
 
 - Match the surrounding code. Prettier + ESLint decide formatting; don't hand-format.
+- **Do not over-comment.** No docblocks restating what the code says, no narrating the next
+  line. Write a comment only for a constraint the code cannot express (a gotcha, a why, a
+  non-obvious trade-off), and keep it to one line. Explanations belong in the chat or in
+  this file, not scattered through the source.
 - Path alias `@/` maps to `src/` (see [tsconfig.json](tsconfig.json)).
 - Route-local components live next to their route under `_components/` (e.g.
   [src/pages/posts/[...slug]/_components/](src/pages/posts/%5B...slug%5D/_components/)); shared

@@ -5,6 +5,7 @@ import {
   svgoOptimizer,
 } from "astro/config";
 import tailwindcss from "@tailwindcss/vite";
+import vercel from "@astrojs/vercel";
 import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import { unified } from "@astrojs/markdown-remark";
@@ -21,6 +22,8 @@ import config from "./astro-paper.config";
 
 export default defineConfig({
   site: config.site.url,
+  adapter: vercel(),
+  output: "static",
   integrations: [
     mdx(),
     sitemap({
@@ -74,6 +77,11 @@ export default defineConfig({
       PUBLIC_GOOGLE_SITE_VERIFICATION: envField.string({
         access: "public",
         context: "client",
+        optional: true,
+      }),
+      DATABASE_URL: envField.string({
+        access: "secret",
+        context: "server",
         optional: true,
       }),
     },

@@ -4,10 +4,10 @@
 
 - [x] vercel auto-deployment
 - [x] enable vercel features like RGPD like tracking and core web vitals
-- [ ] replace the current favicon by typovrak's logo
+- [x] replace the current favicon by typovrak's logo
 
-- [ ] create a Supabase database for this project
-- [ ] create .env and .env.example with all needed credentials
+- [x] create a neon database for this project
+- [x] create .env and .env.example with all needed credentials
 - [ ] legal notice page
 - [ ] accessibility optimization
 
@@ -19,3 +19,4 @@
 - [ ] article reactions with or without being logged in with github (if not logged in, with hash function)
 
 - [ ] SEO optimization
+- [ ] adding all my nixos plugins in this website, with it's own section or article.
