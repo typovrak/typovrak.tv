@@ -21,7 +21,10 @@
   --accent: #255c19;
   --accent-foreground: #eff1f5; /* base */
   --muted: #ccd0da; /* surface0 */
-  --muted-foreground: #5c5f77; /* subtext1 */
+  /* subtext1 (#5c5f77) at the same hue and saturation, darkened from 41% to
+     34% lightness. As dates and view counts, it must clear AAA on base; the
+     stock value only reaches 5.53:1. */
+  --muted-foreground: #4c4e62;
   --border: #bcc0cc; /* surface1 */
 }
 

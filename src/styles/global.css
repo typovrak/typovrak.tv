@@ -36,3 +36,22 @@
 :target {
   scroll-margin-block: 1rem;
 }
+
+/* Respect a reduced-motion preference: near-instant transitions and
+   animations, no smooth scroll, no view-transition animation. WCAG 2.3.3. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

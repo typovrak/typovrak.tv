@@ -293,7 +293,8 @@ enough), and a coarse device class.
 
 Also required:
 
-- **Retention.** The CNIL caps audience-measurement data at 25 months. Purge older rows.
+- **Retention.** The CNIL caps audience-measurement data at 25 months. Purging is manual, run by
+  hand with the query in [db/schema.sql](db/schema.sql). Nothing deletes data automatically.
 - **Purpose limitation.** Audience measurement only. Do not cross-reference these rows with
   anything else, and do not pass them to a third party.
 - **Information and objection.** The privacy page must say what is collected and how to object.

@@ -156,6 +156,8 @@ const ogImage = ogImageUrl
     const progressContainer = document.createElement("div");
     progressContainer.className =
       "progress-container fixed top-0 z-10 h-1 w-full bg-background";
+    // Decorative reading indicator: keep it out of the accessibility tree.
+    progressContainer.setAttribute("aria-hidden", "true");
 
     const progressBar = document.createElement("div");
     progressBar.className = "progress-bar h-1 w-0 bg-accent";
