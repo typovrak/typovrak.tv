@@ -1,18 +1,20 @@
-import kebabcase from "lodash.kebabcase";
-import slugify from "slugify";
-
-const hasNonLatin = (str: string): boolean => /[^\x00-\x7F]/.test(str);
-
 /**
- * Slugify a string using a hybrid approach:
- * - Latin strings: slugify (e.g. "E2E Testing" → "e2e-testing")
- * - Strings with non-Latin chars: lodash.kebabcase (preserves non-Latin chars)
+ * Slugify a string to `[a-z0-9-]`:
+ * - decompose accents to their base letter (accented -> base)
+ * - lowercase
+ * - anything that is not a-z or 0-9 becomes a single dash (a run never
+ *   produces two dashes in a row)
+ * - no leading or trailing dash
+ *
+ * Letters with no base form (slashed o, ligatures, non-Latin scripts) are
+ * dropped, not transliterated. The site is English-only, so this is fine.
  */
-export const slugifyStr = (str: string): string => {
-  if (hasNonLatin(str)) {
-    return kebabcase(str);
-  }
-  return slugify(str, { lower: true });
-};
+export const slugifyStr = (str: string): string =>
+  str
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 
-export const slugifyAll = (arr: string[]) => arr.map(str => slugifyStr(str));
+export const slugifyAll = (arr: string[]) => arr.map(slugifyStr);

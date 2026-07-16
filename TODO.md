@@ -1,10 +1,3 @@
-- [x] Content-Security-Policy, enforced. scripts/security-headers.mjs recomputes script hashes
-      from the built HTML each build. Removed Astro's ClientRouter (its data: probe tripped
-      script-src), so view transitions are gone and navigation is full page loads. style-src
-      keeps unsafe-inline (Shiki per-token styles); script-src is strict, enforced. Also fixed a
-      pagefind bug (search 404 in prod) uncovered while testing: pagefind now indexes the deployed
-      .vercel/output/static, not dist.
-
 - [~] legal notice page -> /legal-notices, linked in the footer. Covers editor, hosting (Vercel,
       Neon), the view tracking, Vercel Analytics + Speed Insights as processors, no-cookie stance,
       EU transfers, rights and objection, CNIL. Fill in the bracketed line (business status/SIRET)
@@ -20,7 +13,9 @@
 
 - [ ] mettre codecov et autres intégrations de ce type gratuite pour apprendre et découvrir 
 
-- [ ] remove useless packages like slugify that can be made myself
+- [~] remove useless packages that can be written by hand. Done: slugify, lodash.kebabcase and
+      @types/lodash.kebabcase, replaced by a small slugifyStr (NFKD accent strip + [a-z0-9-]).
+      Still to review: dayjs (date formatting), whether it can go native.
 
 - [ ] mettre des composants comme sur les cours AWS pour varier la lecture
   
