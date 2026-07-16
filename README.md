@@ -1,5 +1,10 @@
 # typovrak.tv
 
+[![CI](https://github.com/typovrak/typovrak.tv/actions/workflows/ci.yml/badge.svg)](https://github.com/typovrak/typovrak.tv/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/typovrak/typovrak.tv/actions/workflows/codeql.yml/badge.svg)](https://github.com/typovrak/typovrak.tv/actions/workflows/codeql.yml)
+[![codecov](https://codecov.io/gh/typovrak/typovrak.tv/branch/main/graph/badge.svg)](https://codecov.io/gh/typovrak/typovrak.tv)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/typovrak/typovrak.tv/badge)](https://securityscorecards.dev/viewer/?uri=github.com/typovrak/typovrak.tv)
+
 Source of [typovrak.tv](https://typovrak.tv), my developer blog. Notes on Linux, CLI tooling and web development.
 
 Built with [Astro](https://astro.build), [Tailwind CSS](https://tailwindcss.com) and [Pagefind](https://pagefind.app), on top of the [AstroPaper](https://github.com/satnaing/astro-paper) theme by Sat Naing.

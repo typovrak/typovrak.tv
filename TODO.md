@@ -3,20 +3,18 @@
       EU transfers, rights and objection, CNIL. Fill in the bracketed line (business status/SIRET)
       if publishing as a registered business, and have someone review it. Not legal advice.
 
-- [~] articles commentary section with github account -> giscus (GitHub Discussions), on posts
-      only, click-to-load for privacy, Catppuccin theme synced to light/dark, CSP allows
-      giscus.app, legal notices updated. To activate: enable Discussions on the repo, install the
-      giscus app (github.com/apps/giscus), then fill repoId and categoryId in astro-paper.config.ts
-      from giscus.app. Comments stay hidden until both are set. Chose giscus over a hand-built
-      system for now (OAuth + image/upload + moderation are too much until the blog has traffic).
-
-- [ ] article reactions with or without being logged in with github (if not logged in, with hash function)
+- [ ] rendre le bouton load comments plus visible, actuellement, on ne le voit à peine si on fait pas attention.
 
 - [ ] SEO optimization
 
 - [ ] adding all my nixos plugins in this website, with it's own section or article.
 
-- [ ] mettre codecov et autres intégrations de ce type gratuite pour apprendre et découvrir 
+- [~] free CI integrations to learn: Dependabot (deps + actions), CodeQL (SAST), OpenSSF
+      Scorecard, Codecov. CI now also runs on push main. Coverage is scoped to the pure unit-
+      tested modules (98%+), not the astro-wiring ones. To finish Codecov: sign in at codecov.io
+      with GitHub, add the repo, and set the CODECOV_TOKEN secret in the repo. The others activate
+      on merge. If GitHub CodeQL "default setup" is on in repo settings, turn it off (the workflow
+      is the advanced setup).
 
 - [ ] mettre des composants comme sur les cours AWS pour varier la lecture
   

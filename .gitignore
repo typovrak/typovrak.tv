@@ -2,6 +2,9 @@
 dist/
 .vercel/
 
+# test coverage
+coverage/
+
 # generated types
 .astro/
 
