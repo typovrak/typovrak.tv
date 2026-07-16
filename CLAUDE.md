@@ -36,6 +36,11 @@ Vercel function with `export const prerender = false`. A content blog should sta
 `output: "server"` would make every page a function and force `prerender = true` everywhere to
 undo it. Only API routes touching the database need to opt out.
 
+**URLs never carry a trailing slash.** `trailingSlash: "never"` in [astro.config.ts](astro.config.ts)
+makes Astro emit slash-free links, and the Vercel adapter adds a 308 redirect from `/path/` to
+`/path`. Keep it that way: do not set `trailingSlash` to anything else, and write internal links
+without a trailing slash.
+
 Files under `src/pages/` whose name starts with `_` are not routed at all, so an endpoint named
 `_probe.ts` silently produces no function.
 
@@ -323,6 +328,20 @@ Parameterised queries stop injection, but they do not stop garbage being stored 
 **Do not grep the built HTML for a payload to check for XSS.** It gives false positives: a
 payload sitting inside a quoted attribute or already escaped to `&quot;` still matches. Read the
 rendered tag instead.
+
+**Security headers and CSP** are injected into the Vercel Build Output config after the build by
+[scripts/security-headers.mjs](scripts/security-headers.mjs) (wired into `pnpm build`). It
+recomputes the `script-src` hashes from the built HTML every build, so they never drift by hand.
+Astro's native CSP is not usable here: it does not support Shiki (inline `style` per code token)
+or the `<ClientRouter />`. `style-src` therefore keeps `'unsafe-inline'` (style injection cannot
+execute script); `script-src` stays strict, `'self'` plus per-script hashes.
+
+The CSP ships as **`Content-Security-Policy-Report-Only`**: it reports violations without
+blocking. To enforce it, set `ENFORCE_CSP = true` in that script, but only after loading the
+deployed site in a browser and confirming the console is clean on the home page, an article with
+code blocks, and search. Enforcing an unverified CSP breaks production. The other headers (HSTS,
+nosniff, frame-ancestors via X-Frame-Options, Referrer-Policy, Permissions-Policy, COOP) are
+enforced and safe.
 
 ## Answering in chat
 

@@ -18,5 +18,7 @@ export default [
     },
   },
   { rules: { "no-console": "error" } },
+  // Build scripts run in a terminal; console output is the point.
+  { files: ["scripts/**"], rules: { "no-console": "off" } },
   { ignores: ["dist/**", ".astro/**", ".vercel/**", "public/pagefind/**"] },
 ];

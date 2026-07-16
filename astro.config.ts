@@ -25,6 +25,7 @@ export default defineConfig({
   site: config.site.url,
   adapter: vercel(),
   output: "static",
+  trailingSlash: "never",
   integrations: [
     mdx(),
     sitemap({
