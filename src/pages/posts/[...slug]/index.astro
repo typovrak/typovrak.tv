@@ -12,6 +12,7 @@ import ShareLinks from "./_components/ShareLinks.astro";
 import BackButton from "./_components/BackButton.astro";
 import BackToTopButton from "./_components/BackToTopButton.astro";
 import AdjacentPostNav from "./_components/AdjacentPostNav.astro";
+import Comments from "@/components/Comments.astro";
 import PageViews from "@/components/PageViews.astro";
 import config from "@/config";
 
@@ -143,6 +144,8 @@ const ogImage = ogImageUrl
     <hr class="my-8 border-dashed" />
 
     <AdjacentPostNav {prevPost} {nextPost} />
+
+    <Comments />
   </main>
   <Footer />
 </PostLayout>

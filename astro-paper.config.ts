@@ -24,6 +24,14 @@ export default defineAstroPaperConfig({
     showBackButton: true,
     search: "pagefind",
   },
+  // giscus comments. These IDs are public (they ship in the page HTML), so
+  // they live here, not in .env.
+  comments: {
+    repo: "typovrak/typovrak.tv",
+    repoId: "R_kgDOO9Us_w",
+    category: "Comments",
+    categoryId: "DIC_kwDOO9Us_84DBNio",
+  },
   socials: [
     { name: "github", url: "https://github.com/typovrak" },
     { name: "mail", url: "mailto:typovrak@gmail.com" },

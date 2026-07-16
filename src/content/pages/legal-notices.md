@@ -52,9 +52,13 @@ The site never stores your IP address (not even hashed), your full user-agent st
 
 **Retention.** Audience data is kept for at most 25 months, then deleted, in line with the CNIL's cap for audience measurement.
 
+## Comments
+
+Comments are powered by [giscus](https://giscus.app), which stores them as GitHub Discussions on this site's repository. The comment widget is loaded from `giscus.app` (operated by GitHub, a United States company) **only when you click to load it**, which exposes your IP address to GitHub at that point. Posting a comment requires signing in with a GitHub account, under GitHub's own terms and privacy policy. If you never open the comments, nothing is sent to GitHub.
+
 ## Cookies
 
-The site sets **no cookie** and writes nothing to your browser's storage for analytics or any other purpose. Because nothing is read from or written to your device, no consent banner is required. If this ever changes, a consent mechanism will be added first.
+The site itself sets **no cookie** and writes nothing to your browser's storage for analytics or any other purpose. Because nothing is read from or written to your device by the site, no consent banner is required. Signing in to comment via GitHub is handled by GitHub and may set cookies on GitHub's domain, not on this site.
 
 ## Data transfers outside the EU
 

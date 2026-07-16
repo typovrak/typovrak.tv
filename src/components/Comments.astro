@@ -1,0 +1,109 @@
+---
+import config from "@/config";
+
+// Comments render only once giscus is fully configured (repoId + categoryId
+// from giscus.app). Until then the section is omitted entirely.
+const c = config.comments;
+const enabled = !!(c && c.repoId && c.categoryId);
+---
+
+{
+  enabled && c && (
+    <section class="comments mt-8" data-pagefind-ignore>
+      <h2 class="text-accent mb-4 text-xl font-semibold">
+        Comments <span data-comment-count class="text-muted-foreground" />
+      </h2>
+      <div data-comments-intro>
+        <button
+          type="button"
+          data-load-comments
+          class="border-border hover:border-accent hover:text-accent rounded border px-4 py-2 text-sm"
+        >
+          Load comments
+        </button>
+        <p class="text-muted-foreground mt-2 text-sm">
+          Loads a GitHub-hosted comment widget. It is fetched only when you
+          click, which exposes your IP to GitHub. See the{" "}
+          <a
+            href="/legal-notices"
+            class="hover:text-accent underline decoration-dashed underline-offset-4"
+          >
+            legal notices
+          </a>
+          .
+        </p>
+      </div>
+      <div
+        id="giscus-container"
+        class="mt-6"
+        data-repo={c.repo}
+        data-repo-id={c.repoId}
+        data-category={c.category}
+        data-category-id={c.categoryId}
+      />
+    </section>
+  )
+}
+
+<script>
+  const intro = document.querySelector("[data-comments-intro]");
+  const button = document.querySelector<HTMLButtonElement>(
+    "[data-load-comments]"
+  );
+  const container = document.getElementById("giscus-container");
+
+  const giscusTheme = () =>
+    document.documentElement.getAttribute("data-theme") === "dark"
+      ? "catppuccin_mocha"
+      : "catppuccin_latte";
+
+  // giscus emits discussion metadata (with emitMetadata on). Show the comment
+  // count in the heading once it arrives. Origin-checked: the message is
+  // attacker-controlled otherwise.
+  window.addEventListener("message", event => {
+    if (event.origin !== "https://giscus.app") return;
+    const discussion = event.data?.giscus?.discussion;
+    const count = discussion?.totalCommentCount;
+    const label = document.querySelector("[data-comment-count]");
+    if (label && typeof count === "number") label.textContent = `(${count})`;
+  });
+
+  button?.addEventListener("click", () => {
+    if (!container) return;
+    intro?.remove();
+
+    const script = document.createElement("script");
+    script.src = "https://giscus.app/client.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    Object.assign(script.dataset, {
+      repo: container.dataset.repo,
+      repoId: container.dataset.repoId,
+      category: container.dataset.category,
+      categoryId: container.dataset.categoryId,
+      mapping: "pathname",
+      strict: "1",
+      reactionsEnabled: "1",
+      emitMetadata: "1",
+      inputPosition: "bottom",
+      theme: giscusTheme(),
+      lang: "en",
+      loading: "lazy",
+    });
+    container.appendChild(script);
+
+    // Keep giscus in sync with the light/dark toggle.
+    new MutationObserver(() => {
+      const frame = document.querySelector<HTMLIFrameElement>(
+        "iframe.giscus-frame"
+      );
+      frame?.contentWindow?.postMessage(
+        { giscus: { setConfig: { theme: giscusTheme() } } },
+        "https://giscus.app"
+      );
+    }).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+  });
+</script>

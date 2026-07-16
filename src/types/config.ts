@@ -84,6 +84,18 @@ interface ShareLink {
   linkTitle?: string;
 }
 
+/**
+ * giscus comments (GitHub Discussions). Fill repoId and categoryId from
+ * giscus.app after enabling Discussions and installing the giscus app.
+ * Comments only render on posts when all four fields are set.
+ */
+interface CommentsConfig {
+  repo: `${string}/${string}`;
+  repoId: string;
+  category: string;
+  categoryId: string;
+}
+
 interface AstroPaperConfig {
   site: SiteConfig;
   posts?: PostsConfig;
@@ -92,6 +104,8 @@ interface AstroPaperConfig {
   socials?: SocialLink[];
   /** Share links shown on post detail pages */
   shareLinks?: ShareLink[];
+  /** giscus comments. Omit to disable. */
+  comments?: CommentsConfig;
 }
 
 type ResolvedSiteConfig = Required<
@@ -115,6 +129,7 @@ export interface ResolvedAstroPaperConfig {
   features: Required<FeaturesConfig>;
   socials: SocialLink[];
   shareLinks: ShareLink[];
+  comments?: CommentsConfig;
 }
 
 /**

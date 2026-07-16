@@ -64,6 +64,10 @@ const liveConnect = isPreview
   ? " https://vercel.live wss://ws-us3.pusher.com https://*.pusher.com"
   : "";
 
+// giscus (comments) loads a script, styles, an iframe and an API from
+// giscus.app. Allowing that one trusted origin keeps the policy strict.
+const giscus = "https://giscus.app";
+
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -72,10 +76,10 @@ const csp = [
   "form-action 'self'",
   `img-src 'self' https: data:`,
   `font-src 'self'${isPreview ? " https://assets.vercel.com" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
-  `script-src ${scriptSrc}${live}`,
-  `connect-src 'self' https://vitals.vercel-insights.com${liveConnect}`,
-  ...(isPreview ? ["frame-src https://vercel.live"] : []),
+  `style-src 'self' 'unsafe-inline' ${giscus}`,
+  `script-src ${scriptSrc} ${giscus}${live}`,
+  `connect-src 'self' https://vitals.vercel-insights.com ${giscus}${liveConnect}`,
+  `frame-src ${giscus}${isPreview ? " https://vercel.live" : ""}`,
   "manifest-src 'self'",
   "upgrade-insecure-requests",
 ].join("; ");
