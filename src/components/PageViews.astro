@@ -1,11 +1,15 @@
 ---
+// `path` set: a preview, filled read-only by the batch GET.
+// `path` unset: the current page, filled by the POST in PageViewTracker.
 interface Props {
+  path?: string;
   class?: string;
 }
 
-const { class: className } = Astro.props;
+const { path, class: className } = Astro.props;
+const attr = path ? { "data-views-path": path } : { "data-page-views": true };
 ---
 
 <span class:list={["page-views", className]} data-pagefind-ignore>
-  <span data-page-views>&mdash;</span> views
+  <span {...attr}>&mdash;</span> views
 </span>

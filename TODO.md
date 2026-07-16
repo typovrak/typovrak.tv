@@ -9,11 +9,10 @@
 - [x] create a neon database for this project
 - [x] create .env and .env.example with all needed credentials
 
-- [ ] view count par article
 - [ ] view count per pages
 - [ ] unique visitor count with tracability for upgrading the website in the future
 
-- [ ] separate dev data from prod: create a `dev` branch in the Neon console, point the local
+- [x] separate dev data from prod: create a `dev` branch in the Neon console, point the local
       `.env` at it, keep `main` for the Vercel env vars. Nothing to change in the code, and no
       local Postgres: the HTTP driver speaks Neon's own protocol over HTTPS, not the Postgres
       wire protocol, so a local instance would need Neon's wsproxy container *and* a switch to
@@ -21,20 +20,14 @@
       The Vercel/Neon integration can also branch per preview deploy. Tests need no database:
       they are pure unit tests.
 
-- [ ] tests: postFilter. The only guard against publishing a draft or a scheduled post early.
-      Date-dependent, and its `import.meta.env.DEV` branch inverts the behaviour between dev and
-      prod, so the case that matters is the one never seen locally. Needs fake timers around
-      `scheduledPostMargin`, and a stub for `astro:env/client` (its import chain goes through
-      `@/config`).
-- [ ] tests: slugify. Decides tag URLs permanently, and switches between `slugify` and
-      `lodash.kebabcase` on a `hasNonLatin` regex. `knownPaths` uses `slugifyAll` to validate tag
-      paths, so a change there breaks both the URLs and the view tracking. No Astro imports, so
-      no setup needed.
-- [ ] tests: getPostSlug. Builds post URLs, which never change once published, and `knownPaths`
-      depends on it. Extract the pure part first: it sits in a module importing `astro:i18n`
-      that it does not need, same split as `paths.ts`.
+- [x] tests: postFilter -> extracted the pure rule into postVisibility.ts and tested it with a
+      fixed clock (draft, scheduled, dev/prod, the margin boundary both sides).
+- [x] tests: slugify -> case collapse, accent stripping, non-latin scripts, idempotence.
+- [x] tests: getPostSlug -> extracted postSlug.ts (pure) from getPostPaths, tested slug and
+      directory segments, including the underscore-folder rule.
 - [ ] tests: getUniqueTags (dedup collapses case, so Docker and docker merge into one tag), then
-      archives grouping. Lower value.
+      archives grouping. Lower value. Both import postFilter -> @/config -> astro:env, so testing
+      them needs an astro:env stub in vitest, unlike the pure modules above.
       Not worth testing: withBase (i18n off, base is `/`), toTransitionName, getFontPathByWeight.
 
 - [ ] Content-Security-Policy header. The systemic XSS defence we do not have yet, and the only

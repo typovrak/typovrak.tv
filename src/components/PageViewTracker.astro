@@ -1,33 +1,60 @@
 ---
-// Records a view for every page. Rendered once, in the root layout.
-// Fills any `[data-page-views]` element on the page with the count, so a page
-// that wants to show it costs no extra request.
+// Records a view for every page, and fills the counts shown on it:
+// - `[data-page-views]`: the current page, from the POST that records the view.
+// - `[data-views-path]`: article previews, from one batch GET (read-only).
+// Rendered once, in the root layout.
 ---
 
 <script>
-  function trackView() {
-    const path = window.location.pathname;
+  const nf = new Intl.NumberFormat();
 
+  function drop(el: Element) {
+    el.closest(".page-views")?.remove();
+  }
+
+  function recordCurrent() {
+    const current = document.querySelectorAll("[data-page-views]");
     fetch("/api/views", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ path }),
+      body: JSON.stringify({ path: window.location.pathname }),
     })
       .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
       .then(({ views }) => {
-        const format = new Intl.NumberFormat().format(views);
-        document
-          .querySelectorAll("[data-page-views]")
-          .forEach(el => (el.textContent = format));
+        current.forEach(el => (el.textContent = nf.format(views)));
       })
-      .catch(() => {
-        document
-          .querySelectorAll("[data-page-views]")
-          .forEach(el => el.closest(".page-views")?.remove());
-      });
+      .catch(() => current.forEach(drop));
   }
 
-  trackView();
-  // ClientRouter swaps the DOM without a reload, so each navigation is a view.
-  document.addEventListener("astro:after-swap", trackView);
+  function fillPreviews() {
+    const els = [...document.querySelectorAll("[data-views-path]")];
+    if (els.length === 0) return;
+
+    const params = new URLSearchParams();
+    for (const path of new Set(
+      els.map(el => el.getAttribute("data-views-path")).filter(Boolean)
+    )) {
+      params.append("path", path as string);
+    }
+
+    fetch(`/api/views?${params}`)
+      .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
+      .then(({ views }) => {
+        els.forEach(el => {
+          const count = views[el.getAttribute("data-views-path") ?? ""];
+          if (typeof count === "number") el.textContent = nf.format(count);
+          else drop(el);
+        });
+      })
+      .catch(() => els.forEach(drop));
+  }
+
+  function track() {
+    recordCurrent();
+    fillPreviews();
+  }
+
+  track();
+  // ClientRouter swaps the DOM without a reload, so each navigation re-runs it.
+  document.addEventListener("astro:after-swap", track);
 </script>

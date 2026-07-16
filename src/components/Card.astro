@@ -1,8 +1,10 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import { getPostUrl } from "@/utils/getPostPaths";
+import { normalisePath } from "@/utils/paths";
 import { toTransitionName } from "@/utils/toTransitionName";
 import Datetime from "./Datetime.astro";
+import PageViews from "./PageViews.astro";
 
 type Props = {
   variant?: "h2" | "h3";
@@ -11,6 +13,11 @@ type Props = {
 const { variant: Heading = "h2", id, data, filePath } = Astro.props;
 
 const { title, description, ...props } = data;
+
+// Normalised so it matches the keys the API returns (which strips the trailing
+// slash); otherwise the client lookup misses and the count is dropped.
+const postUrl = getPostUrl(id, filePath, Astro.currentLocale);
+const postPath = normalisePath(postUrl) ?? postUrl;
 ---
 
 <li class="my-6">
@@ -26,6 +33,10 @@ const { title, description, ...props } = data;
       {title}
     </Heading>
   </a>
-  <Datetime {...props} />
+  <div class="flex items-center gap-2">
+    <Datetime {...props} />
+    <span aria-hidden="true" class="text-muted-foreground">|</span>
+    <PageViews path={postPath} class="text-muted-foreground text-sm" />
+  </div>
   <p>{description}</p>
 </li>

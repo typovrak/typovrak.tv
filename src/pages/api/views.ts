@@ -24,10 +24,33 @@ async function readViews(path: string) {
   return Number(rows[0]?.views ?? 0);
 }
 
+// Batch read for listing pages: one query for every preview on the page.
+async function readViewsBatch(paths: string[]) {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT path, views FROM page_view WHERE path = ANY(${paths})
+  `;
+  const counts: Record<string, number> = Object.fromEntries(
+    paths.map(p => [p, 0])
+  );
+  for (const row of rows) counts[String(row.path)] = Number(row.views);
+  return counts;
+}
+
+// Read-only: viewing a listing is not a view of the articles on it.
 export const GET: APIRoute = async ({ url }) => {
-  const path = await resolvePath(url.searchParams.get("path"));
-  if (!path) return new Response(null, { status: 404 });
-  return Response.json({ views: await readViews(path) });
+  const known = await getKnownPaths();
+  const paths = [
+    ...new Set(
+      url.searchParams
+        .getAll("path")
+        .slice(0, 100)
+        .map(normalisePath)
+        .filter((p): p is string => p !== null && known.has(p))
+    ),
+  ];
+  if (paths.length === 0) return new Response(null, { status: 404 });
+  return Response.json({ views: await readViewsBatch(paths) });
 };
 
 export const POST: APIRoute = async ({ request }) => {

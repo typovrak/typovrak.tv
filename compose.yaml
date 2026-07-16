@@ -9,6 +9,7 @@ services:
       pnpm runtime set node 24 -g
       && pnpm install --frozen-lockfile
       && pnpm prune
+      && rm -f .astro/dev.json
       && pnpm run dev --host 0.0.0.0"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4321"]
