@@ -13,10 +13,6 @@
 
 - [ ] mettre codecov et autres intégrations de ce type gratuite pour apprendre et découvrir 
 
-- [~] remove useless packages that can be written by hand. Done: slugify, lodash.kebabcase and
-      @types/lodash.kebabcase, replaced by a small slugifyStr (NFKD accent strip + [a-z0-9-]).
-      Still to review: dayjs (date formatting), whether it can go native.
-
 - [ ] mettre des composants comme sur les cours AWS pour varier la lecture
   
 - [ ] mettre en place une partie dactylographie sur le site

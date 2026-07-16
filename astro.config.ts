@@ -12,7 +12,7 @@ import { unified } from "@astrojs/markdown-remark";
 import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import rehypeCallouts from "rehype-callouts";
-import rehypeExternalLinks from "rehype-external-links";
+import { rehypeExternalLinks } from "./src/utils/rehypeExternalLinks";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -46,15 +46,7 @@ export default defineConfig({
         remarkToc,
         [remarkCollapse, { test: "Table of contents" }],
       ],
-      rehypePlugins: [
-        rehypeCallouts,
-        // Every external link in post content opens in a new tab, hardened
-        // against reverse-tabnabbing.
-        [
-          rehypeExternalLinks,
-          { target: "_blank", rel: ["noopener", "noreferrer"] },
-        ],
-      ],
+      rehypePlugins: [rehypeCallouts, rehypeExternalLinks],
     }),
     shikiConfig: {
       themes: { light: "catppuccin-latte", dark: "catppuccin-mocha" },
