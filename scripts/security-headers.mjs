@@ -53,17 +53,27 @@ for (const file of files) {
 
 const scriptSrc = ["'self'", ...scriptHashes].join(" ");
 
+// The Vercel preview feedback toolbar (vercel.live) is injected on preview
+// deployments only, never in production. Allow its sources for preview builds
+// so the console stays clean, without loosening the production policy.
+const isPreview = process.env.VERCEL_ENV === "preview";
+const live = isPreview ? " https://vercel.live" : "";
+const liveConnect = isPreview
+  ? " https://vercel.live wss://ws-us3.pusher.com https://*.pusher.com"
+  : "";
+
 const csp = [
   "default-src 'self'",
   "base-uri 'self'",
   "object-src 'none'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "img-src 'self' https: data:",
-  "font-src 'self'",
+  `img-src 'self' https: data:`,
+  `font-src 'self'${isPreview ? " https://assets.vercel.com" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  `script-src ${scriptSrc}`,
-  "connect-src 'self' https://vitals.vercel-insights.com",
+  `script-src ${scriptSrc}${live}`,
+  `connect-src 'self' https://vitals.vercel-insights.com${liveConnect}`,
+  ...(isPreview ? ["frame-src https://vercel.live"] : []),
   "manifest-src 'self'",
   "upgrade-insecure-requests",
 ].join("; ");

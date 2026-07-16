@@ -107,9 +107,12 @@ so importing it from client code is a build error rather than a leak. It lives i
 locally (gitignored, see [.env.example](.env.example)) and in the Vercel project settings for
 deploys. Never paste a connection string into source, chat or a commit.
 
-Note when touching the build: `pnpm build` runs `astro check && astro build && pagefind --site dist`
-then copies the Pagefind index into `public/`. Pagefind indexes the built output, so search only
-reflects what exists after a full build.
+Note when touching the build: `pnpm build` runs `astro check && astro build`, then indexes the
+**deployed** output with `pagefind --site .vercel/output/static`, then
+`node scripts/security-headers.mjs`. Pagefind must index `.vercel/output/static` (what Vercel
+serves), not `dist`: indexing `dist` and copying into `public/` leaves the index out of the
+deployed output on a clean checkout (public/ is already written by then, and `public/pagefind` is
+gitignored), so search 404s in production while still working locally.
 
 ## Commands
 
@@ -332,16 +335,24 @@ rendered tag instead.
 **Security headers and CSP** are injected into the Vercel Build Output config after the build by
 [scripts/security-headers.mjs](scripts/security-headers.mjs) (wired into `pnpm build`). It
 recomputes the `script-src` hashes from the built HTML every build, so they never drift by hand.
-Astro's native CSP is not usable here: it does not support Shiki (inline `style` per code token)
-or the `<ClientRouter />`. `style-src` therefore keeps `'unsafe-inline'` (style injection cannot
-execute script); `script-src` stays strict, `'self'` plus per-script hashes.
+Astro's native CSP is not usable here (no Shiki support: it emits an inline `style` per code
+token). `style-src` therefore keeps `'unsafe-inline'` (style injection cannot execute script);
+`script-src` stays strict and **enforced**, `'self'` plus per-script hashes, no `'unsafe-inline'`.
 
-The CSP ships as **`Content-Security-Policy-Report-Only`**: it reports violations without
-blocking. To enforce it, set `ENFORCE_CSP = true` in that script, but only after loading the
-deployed site in a browser and confirming the console is clean on the home page, an article with
-code blocks, and search. Enforcing an unverified CSP breaks production. The other headers (HSTS,
-nosniff, frame-ancestors via X-Frame-Options, Referrer-Policy, Permissions-Policy, COOP) are
-enforced and safe.
+**Do not re-add Astro's `<ClientRouter />` / view transitions.** It injects a
+`data:application/javascript` probe script on every navigation, which strict `script-src` blocks.
+It was removed so the CSP could be enforced. Because there is no client-side router, every
+navigation is a full page load, so page scripts must run on load directly (call the init
+immediately), not from `astro:page-load` / `astro:after-swap`, which no longer fire.
+
+The Vercel preview feedback toolbar (`vercel.live`, Pusher websockets) is injected on preview
+deployments only, never in production. The script allows its sources when `VERCEL_ENV=preview`,
+so the preview console stays clean without loosening the production policy.
+
+The other headers (HSTS, nosniff, frame-ancestors via X-Frame-Options, Referrer-Policy,
+Permissions-Policy, COOP) are enforced and safe. If a CSP change is ever risky, flip
+`ENFORCE_CSP` to `false` in the script to ship it report-only first and check the browser
+console before enforcing.
 
 ## Answering in chat
 

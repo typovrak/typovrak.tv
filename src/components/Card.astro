@@ -2,7 +2,6 @@
 import type { CollectionEntry } from "astro:content";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { normalisePath } from "@/utils/paths";
-import { toTransitionName } from "@/utils/toTransitionName";
 import Datetime from "./Datetime.astro";
 import PageViews from "./PageViews.astro";
 
@@ -29,7 +28,7 @@ const postPath = normalisePath(postUrl) ?? postUrl;
       "focus-visible:no-underline focus-visible:underline-offset-0",
     ]}
   >
-    <Heading transition:name={toTransitionName(title)}>
+    <Heading>
       {title}
     </Heading>
   </a>
