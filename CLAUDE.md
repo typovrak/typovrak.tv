@@ -338,6 +338,8 @@ recomputes the `script-src` hashes from the built HTML every build, so they neve
 Astro's native CSP is not usable here (no Shiki support: it emits an inline `style` per code
 token). `style-src` therefore keeps `'unsafe-inline'` (style injection cannot execute script);
 `script-src` stays strict and **enforced**, `'self'` plus per-script hashes, no `'unsafe-inline'`.
+It also carries `'wasm-unsafe-eval'`, which Pagefind's search WebAssembly needs to compile; that
+token permits WASM only, never `eval()`, so the policy stays strict.
 
 **Do not re-add Astro's `<ClientRouter />` / view transitions.** It injects a
 `data:application/javascript` probe script on every navigation, which strict `script-src` blocks.

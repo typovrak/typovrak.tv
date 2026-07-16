@@ -51,7 +51,9 @@ for (const file of files) {
   }
 }
 
-const scriptSrc = ["'self'", ...scriptHashes].join(" ");
+// 'wasm-unsafe-eval' lets Pagefind's search WebAssembly compile. It permits
+// WASM only, not eval()/new Function(), so script-src stays strict.
+const scriptSrc = ["'self'", "'wasm-unsafe-eval'", ...scriptHashes].join(" ");
 
 // The Vercel preview feedback toolbar (vercel.live) is injected on preview
 // deployments only, never in production. Allow its sources for preview builds
