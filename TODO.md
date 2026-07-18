@@ -1,10 +1,6 @@
-- [ ] adding all my nixos plugins in this website, with it's own section or article.
-
-- [ ] every og image should be my github banner
-
 - [ ] mettre en place une partie dactylographie sur le site
 
-- [ ] create a section on the home for every github project that i help with open source
+- [ ] create a section on the home for every github project that i contribute 
 
 - [ ] add a section for my public most OSS project, star rune with 15000$ 
 

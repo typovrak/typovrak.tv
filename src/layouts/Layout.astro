@@ -16,6 +16,7 @@ type Props = {
   keywords?: string;
   ogImage?: string;
   canonicalURL?: string;
+  robots?: string;
 };
 
 const { site } = config;
@@ -26,6 +27,7 @@ const {
   keywords = site.keywords,
   ogImage = resolveDefaultOgImagePath(config),
   canonicalURL = new URL(Astro.url.pathname, Astro.site).href,
+  robots = "index, follow",
 } = Astro.props;
 
 const socialImageURL = new URL(ogImage, Astro.site ?? Astro.url);
@@ -60,6 +62,8 @@ const rssHref = getRelativeLocaleUrl(
     <meta name="description" content={description} />
     {keywords && <meta name="keywords" content={keywords} />}
     <meta name="author" content={site.author} />
+    <meta name="publisher" content={site.author} />
+    <meta name="robots" content={robots} />
     <link rel="sitemap" href={getAssetPath("sitemap-index.xml")} />
 
     <!-- Open Graph -->

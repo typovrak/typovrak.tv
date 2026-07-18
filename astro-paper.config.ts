@@ -13,6 +13,7 @@ export default defineAstroPaperConfig({
     lang: "en",
     timezone: "Europe/Paris",
     dir: "ltr",
+    ogImage: "typovrak-banner-hobbies-radius-min.png",
   },
   posts: {
     perPage: 4,
@@ -21,7 +22,7 @@ export default defineAstroPaperConfig({
   },
   features: {
     lightAndDarkMode: true,
-    dynamicOgImage: true,
+    dynamicOgImage: false,
     showArchives: true,
     showBackButton: true,
     search: "pagefind",
