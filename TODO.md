@@ -3,16 +3,14 @@
       EU transfers, rights and objection, CNIL. Fill in the bracketed line (business status/SIRET)
       if publishing as a registered business, and have someone review it. Not legal advice.
 
-- [~] SEO optimization. Done: WebSite + SearchAction JSON-LD on the home, BreadcrumbList on
-      pages with a visual breadcrumb, richer BlogPosting (description, mainEntityOfPage, keywords,
-      publisher), article:tag OG meta, meta keywords (site default + per-post tags), sitemap
-      lastmod from modDatetime/pubDatetime. Foundations (canonical, OG, sitemap, RSS, robots) were
-      already there. Remaining (your action): verify the domain in Google Search Console + Bing,
-      set PUBLIC_GOOGLE_SITE_VERIFICATION, submit the sitemap. Validate rich results with the
-      tools in AUDITS.md. The rest of SEO is content.
+- [ ] does i need a privacy policy in this website ?
 
 - [ ] adding all my nixos plugins in this website, with it's own section or article.
 
-- [ ] mettre des composants comme sur les cours AWS pour varier la lecture
-  
 - [ ] mettre en place une partie dactylographie sur le site
+
+AFTER THE FIRST POST IS DONE :
+- [ ] Google site verification + bing
+
+- [ ] add components like AWS does it in every article to make it more enjoyable
+- [ ] add at the end, before the comment section, a Q&A for every article with a result (like AWS)

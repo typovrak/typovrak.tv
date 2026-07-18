@@ -3,83 +3,124 @@ title: "Legal Notices"
 description: "Publisher, hosting, and how typovrak.tv handles personal data."
 ---
 
-Last updated: 16 July 2026.
+Legal notices
+These legal notices apply to the [typovrak.tv](/) website.
 
-## Website editor
+[# 1. Website publisher](#1-website-publisher)
 
-This site is published by Morgan Scholz (typovrak), an individual based in France.
+The [typovrak.tv](/) website is published by :
 
-Contact: [typovrak@gmail.com](mailto:typovrak@gmail.com)
+Name : Morphik Web
+Main activity : Computer programming and web development services
+Status : Micro-entrepreneur
 
-[If you publish this site as a registered business, add your legal status and SIRET here.]
+Address : Wasquehal, 59290
+Email : <a href="mailto:typovrak@gmail.com" target="_blank">typovrak@gmail.com</a>
+Phone : <a href="tel:+33649495137" target="_blank">+33 6 49 49 51 37</a>
 
-## Publication director
+SIRET : 945 312 833 000 11
+Intra-community VAT : not applicable, article 293B of the CGI
 
-Morgan Scholz.
+[# 2. Publication director](#2-publication-director)
 
-## Hosting
+The publication director of the [typovrak.tv](/) website is Morgan SCHOLZ.
 
-The site is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, United States ([vercel.com](https://vercel.com)).
+[# 3. Hosting](#3-hosting)
 
-The database is hosted by Neon Inc. ([neon.com](https://neon.com)).
+The [typovrak.tv](/) website is hosted by :
 
-## Intellectual property
+Vercel Inc.
+340 S Lemon Ave #4133
+Walnut, CA 91789
+United States
 
-The articles and written content on this site are the work of the publisher. Do not reproduce them without permission.
+Website : <a href="https://vercel.com" target="_blank">vercel.com</a>
 
-The source code of the site is open source, under the MIT License, at [github.com/typovrak/typovrak.tv](https://github.com/typovrak/typovrak.tv). It is built on the AstroPaper theme by Sat Naing, also MIT.
+[# 4. Intellectual property](#4-intellectual-property)
 
-## Personal data
+All content on the [typovrak.tv](/) website (text, images, graphics, logo, icons, structure, source code, and more generally any element comprising the website) is the exclusive property of Morphik Web, unless otherwise stated.
 
-The site measures its own audience, and nothing more. When you open a page, the server records:
+Any reproduction, representation, modification, publication, or adaptation, in whole or in part, of these elements, regardless of the means or process used, is prohibited without prior written authorization.
 
-- the page path (for example `/posts/some-article`)
-- the date and time of the visit
-- the host of the referring site (for example `google.com`), never the full URL
-- a coarse country, derived from the request
-- a coarse device class (mobile, tablet, or desktop)
+[# 5. Liability](#5-liability)
 
-The site never stores your IP address (not even hashed), your full user-agent string, or any identifier that would let it recognise you across visits.
+The information published on the morphikweb.com website is provided for informational purposes only.
 
-**Purpose.** Audience measurement only: knowing which articles are read. The data is not cross-referenced with anything else, is not used to profile visitors, and is not sold or shared for other purposes.
+Despite the care taken to ensure its accuracy and to keep it up to date, Morphik Web cannot be held liable for any omissions, inaccuracies, or deficiencies that may appear.
 
-**Legal basis.** Legitimate interest in measuring the site's audience (GDPR art. 6(1)(f)), kept proportionate by collecting no personal identifier.
+The user acknowledges that they use the information on the website under their sole responsibility.
 
-**Processors.** Three providers process this data on the publisher's behalf:
+[# 6. Personal data](#6-personal-data)
 
-- **Vercel Web Analytics** and **Vercel Speed Insights**, which are cookieless, for traffic and performance metrics.
-- **Neon**, which hosts the database where the audience data is stored.
+The [typovrak.tv](/) website may collect personal data in the following cases :
 
-**Retention.** Audience data is kept for at most 25 months, then deleted, in line with the CNIL's cap for audience measurement.
+- when sending a message via the contact form,
+- when subscribing to the newsletter,
+- when browsing the website, subject to the acceptance of cookies.
 
-## Comments
+The data collected is used solely for the following purposes :
 
-Comments are powered by [giscus](https://giscus.app), which stores them as GitHub Discussions on this site's repository. The comment widget is loaded from `giscus.app` (operated by GitHub, a United States company) **only when you click to load it**, which exposes your IP address to GitHub at that point. Posting a comment requires signing in with a GitHub account, under GitHub's own terms and privacy policy. If you never open the comments, nothing is sent to GitHub.
+- responding to contact requests,
+- sending information and content by email, including personalized emails,
+- analyzing website usage and improving the user experience,
+- measuring the technical performance of the website.
 
-## Cookies
+The processing of personal data is based on :
 
-The site itself sets **no cookie** and writes nothing to your browser's storage for analytics or any other purpose. Because nothing is read from or written to your device by the site, no consent banner is required. Signing in to comment via GitHub is handled by GitHub and may set cookies on GitHub's domain, not on this site.
+- the user's consent, in particular for forms, the newsletter, and cookies subject to consent,
+- Morphik Web's legitimate interest in ensuring the proper functioning, security, and improvement of the site.
 
-## Data transfers outside the EU
+Data retention period :
+- data collected via the contact form is retained for a maximum of 12 months,
+- data related to the newsletter is retained until the user withdraws their consent,
+- browsing and audience measurement data is retained in accordance with the periods defined by the tools used and in compliance with the recommendations of the CNIL (French Data Protection Authority).
 
-Vercel is a United States company, so some data may be processed outside the European Union. Such transfers are governed by the European Commission's Standard Contractual Clauses.
+The tools that may be used include :
+- Vercel Analytics, used for anonymous traffic statistics, without collecting personal data,
+- Vercel Speed Insights, used for web performance analysis, without collecting personal data.
 
-## Your rights
+Personal data is not sold, rented, or transferred to third parties.
 
-Under the GDPR you have the right to access, rectify, and erase your data, and to object to its processing. Because the site stores no identifier, it usually cannot link stored rows back to an individual, which limits what can be acted on in practice.
+In accordance with current regulations, you have the right to access, rectify, delete, oppose, and withdraw your consent at any time.
 
-To exercise a right, or to object to the audience measurement described above, email [typovrak@gmail.com](mailto:typovrak@gmail.com).
+To exercise these rights, you can contact: <a href="mailto:typovrak@gmail.com" target="_blank">typovrak@gmail.com</a> 
 
-You may also lodge a complaint with the French data protection authority, the [CNIL](https://www.cnil.fr).
+The data controller is Morphik Web, represented by Morgan SCHOLZ.
 
-## Security
+You also have the right to lodge a complaint with the CNIL (<a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a>).
 
-The site is served over HTTPS with a strict set of security headers. Database queries are parameterised against injection, and no personal identifier is stored.
+[# 7. Data transfer outside the European Union](#7-data-transfer-outside-the-european-union)
 
-## Applicable law
+Some tools used on the site (Vercel, Google Analytics GA4, Hotjar) may result in data being transferred outside the European Union, in particular to the United States.
 
-These notices are governed by French law. Any dispute falls under the jurisdiction of the competent French courts.
+These transfers are governed by standard contractual clauses approved by the European Commission or by mechanisms recognized as compliant with the GDPR.
 
-## Updates
+Google Analytics (GA4), Hotjar, and Vercel are configured to comply with the recommendations of the CNIL, in particular by anonymizing data and not collecting directly identifiable data.
 
-These notices may change. The date at the top reflects the latest revision.
+[# 8. Cookies](#8-cookies)
+
+When browsing the [typovrak.tv](/) website, cookies may be stored on the user's device.
+
+[# 9. Applicable law](#9-applicable-law)
+
+These legal notices are governed by French law.
+
+In the event of a dispute, and in the absence of an amicable resolution, the competent courts of Lille shall have sole jurisdiction.
+
+[# 10. Security](#10-security)
+
+Personal data collected via the [typovrak.tv](/) website is processed securely.
+
+Appropriate technical and organizational measures are in place to protect data against unauthorized access, loss, alteration, or disclosure.
+
+Access to data is strictly limited to Morphik Web.
+
+[# 11. Updates](#11-updates)
+
+These legal notices may be modified at any time to ensure compliance with current legislation.
+
+The date of the last update is indicated on this page.
+
+---
+
+Date of last modification : 07/18/2026
