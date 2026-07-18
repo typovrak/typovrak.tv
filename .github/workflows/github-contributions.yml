@@ -1,0 +1,45 @@
+name: GitHub contributions
+
+on:
+  schedule:
+    # Daily at 00:00 UTC. A commit only lands when the wall changed, so quiet
+    # days trigger no deploy.
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    name: Refresh the contribution wall
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: "☁️ Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+
+      - name: "🧱 Fetch contributions"
+        env:
+          # CONTRIB_TOKEN (a read:user PAT) also counts private contributions;
+          # without it, GITHUB_TOKEN returns the public ones only.
+          GH_TOKEN: ${{ secrets.CONTRIB_TOKEN || secrets.GITHUB_TOKEN }}
+        run: node scripts/fetch-github-contributions.mjs
+
+      - name: "📤 Commit if changed"
+        run: |
+          if git diff --quiet src/data/github-contributions.json; then
+            echo "No change."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add src/data/github-contributions.json
+            git commit -m "chore: refresh github contributions wall"
+            git push
+          fi

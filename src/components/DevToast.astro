@@ -1,0 +1,33 @@
+---
+// Temporary notice shown while the site is in development: the posts are
+// placeholders, not real articles. Remove this component before launch.
+// Dismissal removes it from the DOM only, with no storage, so it reappears on
+// the next load and the no-cookie/no-storage stance holds.
+---
+
+<div
+  id="dev-toast"
+  role="status"
+  class="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-md items-start gap-3 rounded-md bg-red-700 px-4 py-3 text-sm text-white shadow-lg"
+>
+  <span>
+    This site is in development. The posts are placeholders, not real articles
+    yet.
+  </span>
+  <button
+    type="button"
+    data-dev-toast-close
+    aria-label="Dismiss"
+    class="shrink-0 text-lg leading-none font-bold"
+  >
+    &times;
+  </button>
+</div>
+
+<script>
+  document
+    .querySelector("[data-dev-toast-close]")
+    ?.addEventListener("click", () =>
+      document.getElementById("dev-toast")?.remove()
+    );
+</script>

@@ -1,6 +1,11 @@
 - [ ] adding all my nixos plugins in this website, with it's own section or article.
 
-- [ ] display my github wall ? with an animation appear with every square, so it can be lazy loaded
+- [x] display my github wall -> a daily GitHub Action fetches the contribution calendar into
+      src/data/github-contributions.json (commit-if-changed), and GithubWall.astro renders it at
+      build as a grid of divs (theme-aware via --accent/--muted), clickable to the profile. No
+      runtime API call, no third party, CSP/GDPR clean. Animation dropped for now; the divs make
+      it a trivial CSS add later. To count PRIVATE contributions, set a CONTRIB_TOKEN (read:user
+      PAT) repo secret; without it the Action uses GITHUB_TOKEN (public contributions only).
 
 - [ ] mettre en place une partie dactylographie sur le site
 

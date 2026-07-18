@@ -1,0 +1,62 @@
+---
+import contributions from "@/data/github-contributions.json";
+import config from "@/config";
+
+const profile =
+  config.socials.find(s => s.name === "github")?.url ??
+  "https://github.com/typovrak";
+const weeks = contributions.weeks.length;
+
+// Drawn as one SVG rather than a CSS grid: a 1fr grid rounds each cell to a
+// whole pixel independently, so at full width some cells land 1px off and the
+// wall looks uneven. The SVG scales as a single transform, so cells, gaps and
+// radius stay perfectly uniform at any width.
+const CELL = 12;
+const PITCH = 14; // 12 cell + 2 gap, in viewBox units
+const width = weeks * PITCH - (PITCH - CELL);
+const height = 7 * PITCH - (PITCH - CELL);
+
+// Empty day uses --muted; levels 1-4 are --accent at rising opacity, so the
+// wall follows the light/dark theme with no second asset.
+const levelClass = [
+  "fill-muted",
+  "fill-accent/30",
+  "fill-accent/60",
+  "fill-accent/80",
+  "fill-accent",
+];
+---
+
+{
+  weeks > 0 && (
+    <a
+      href={profile}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${contributions.total} GitHub contributions in the last year`}
+      class="focus-outline block w-full"
+    >
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        width="100%"
+        aria-hidden="true"
+        class="block h-auto w-full"
+      >
+        {contributions.weeks.map((week, wi) =>
+          week.days.map((day, di) => (
+            <rect
+              x={wi * PITCH}
+              y={di * PITCH}
+              width={CELL}
+              height={CELL}
+              rx="2"
+              class={levelClass[day.level]}
+            >
+              <title>{`${day.count} contribution${day.count === 1 ? "" : "s"} on ${day.date}`}</title>
+            </rect>
+          ))
+        )}
+      </svg>
+    </a>
+  )
+}

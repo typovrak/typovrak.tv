@@ -8,6 +8,7 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
 import Card from "@/components/Card.astro";
+import GithubWall from "@/components/GithubWall.astro";
 import HeadingLinks from "@/components/HeadingLinks.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
@@ -94,6 +95,22 @@ const homePath = getRelativeLocaleUrl(locale, "");
           more about me
         </LinkButton>.
       </p>
+
+      <div class="mt-6">
+        <GithubWall />
+        <details class="mt-1 text-sm">
+          <summary
+            class="hover:text-accent w-fit cursor-pointer list-none opacity-50"
+          >
+            ?
+          </summary>
+          <p class="text-muted-foreground mt-1 italic">
+            If you don't know what this wall represents, you will not understand
+            a thing here.
+          </p>
+        </details>
+      </div>
+
       {
         socials.length > 0 && (
           <div class="mt-4 flex max-sm:flex-col sm:items-center">
