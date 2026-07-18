@@ -5,6 +5,7 @@ import Header from "@/components/Header.astro";
 import Breadcrumb from "@/components/Breadcrumb.astro";
 import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
+import HeadingLinks from "@/components/HeadingLinks.astro";
 import config from "@/config";
 
 const legal = await getEntry("pages", "legal-notices");
@@ -33,4 +34,6 @@ const { Content } = await render(legal);
   </Main>
 
   <Footer />
+
+  <HeadingLinks />
 </Layout>

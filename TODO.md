@@ -7,6 +7,8 @@
 
 - [ ] adding all my nixos plugins in this website, with it's own section or article.
 
+- [ ] display my github wall ? with an animation appear with every square, so it can be lazy loaded
+
 - [ ] mettre en place une partie dactylographie sur le site
 
 AFTER THE FIRST POST IS DONE :

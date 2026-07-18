@@ -8,6 +8,7 @@ import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
 import Card from "@/components/Card.astro";
+import HeadingLinks from "@/components/HeadingLinks.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { useTranslations } from "@/i18n";
@@ -108,13 +109,12 @@ const homePath = getRelativeLocaleUrl(locale, "");
     {
       featuredPosts.length > 0 && (
         <section
-          id="featured"
           class:list={[
             "pt-12 pb-6",
             { "border-border border-b": recentPosts.length > 0 },
           ]}
         >
-          <h2 class="text-2xl font-semibold tracking-wide">
+          <h2 id="featured" class="text-2xl font-semibold tracking-wide">
             {t.home.featured}
           </h2>
           <ul>
@@ -128,8 +128,8 @@ const homePath = getRelativeLocaleUrl(locale, "");
 
     {
       recentPosts.length > 0 && (
-        <section id="recent-posts" class="pt-12 pb-6">
-          <h2 class="text-2xl font-semibold tracking-wide">
+        <section class="pt-12 pb-6">
+          <h2 id="recent-posts" class="text-2xl font-semibold tracking-wide">
             {t.home.recentPosts}
           </h2>
           <ul>
@@ -149,6 +149,8 @@ const homePath = getRelativeLocaleUrl(locale, "");
     </div>
   </main>
   <Footer />
+
+  <HeadingLinks />
 </Layout>
 
 <script>
