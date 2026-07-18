@@ -1,0 +1,167 @@
+{
+  "nixos": {
+    "stars": 5,
+    "forks": 2,
+    "archived": false
+  },
+  "nixos-alacritty": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-audio": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-bash": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-bat": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-btop": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-cava": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-fastfetch": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-flatpak": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-fonts": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-gh": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-ghostty": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-git": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-gtk": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-htop": {
+    "stars": 2,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-i3": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-i3lock-color": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-launchers": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-lazygit": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-lightdm": {
+    "stars": 1,
+    "forks": 1,
+    "archived": false
+  },
+  "nixos-locale": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-nemo": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-neofetch": {
+    "stars": 1,
+    "forks": 1,
+    "archived": true
+  },
+  "nixos-nvim": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-pavucontrol": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-polybar": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-projects": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-screenkey": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-ssh": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-stylus": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-yazi": {
+    "stars": 1,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-zellij": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
+  "nixos-zsh": {
+    "stars": 2,
+    "forks": 0,
+    "archived": false
+  }
+}

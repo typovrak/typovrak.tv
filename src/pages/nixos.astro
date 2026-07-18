@@ -1,0 +1,103 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import HeadingLinks from "@/components/HeadingLinks.astro";
+import RepoStats from "@/components/RepoStats.astro";
+import { slugifyStr } from "@/utils/slugify";
+import {
+  nixosCategories,
+  nixosRepoUrl,
+  moduleUrl,
+  moduleStatsFor,
+  repoStatsFor,
+} from "@/data/nixos";
+import config from "@/config";
+
+const title = "NixOS";
+const description = "My NixOS configuration, split into one module per tool.";
+const coreStats = repoStatsFor("nixos");
+---
+
+<Layout title={`${title} | ${config.site.title}`} description={description}>
+  <Header />
+
+  <Breadcrumb />
+
+  <Main pageTitle={title}>
+    <p>
+      My NixOS setup is split into one module per tool, each in its own repo.
+      The modules are grouped below by what they configure.
+    </p>
+
+    <a
+      href={nixosRepoUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="focus-outline group border-accent hover:bg-accent/5 mt-6 block rounded-lg border-2 p-5 sm:p-6"
+    >
+      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+        <span class="text-accent text-2xl font-bold group-hover:underline">
+          nixos
+        </span>
+        <span class="text-muted-foreground text-sm">the core config</span>
+      </div>
+      <p class="mt-2">
+        The umbrella config that ties every module below together: shell,
+        desktop, development tools, window manager, audio, fonts and theming.
+      </p>
+      <RepoStats stars={coreStats.stars} forks={coreStats.forks} class="mt-3" />
+    </a>
+
+    {
+      nixosCategories.map(category => (
+        <section class="mt-10">
+          <h2
+            id={slugifyStr(category.title)}
+            class="text-xl font-semibold tracking-wide"
+          >
+            {category.title}
+          </h2>
+          <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+            {category.modules.map(module => {
+              const stats = moduleStatsFor(module.name);
+              return (
+                <li class="border-border rounded-md border p-3">
+                  <a
+                    href={moduleUrl(module.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="focus-outline group block"
+                  >
+                    <span class="text-accent font-semibold group-hover:underline">
+                      {module.name}
+                    </span>
+                    {stats.archived && (
+                      <span class="border-border text-muted-foreground ms-2 rounded border px-1.5 py-0.5 align-middle text-xs">
+                        archived
+                      </span>
+                    )}
+                    <span class="text-muted-foreground mt-1 block text-sm">
+                      {module.purpose}
+                    </span>
+                    <RepoStats
+                      stars={stats.stars}
+                      forks={stats.forks}
+                      class="mt-2"
+                    />
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ))
+    }
+  </Main>
+
+  <Footer />
+
+  <HeadingLinks />
+</Layout>
