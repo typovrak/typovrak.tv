@@ -50,7 +50,8 @@ const levelClass = [
               width={CELL}
               height={CELL}
               rx="2"
-              class={levelClass[day.level]}
+              class:list={["wall-cell", levelClass[day.level]]}
+              style={`animation-delay:${300 + Math.round(Math.random() * 2500)}ms`}
             >
               <title>{`${day.count} contribution${day.count === 1 ? "" : "s"} on ${day.date}`}</title>
             </rect>
@@ -60,3 +61,27 @@ const levelClass = [
     </a>
   )
 }
+
+<style>
+  /* Each cell fades in on load with a per-cell random delay (set inline), so
+     the wall builds up in a random order. Opacity only: animating a transform
+     on hundreds of SVG rects janks, opacity stays on the compositor. */
+  .wall-cell {
+    opacity: 0;
+    animation: wall-cell-in 0.7s ease-out forwards;
+  }
+  @keyframes wall-cell-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wall-cell {
+      opacity: 1;
+      animation: none;
+    }
+  }
+</style>
