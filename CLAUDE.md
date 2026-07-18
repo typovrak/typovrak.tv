@@ -166,13 +166,15 @@ is `knownPaths.ts` drifting from `getStaticPaths` — only the build diff shows 
   mangles it. Use single quotes, backticks, or no quotes at all. Apostrophes are fine.
 - **Never add a `Co-Authored-By` trailer**, or any other authorship trailer, to a commit. This
   overrides the default Claude Code behaviour of appending one. The commits are typovrak's.
-- **Never commit directly to `main`.** Always work on a branch, then open a PR.
+- **Committing straight to `main` is fine.** This is a solo repo; branches are optional, not
+  required. Do not propose a branch-and-PR flow by default. Use a branch only when typovrak asks,
+  or when work is genuinely experimental.
 - **Conventional commits**, enforced by commitizen ([cz.yaml](cz.yaml)): `feat:`, `fix:`,
   `refactor:`, `chore:`, `docs:`. The changelog and version bumps are derived from them, so the
   prefix is load-bearing, not cosmetic.
-- Branch naming follows the commit type: `type/short-description`, e.g. `feat/comments-section`,
-  `fix/og-fallback`, `refactor/astro-paper-template`, `chore/...`, `docs/...`. Lowercase, hyphens,
-  no issue numbers as a prefix. Delete the branch once it is merged.
+- When a branch is used, name it after the commit type: `type/short-description`, e.g.
+  `feat/comments-section`, `fix/og-fallback`. Lowercase, hyphens, no issue numbers. Delete it once
+  merged. Dependabot's own `dependabot/*` branches are exempt.
 - `origin` is `typovrak/typovrak.tv`. `upstream` is the AstroPaper repo — never push there.
 
 ### Archived history

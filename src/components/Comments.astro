@@ -17,11 +17,11 @@ const enabled = !!(c && c.repoId && c.categoryId);
         <button
           type="button"
           data-load-comments
-          class="border-border hover:border-accent hover:text-accent rounded border px-4 py-2 text-sm"
+          class="bg-accent text-accent-foreground rounded-md px-5 py-2.5 font-medium transition-opacity hover:opacity-90"
         >
           Load comments
         </button>
-        <p class="text-muted-foreground mt-2 text-sm">
+        <p class="text-muted-foreground mt-4 text-sm">
           Loads a GitHub-hosted comment widget. It is fetched only when you
           click, which exposes your IP to GitHub. See the{" "}
           <a
