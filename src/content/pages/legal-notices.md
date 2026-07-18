@@ -1,6 +1,6 @@
 ---
 title: "Legal Notices"
-description: "Publisher, hosting, and how typovrak.tv handles personal data."
+description: "Publisher, hosting, and terms for the typovrak.tv website."
 ---
 
 These legal notices apply to the [typovrak.tv](/) website.
@@ -37,54 +37,13 @@ Despite the care taken to keep it accurate and up to date, no liability can be a
 
 ## 6. Personal data
 
-The website measures its own audience, and nothing more. When you open a page, the server records:
+How this website collects, uses, and protects personal data, including cookies, processors, and your rights, is described in the [Privacy Policy](/privacy-policy).
 
-- the page path (for example `/posts/some-article`),
-- the date and time of the visit,
-- the host of the referring site (for example `google.com`), never the full URL,
-- a coarse country, derived from the request,
-- a coarse device class (mobile, tablet, or desktop).
-
-The website never stores your IP address (not even hashed), your full user-agent string, or any identifier that would let it recognise you across visits. There is no contact form and no newsletter.
-
-**Purpose.** Audience measurement only, to know which articles are read. The data is not used to profile visitors, and is not sold, rented, or shared for other purposes.
-
-**Legal basis.** Legitimate interest in measuring the site's audience (GDPR art. 6(1)(f)), kept proportionate by collecting no personal identifier.
-
-**Processors.** Three providers process this data on the publisher's behalf:
-
-- Vercel Web Analytics and Vercel Speed Insights, which are cookieless, for traffic and performance metrics,
-- Neon, which hosts the database where the audience data is stored.
-
-Comments are handled by [giscus](https://giscus.app) (GitHub Discussions). The comment widget is loaded from GitHub only when you click to load it, which exposes your IP address to GitHub at that point. Posting a comment requires a GitHub account, under GitHub's own terms. If you never open the comments, nothing is sent to GitHub.
-
-**Retention.** Audience-measurement data is kept for at most 25 months, in line with the CNIL's cap, then deleted.
-
-Under the GDPR you have the right to access, rectify, and erase your data, and to object to its processing. Because the site stores no identifier, it usually cannot link a stored row back to an individual, which limits what can be acted on in practice.
-
-To exercise a right, or to object to the audience measurement described above, email [typovrak@gmail.com](mailto:typovrak@gmail.com). The data controller is Morgan Scholz.
-
-You may also lodge a complaint with the French data protection authority, the [CNIL](https://www.cnil.fr).
-
-## 7. Data transfer outside the European Union
-
-Some processors are United States companies (Vercel, and GitHub for the comments), so some data may be processed outside the European Union. Such transfers are governed by the European Commission's Standard Contractual Clauses.
-
-## 8. Cookies
-
-The website itself sets **no cookie** and writes nothing to your browser's storage, for analytics or any other purpose. Because nothing is read from or written to your device by the site, no consent banner is required.
-
-Signing in to comment through giscus is handled by GitHub and may set cookies on GitHub's domain, not on this site.
-
-## 9. Applicable law
+## 7. Applicable law
 
 These legal notices are governed by French law. In the absence of an amicable resolution, any dispute falls under the jurisdiction of the competent French courts.
 
-## 10. Security
-
-The [typovrak.tv](/) website is served over HTTPS with a strict set of security headers and a Content Security Policy. Database queries are parameterised against injection, and no personal identifier is stored.
-
-## 11. Updates
+## 8. Updates
 
 These legal notices may change to stay compliant with current law. The date below reflects the latest revision.
 

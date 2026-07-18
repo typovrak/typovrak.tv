@@ -1,10 +1,3 @@
-- [~] legal notice page -> /legal-notices, linked in the footer. Covers editor, hosting (Vercel,
-      Neon), the view tracking, Vercel Analytics + Speed Insights as processors, no-cookie stance,
-      EU transfers, rights and objection, CNIL. Fill in the bracketed line (business status/SIRET)
-      if publishing as a registered business, and have someone review it. Not legal advice.
-
-- [ ] does i need a privacy policy in this website ?
-
 - [ ] adding all my nixos plugins in this website, with it's own section or article.
 
 - [ ] display my github wall ? with an animation appear with every square, so it can be lazy loaded

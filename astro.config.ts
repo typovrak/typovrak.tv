@@ -64,6 +64,7 @@ export default defineConfig({
   adapter: vercel(),
   output: "static",
   trailingSlash: "never",
+  devToolbar: { enabled: false },
   integrations: [
     mdx(),
     sitemap({

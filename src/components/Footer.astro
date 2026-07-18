@@ -33,6 +33,13 @@ const currentYear = new Date().getFullYear();
       >
         Legal notices
       </a>
+      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
+      <a
+        href={getRelativeLocaleUrl(locale, "privacy-policy")}
+        class="hover:text-accent underline decoration-dashed underline-offset-4"
+      >
+        Privacy policy
+      </a>
     </div>
   </div>
 </footer>
