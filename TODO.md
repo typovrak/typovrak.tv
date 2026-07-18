@@ -3,10 +3,13 @@
       EU transfers, rights and objection, CNIL. Fill in the bracketed line (business status/SIRET)
       if publishing as a registered business, and have someone review it. Not legal advice.
 
-- [x] rendre le bouton load comments plus visible -> solid accent button (bg-accent +
-      accent-foreground text, larger, medium weight) instead of the faint border-border outline.
-
-- [ ] SEO optimization
+- [~] SEO optimization. Done: WebSite + SearchAction JSON-LD on the home, BreadcrumbList on
+      pages with a visual breadcrumb, richer BlogPosting (description, mainEntityOfPage, keywords,
+      publisher), article:tag OG meta, meta keywords (site default + per-post tags), sitemap
+      lastmod from modDatetime/pubDatetime. Foundations (canonical, OG, sitemap, RSS, robots) were
+      already there. Remaining (your action): verify the domain in Google Search Console + Bing,
+      set PUBLIC_GOOGLE_SITE_VERIFICATION, submit the sitemap. Validate rich results with the
+      tools in AUDITS.md. The rest of SEO is content.
 
 - [ ] adding all my nixos plugins in this website, with it's own section or article.
 

@@ -19,7 +19,45 @@ import {
   transformerNotationWordHighlight,
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
+import { postSlugPath } from "./src/utils/postSlug";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import config from "./astro-paper.config";
+
+// Build a `pathname -> last-modified` map for the sitemap. @astrojs/sitemap does
+// not know post dates, so we read the frontmatter here and reuse postSlugPath
+// (the same pure function getPostUrl uses) so the URLs cannot drift from the
+// routes. A post whose id convention we fail to reconstruct simply gets no
+// lastmod, never a wrong one.
+const BLOG_DIR = "src/content/posts";
+function postLastmodMap(): Map<string, string> {
+  const map = new Map<string, string>();
+  const walk = (dir: string, base = "") => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.name.startsWith("_")) continue;
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(full, `${base}${entry.name}/`);
+        continue;
+      }
+      if (!/\.mdx?$/.test(entry.name)) continue;
+      const frontmatter = readFileSync(full, "utf8").split("---")[1] ?? "";
+      if (/\bdraft:\s*true\b/.test(frontmatter)) continue;
+      const pub = frontmatter.match(/pubDatetime:\s*(\S+)/)?.[1];
+      const mod = frontmatter.match(/modDatetime:\s*(\S+)/)?.[1];
+      const date = mod || pub;
+      if (!date) continue;
+      const id = base + entry.name.replace(/\.mdx?$/, "");
+      map.set(
+        `/posts/${postSlugPath(id, full, BLOG_DIR)}`,
+        new Date(date).toISOString()
+      );
+    }
+  };
+  walk(BLOG_DIR);
+  return map;
+}
+const lastmodByPath = postLastmodMap();
 
 export default defineConfig({
   site: config.site.url,
@@ -31,6 +69,11 @@ export default defineConfig({
     sitemap({
       filter: page =>
         config.features?.showArchives !== false || !page.endsWith("/archives/"),
+      serialize(item) {
+        const path = new URL(item.url).pathname.replace(/\/$/, "") || "/";
+        const lastmod = lastmodByPath.get(path);
+        return lastmod ? { ...item, lastmod } : item;
+      },
     }),
   ],
   i18n: {

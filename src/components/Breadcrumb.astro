@@ -1,6 +1,7 @@
 ---
 import { getRelativeLocaleUrl } from "astro:i18n";
 import IconChevronRight from "@/assets/icons/IconChevronRight.svg";
+import { serialiseJsonLd } from "@/utils/jsonLd";
 import { stripBase, stripLocale } from "@/utils/withBase";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -56,6 +57,28 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
     }`
   );
 }
+
+// Structured breadcrumb, built from the path (not the mutated visual list
+// above) so every item carries a correct absolute URL.
+const crumbs = [{ name: t.nav.home, path: "/" }];
+let acc = "";
+for (const segment of currentUrlPath.split("/").filter(Boolean)) {
+  acc += `/${segment}`;
+  crumbs.push({
+    name: navLabels[segment] ?? decodeSegment(segment),
+    path: acc,
+  });
+}
+const breadcrumbLd = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: crumbs.map((crumb, index) => ({
+    "@type": "ListItem",
+    position: index + 1,
+    name: crumb.name,
+    item: new URL(crumb.path, Astro.site).href,
+  })),
+};
 ---
 
 <nav class="app-layout mt-8 mb-1" aria-label="breadcrumb">
@@ -101,3 +124,9 @@ if (breadcrumbList[0] === "tags" && !isNaN(Number(breadcrumbList[2]))) {
     }
   </ul>
 </nav>
+
+<script
+  type="application/ld+json"
+  is:inline
+  set:html={serialiseJsonLd(breadcrumbLd)}
+/>

@@ -5,6 +5,8 @@ interface SiteConfig {
   title: string;
   /** Short description used in SEO meta and RSS feed */
   description: string;
+  /** Comma-separated default meta keywords. Posts override with their tags. */
+  keywords?: string;
   /** Default post author name */
   author: string;
   /** Author profile URL (used in structured data) */
@@ -121,7 +123,7 @@ type ResolvedSiteConfig = Required<
     | "ogImage"
   >
 > &
-  Pick<SiteConfig, "profile" | "googleVerification">;
+  Pick<SiteConfig, "profile" | "googleVerification" | "keywords">;
 
 export interface ResolvedAstroPaperConfig {
   site: ResolvedSiteConfig;

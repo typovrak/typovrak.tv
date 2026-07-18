@@ -11,9 +11,28 @@ import Card from "@/components/Card.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { useTranslations } from "@/i18n";
+import { serialiseJsonLd } from "@/utils/jsonLd";
 import config from "@/config";
 
 const { socials, posts: postsConfig } = config;
+
+// WebSite + SearchAction: lets Google offer a sitelinks search box. The target
+// points at the Pagefind search page, which reads ?q=.
+const websiteLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  url: config.site.url,
+  name: config.site.title,
+  description: config.site.description,
+  potentialAction: {
+    "@type": "SearchAction",
+    target: {
+      "@type": "EntryPoint",
+      urlTemplate: `${config.site.url}search?q={search_term_string}`,
+    },
+    "query-input": "required name=search_term_string",
+  },
+};
 
 const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(locale);
@@ -26,6 +45,14 @@ const homePath = getRelativeLocaleUrl(locale, "");
 ---
 
 <Layout>
+  <Fragment slot="head">
+    <script
+      type="application/ld+json"
+      is:inline
+      set:html={serialiseJsonLd(websiteLd)}
+    />
+  </Fragment>
+
   <Header />
   <main
     id="main-content"
