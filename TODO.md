@@ -1,6 +1,15 @@
 - [ ] mettre en place une partie dactylographie sur le site où on écrit mon code source de mes propres repo
 
-- [ ] add a section for my public most OSS project, star rune with 15000$ 
+- [ ] mettre lien github de star rune + refaire le README
+
+- [ ] mettre sur la page /nixos, request a new module ? So that i can create a nixos module with catppuccin green mocha theme that integrate in my current configuration
+
+- [ ] Page /uses (matériel, clavier, layout, outils) en complément de /nixos. Naturel pour ton audience.
+
+Callouts / admonitions (note, warning, tip) thémés Catppuccin. Tu as évoqué des composants « façon AWS » : c'est la base.
+Bloc Q&A / FAQ par article (aussi dans ton TODO) avec JSON-LD FAQPage : lisibilité + gain SEO réel (rich snippets).
+Diagrammes Mermaid rendus au build en SVG (via rehype, pas de JS client) : schémas d'archi sans casser la CSP.
+Casts de terminal en SVG animé (type svg-term, généré au build) : montrer une session CLI sans lecteur JS externe. Parfait pour tes tutos.
 
 AFTER THE FIRST POST IS DONE :
 - [ ] Google site verification + bing

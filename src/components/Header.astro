@@ -130,13 +130,14 @@ const isActive = (path: string) => {
         }
         {
           features.search !== false && (
-            <li class="col-span-1 flex items-center justify-center">
+            <li class="col-span-1 flex items-center justify-center gap-1.5">
               <LinkButton
                 href={getRelativeLocaleUrl(locale, "search")}
                 class:list={["focus-outline relative size-8"]}
                 title={t.nav.search}
                 aria-label={t.nav.search}
                 aria-current={isActive("/search") ? "page" : undefined}
+                data-command-palette-trigger
               >
                 <IconSearch class="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2" />
                 <span class="sr-only">{t.nav.search}</span>
@@ -147,6 +148,12 @@ const isActive = (path: string) => {
                   />
                 )}
               </LinkButton>
+              <kbd
+                data-cp-hint
+                class="border-border text-muted-foreground hidden rounded border px-1.5 py-0.5 text-xs sm:inline-block"
+              >
+                Ctrl K
+              </kbd>
             </li>
           )
         }

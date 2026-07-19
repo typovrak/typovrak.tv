@@ -1,0 +1,393 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import { getAssetPath } from "@/utils/withBase";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const l = (path: string) => getRelativeLocaleUrl(locale, path);
+
+const enabled = config.features.search === "pagefind";
+const themeEnabled = config.features.lightAndDarkMode;
+const bundlePath = getAssetPath("pagefind/");
+
+// Server-rendered so the links are correct without building URLs in JS.
+const pages = [
+  { label: "Home", href: l("") },
+  { label: "Posts", href: l("posts") },
+  { label: "Tags", href: l("tags") },
+  { label: "NixOS", href: l("nixos") },
+  { label: "About", href: l("about") },
+  { label: "Search", href: l("search") },
+  {
+    label: "RSS feed",
+    href: `${import.meta.env.BASE_URL.replace(/\/?$/, "/")}rss.xml`,
+  },
+];
+---
+
+{
+  enabled && (
+    <div
+      id="command-palette"
+      hidden
+      data-bundle-path={bundlePath}
+      class="fixed inset-0 z-[100]"
+    >
+      <div data-cp-backdrop class="absolute inset-0 bg-black/50" />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
+        class="border-border bg-background relative mx-auto mt-[10vh] flex max-h-[80vh] w-[92%] max-w-xl flex-col overflow-hidden rounded-lg border shadow-2xl"
+      >
+        <div class="border-border flex items-center gap-2 border-b px-3">
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            class="text-muted-foreground shrink-0"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            data-cp-input
+            type="text"
+            role="combobox"
+            aria-expanded="true"
+            aria-controls="cp-list"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Search posts or jump to a page…"
+            class="w-full bg-transparent py-3 outline-none"
+          />
+          <kbd class="border-border text-muted-foreground rounded border px-1.5 py-0.5 text-xs">
+            Esc
+          </kbd>
+        </div>
+        <div id="cp-list" role="listbox" class="overflow-y-auto p-2">
+          <div data-cp-actions>
+            <div class="text-muted-foreground px-2 pt-1 pb-1 text-xs tracking-wide uppercase">
+              Pages
+            </div>
+            <ul>
+              {pages.map((page, i) => (
+                <li>
+                  <a
+                    id={`cp-page-${i}`}
+                    data-cp-item
+                    data-label={page.label}
+                    href={page.href}
+                    role="option"
+                    aria-selected="false"
+                    class="cp-item"
+                  >
+                    <span class="cp-item-title">{page.label}</span>
+                  </a>
+                </li>
+              ))}
+              {themeEnabled && (
+                <li>
+                  <button
+                    type="button"
+                    id="cp-action-theme"
+                    data-cp-item
+                    data-cp-action="theme"
+                    data-label="Toggle theme"
+                    role="option"
+                    aria-selected="false"
+                    class="cp-item w-full text-start"
+                  >
+                    <span class="cp-item-title">Toggle theme</span>
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+          <div data-cp-results-section hidden>
+            <div class="text-muted-foreground px-2 pt-2 pb-1 text-xs tracking-wide uppercase">
+              Posts
+            </div>
+            <ul data-cp-results />
+          </div>
+          <p
+            data-cp-empty
+            hidden
+            class="text-muted-foreground px-2 py-6 text-center text-sm"
+          >
+            No results.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+<script>
+  const palette = document.getElementById("command-palette");
+  if (palette) {
+    const input = palette.querySelector<HTMLInputElement>("[data-cp-input]")!;
+    const backdrop = palette.querySelector<HTMLElement>("[data-cp-backdrop]")!;
+    const actionsList =
+      palette.querySelector<HTMLElement>("[data-cp-actions]")!;
+    const resultsSection = palette.querySelector<HTMLElement>(
+      "[data-cp-results-section]"
+    )!;
+    const resultsList =
+      palette.querySelector<HTMLElement>("[data-cp-results]")!;
+    const emptyEl = palette.querySelector<HTMLElement>("[data-cp-empty]")!;
+    const pageItems = Array.from(
+      actionsList.querySelectorAll<HTMLElement>("[data-cp-item]")
+    );
+    const bundlePath = palette.dataset.bundlePath ?? "/pagefind/";
+
+    let items: HTMLElement[] = [];
+    let active = -1;
+    let lastFocused: HTMLElement | null = null;
+    let searchToken = 0;
+    // Pagefind is imported lazily on the first query; it is a runtime-only
+    // module served from /pagefind, so it stays out of the bundle.
+    let pagefind: {
+      search: (q: string) => Promise<{ results: PfResult[] }>;
+    } | null = null;
+    let pagefindTried = false;
+
+    type PfResult = { data: () => Promise<PfData> };
+    type PfData = { url: string; excerpt?: string; meta?: { title?: string } };
+
+    const isOpen = () => !palette.hidden;
+
+    function setActive(i: number) {
+      active = i;
+      items.forEach((el, idx) => {
+        const on = idx === i;
+        el.classList.toggle("cp-active", on);
+        el.setAttribute("aria-selected", on ? "true" : "false");
+        if (on) {
+          input.setAttribute("aria-activedescendant", el.id);
+          el.scrollIntoView({ block: "nearest" });
+        }
+      });
+      if (i < 0) input.removeAttribute("aria-activedescendant");
+    }
+
+    function refresh() {
+      const visiblePages = pageItems.filter(el => !el.hidden);
+      const results = Array.from(
+        resultsList.querySelectorAll<HTMLElement>("[data-cp-item]")
+      );
+      items = [...visiblePages, ...results];
+      emptyEl.hidden = items.length > 0;
+      setActive(
+        items.length ? Math.min(Math.max(active, 0), items.length - 1) : -1
+      );
+    }
+
+    function filterPages(query: string) {
+      pageItems.forEach(el => {
+        const label = (el.dataset.label ?? "").toLowerCase();
+        el.hidden = query.length > 0 && !label.includes(query);
+      });
+    }
+
+    async function ensurePagefind() {
+      if (pagefind || pagefindTried) return pagefind;
+      pagefindTried = true;
+      try {
+        pagefind = await import(/* @vite-ignore */ `${bundlePath}pagefind.js`);
+      } catch {
+        pagefind = null;
+      }
+      return pagefind;
+    }
+
+    async function runSearch(query: string) {
+      const token = ++searchToken;
+      if (query.length < 2) {
+        resultsList.replaceChildren();
+        resultsSection.hidden = true;
+        refresh();
+        return;
+      }
+      const pf = await ensurePagefind();
+      if (!pf || token !== searchToken) return;
+      const search = await pf.search(query);
+      if (token !== searchToken) return;
+      const data = await Promise.all(
+        search.results.slice(0, 6).map(result => result.data())
+      );
+      if (token !== searchToken) return;
+
+      resultsList.replaceChildren();
+      data.forEach((entry, i) => {
+        const url = entry.url.replace(/\.html$/, "").replace(/\/$/, "") || "/";
+        const item = document.createElement("a");
+        item.id = `cp-result-${i}`;
+        item.href = url;
+        item.className = "cp-item";
+        item.dataset.cpItem = "";
+        item.setAttribute("role", "option");
+        item.setAttribute("aria-selected", "false");
+
+        const title = document.createElement("span");
+        title.className = "cp-item-title";
+        title.textContent = entry.meta?.title ?? url;
+
+        const sub = document.createElement("span");
+        sub.className = "cp-item-sub";
+        // Excerpt is our own indexed content (with <mark> highlights).
+        sub.innerHTML = entry.excerpt ?? "";
+
+        item.append(title, sub);
+        const li = document.createElement("li");
+        li.append(item);
+        resultsList.append(li);
+      });
+      resultsSection.hidden = data.length === 0;
+      refresh();
+    }
+
+    function onInput() {
+      const query = input.value.trim().toLowerCase();
+      filterPages(query);
+      active = 0;
+      refresh();
+      runSearch(query);
+    }
+
+    const open = () => {
+      if (isOpen()) return;
+      lastFocused = document.activeElement as HTMLElement | null;
+      palette.hidden = false;
+      document.documentElement.style.overflow = "hidden";
+      input.value = "";
+      filterPages("");
+      resultsList.replaceChildren();
+      resultsSection.hidden = true;
+      active = 0;
+      refresh();
+      input.focus();
+    };
+
+    const close = () => {
+      if (!isOpen()) return;
+      palette.hidden = true;
+      document.documentElement.style.overflow = "";
+      lastFocused?.focus?.();
+    };
+
+    function move(delta: number) {
+      if (!items.length) return;
+      setActive((active + delta + items.length) % items.length);
+    }
+
+    input.addEventListener("input", onInput);
+    backdrop.addEventListener("click", close);
+    palette.addEventListener("mouseover", event => {
+      const item = (event.target as HTMLElement).closest<HTMLElement>(
+        "[data-cp-item]"
+      );
+      if (item) setActive(items.indexOf(item));
+    });
+
+    document.addEventListener("keydown", event => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        isOpen() ? close() : open();
+        return;
+      }
+      if (!isOpen()) return;
+      switch (event.key) {
+        case "Escape":
+          event.preventDefault();
+          close();
+          break;
+        case "ArrowDown":
+          event.preventDefault();
+          move(1);
+          break;
+        case "ArrowUp":
+          event.preventDefault();
+          move(-1);
+          break;
+        case "Tab":
+          // Keep focus in the palette; navigate with the arrow keys.
+          event.preventDefault();
+          break;
+        case "Enter":
+          if (active >= 0 && items[active]) {
+            event.preventDefault();
+            items[active].click();
+          }
+          break;
+      }
+    });
+
+    // The header search icon opens the palette; without JS it still links to
+    // the search page.
+    document
+      .querySelectorAll<HTMLElement>("[data-command-palette-trigger]")
+      .forEach(trigger =>
+        trigger.addEventListener("click", event => {
+          event.preventDefault();
+          open();
+        })
+      );
+
+    // Toggle theme reuses the header button, so the logic lives in one place.
+    palette
+      .querySelector<HTMLElement>('[data-cp-action="theme"]')
+      ?.addEventListener("click", () => {
+        document.getElementById("theme-btn")?.click();
+        close();
+      });
+
+    // The shortcut is Ctrl on Linux/Windows (the rendered default) and Cmd on
+    // Apple platforms.
+    if (/Mac|iPhone|iPad/i.test(navigator.userAgent)) {
+      document
+        .querySelectorAll<HTMLElement>("[data-cp-hint]")
+        .forEach(el => (el.textContent = "⌘K"));
+    }
+  }
+</script>
+
+<style is:global>
+  .cp-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.375rem;
+    text-decoration: none;
+    color: var(--foreground);
+    cursor: pointer;
+  }
+  .cp-item.cp-active {
+    background: var(--muted);
+  }
+  .cp-item-title {
+    font-weight: 500;
+  }
+  .cp-item.cp-active .cp-item-title {
+    color: var(--accent);
+  }
+  .cp-item-sub {
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cp-item-sub mark {
+    background: transparent;
+    color: var(--accent);
+    font-weight: 600;
+  }
+</style>
