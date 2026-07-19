@@ -1,7 +1,5 @@
 - [ ] mettre en place une partie dactylographie sur le site où on écrit mon code source de mes propres repo
 
-- [ ] create a section on the home for every github project that i contribute 
-
 - [ ] add a section for my public most OSS project, star rune with 15000$ 
 
 AFTER THE FIRST POST IS DONE :
