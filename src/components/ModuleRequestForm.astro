@@ -1,0 +1,151 @@
+---
+import { getRelativeLocaleUrl } from "astro:i18n";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const privacyUrl = getRelativeLocaleUrl(locale, "privacy-policy");
+
+const field =
+  "border-border bg-background focus:outline-accent w-full rounded-md border px-3 py-2 outline-none focus:outline-2";
+---
+
+<form data-module-request class="mt-4 flex flex-col gap-4">
+  <div class="flex flex-col gap-1">
+    <label for="mr-module" class="text-sm font-medium">Module</label>
+    <input
+      id="mr-module"
+      name="module"
+      type="text"
+      required
+      maxlength="100"
+      autocomplete="off"
+      placeholder="The tool to package, e.g. waybar"
+      class={field}
+    />
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label for="mr-details" class="text-sm font-medium">Details</label>
+    <textarea
+      id="mr-details"
+      name="details"
+      rows="3"
+      required
+      maxlength="2000"
+      placeholder="What it should do, options you care about, links…"
+      class={field}></textarea>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label for="mr-email" class="text-sm font-medium">Email</label>
+    <input
+      id="mr-email"
+      name="email"
+      type="email"
+      required
+      maxlength="200"
+      autocomplete="email"
+      placeholder="So I can reply"
+      class={field}
+    />
+  </div>
+
+  {/* Honeypot: hidden from people, tempting to bots. */}
+  <input
+    type="text"
+    name="website"
+    tabindex="-1"
+    autocomplete="off"
+    aria-hidden="true"
+    class="hidden"
+  />
+
+  <label class="flex items-start gap-2 text-sm">
+    <input
+      name="consent"
+      type="checkbox"
+      required
+      class="accent-accent mt-0.5"
+    />
+    <span>
+      I agree that my email and request are stored and sent to the maintainer so
+      they can reply, as described in the{" "}
+      <a
+        href={privacyUrl}
+        class="text-accent underline-offset-4 hover:underline"
+      >
+        privacy policy
+      </a>.
+    </span>
+  </label>
+
+  <div class="flex items-center gap-3">
+    <button
+      type="submit"
+      class="focus-outline bg-accent text-accent-foreground inline-flex items-center rounded-md px-4 py-2 font-medium transition-opacity hover:opacity-90 disabled:opacity-60"
+    >
+      Send request
+    </button>
+    <p
+      data-module-request-status
+      role="status"
+      aria-live="polite"
+      class="text-sm"
+    >
+    </p>
+  </div>
+</form>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-module-request]");
+  if (form) {
+    const status = form.querySelector<HTMLElement>(
+      "[data-module-request-status]"
+    )!;
+    const button = form.querySelector<HTMLButtonElement>(
+      "button[type=submit]"
+    )!;
+
+    const value = (name: string) =>
+      (form.elements.namedItem(name) as HTMLInputElement | null)?.value ?? "";
+
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      status.textContent = "";
+      status.style.color = "";
+      button.disabled = true;
+
+      try {
+        const response = await fetch("/api/module-request", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            module: value("module"),
+            details: value("details"),
+            email: value("email"),
+            website: value("website"),
+            consent: (form.elements.namedItem("consent") as HTMLInputElement)
+              .checked,
+          }),
+        });
+
+        if (response.ok) {
+          form.reset();
+          status.style.color = "var(--accent)";
+          status.textContent = "Thanks, your request was sent.";
+        } else {
+          status.style.color = "var(--foreground)";
+          status.textContent =
+            "Something went wrong. Check the fields and retry.";
+        }
+      } catch {
+        status.style.color = "var(--foreground)";
+        status.textContent = "Network error. Please try again.";
+      } finally {
+        button.disabled = false;
+      }
+    });
+  }
+</script>

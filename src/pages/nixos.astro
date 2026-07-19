@@ -7,6 +7,7 @@ import Footer from "@/components/Footer.astro";
 import HeadingLinks from "@/components/HeadingLinks.astro";
 import RepoStats from "@/components/RepoStats.astro";
 import CategoryIcon from "@/components/CategoryIcon.astro";
+import ModuleRequestForm from "@/components/ModuleRequestForm.astro";
 import { slugifyStr } from "@/utils/slugify";
 import {
   nixosCategories,
@@ -106,6 +107,17 @@ const coreStats = repoStatsFor("nixos");
         </section>
       ))
     }
+
+    <section class="border-border mt-12 border-t pt-8">
+      <h2 id="request-a-module" class="text-xl font-semibold tracking-wide">
+        Request a new module?
+      </h2>
+      <p class="text-muted-foreground mt-2 max-w-prose">
+        Missing a tool? Ask for it and I can build a NixOS module for it, in the
+        Catppuccin Mocha green theme and wired to fit this configuration.
+      </p>
+      <ModuleRequestForm />
+    </section>
   </Main>
 
   <Footer />

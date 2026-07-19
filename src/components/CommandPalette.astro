@@ -10,19 +10,54 @@ const enabled = config.features.search === "pagefind";
 const themeEnabled = config.features.lightAndDarkMode;
 const bundlePath = getAssetPath("pagefind/");
 
-// Server-rendered so the links are correct without building URLs in JS.
-const pages = [
-  { label: "Home", href: l("") },
-  { label: "Posts", href: l("posts") },
-  { label: "Tags", href: l("tags") },
-  { label: "NixOS", href: l("nixos") },
-  { label: "About", href: l("about") },
-  { label: "Search", href: l("search") },
-  {
-    label: "RSS feed",
-    href: `${import.meta.env.BASE_URL.replace(/\/?$/, "/")}rss.xml`,
-  },
+// Nicer labels than the auto-generated ones for a few paths.
+const overrides: Record<string, string> = {
+  "/": "Home",
+  "/nixos": "NixOS",
+  "/posts": "Posts",
+  "/tags": "Tags",
+  "/archives": "Archives",
+};
+const titleFromPath = (path: string) => {
+  const slug = path.replace(/^\//, "");
+  return slug.charAt(0).toUpperCase() + slug.slice(1).replace(/-/g, " ");
+};
+
+// Every top-level static page, so a new page is listed on its own, plus the
+// section indexes that live under dynamic-route folders.
+const pageModules = import.meta.glob("/src/pages/*.astro");
+const staticPaths = Object.keys(pageModules)
+  .map(
+    file =>
+      file
+        .replace("/src/pages", "")
+        .replace(/\.astro$/, "")
+        .replace(/\/index$/, "") || "/"
+  )
+  .filter(path => path !== "/404");
+const sectionPaths = [
+  "/posts",
+  "/tags",
+  ...(config.features.showArchives ? ["/archives"] : []),
 ];
+
+// Server-rendered so the links are correct without building URLs in JS.
+const pages = Array.from(new Set([...staticPaths, ...sectionPaths]))
+  .map(path => ({
+    href: l(path.replace(/^\//, "")),
+    label: overrides[path] ?? titleFromPath(path),
+  }))
+  .sort((a, b) =>
+    a.label === "Home"
+      ? -1
+      : b.label === "Home"
+        ? 1
+        : a.label.localeCompare(b.label)
+  );
+pages.push({
+  label: "RSS feed",
+  href: `${import.meta.env.BASE_URL.replace(/\/?$/, "/")}rss.xml`,
+});
 ---
 
 {

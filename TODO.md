@@ -1,8 +1,7 @@
 - [ ] mettre en place une partie dactylographie sur le site où on écrit mon code source de mes propres repo
 
-- [ ] mettre lien github de star rune + refaire le README
-
-- [ ] mettre sur la page /nixos, request a new module ? So that i can create a nixos module with catppuccin green mocha theme that integrate in my current configuration
+- [ ] mettre en place altcha comme sur webphl pour l'anti-bot
+- [ ] mettre l'envoie d'email automatique en cas de demande de module
 
 - [ ] Page /uses (matériel, clavier, layout, outils) en complément de /nixos. Naturel pour ton audience.
 

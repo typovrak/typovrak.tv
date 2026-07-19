@@ -21,7 +21,7 @@ The publication director of the [typovrak.tv](/) website is Morgan Scholz.
 
 The [typovrak.tv](/) website is hosted by Vercel Inc., 340 S Lemon Ave #4133, Walnut, CA 91789, United States ([vercel.com](https://vercel.com)).
 
-The database that stores audience-measurement data is hosted by Neon Inc. ([neon.com](https://neon.com)).
+The database that stores audience-measurement data and module requests is hosted by Neon Inc. ([neon.com](https://neon.com)).
 
 ## 4. Intellectual property
 
@@ -49,4 +49,4 @@ These legal notices may change to stay compliant with current law. The date belo
 
 ---
 
-**Date of last modification:** 18 July 2026
+**Date of last modification:** 19 July 2026

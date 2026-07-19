@@ -33,3 +33,19 @@ create table if not exists page_view (
 -- insert into page_view (path, views)
 -- select path, count(*) from page_view_event group by path
 -- on conflict (path) do update set views = excluded.views;
+
+-- Visitor-submitted requests for a new NixOS module. Stores the email so the
+-- publisher can reply; a ticked consent box is the legal basis, so the row
+-- only exists once consent is given (enforced in the API route).
+create table if not exists module_request (
+  id bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  module text not null,
+  details text not null,
+  email text not null
+);
+
+create index if not exists module_request_created_at_idx on module_request (created_at);
+
+-- Retention: keep only while a request is being handled. Purge by hand.
+-- delete from module_request where created_at < now() - interval '12 months';
