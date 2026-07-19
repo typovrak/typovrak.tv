@@ -43,7 +43,29 @@ for (const repo of repos
   };
 }
 
+// External repos typovrak contributes to, keyed by full name (mirrors the list
+// in src/data/contributions.ts).
+const external = [
+  "freeCodeCamp/freeCodeCamp",
+  "Racketlon17/2d-collision-simulator",
+];
+for (const full of external) {
+  const response = await fetch(`https://api.github.com/repos/${full}`, {
+    headers,
+  });
+  if (!response.ok) {
+    console.error("GitHub API error:", response.status, await response.text());
+    process.exit(1);
+  }
+  const repo = await response.json();
+  data[full] = {
+    stars: repo.stargazers_count,
+    forks: repo.forks_count,
+    archived: repo.archived,
+  };
+}
+
 // Indented so the daily commit produces a readable line-by-line diff. This
 // file is excluded from prettier (see .prettierignore).
 writeFileSync("src/data/github-repos.json", JSON.stringify(data, null, 2) + "\n");
-console.log(`github-repos: ${Object.keys(data).length} nixos repos.`);
+console.log(`github-repos: ${Object.keys(data).length} repos.`);

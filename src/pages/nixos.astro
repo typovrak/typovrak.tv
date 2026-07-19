@@ -6,14 +6,18 @@ import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
 import HeadingLinks from "@/components/HeadingLinks.astro";
 import RepoStats from "@/components/RepoStats.astro";
+import CategoryIcon from "@/components/CategoryIcon.astro";
 import { slugifyStr } from "@/utils/slugify";
 import {
   nixosCategories,
   nixosRepoUrl,
   moduleUrl,
   moduleStatsFor,
-  repoStatsFor,
+  moduleNixos,
+  nixosVersion,
+  popularityCard,
 } from "@/data/nixos";
+import { repoStatsFor } from "@/data/githubRepos";
 import config from "@/config";
 
 const title = "NixOS";
@@ -48,7 +52,10 @@ const coreStats = repoStatsFor("nixos");
         The umbrella config that ties every module below together: shell,
         desktop, development tools, window manager, audio, fonts and theming.
       </p>
-      <RepoStats stars={coreStats.stars} forks={coreStats.forks} class="mt-3" />
+      <div class="mt-3 flex items-center justify-between">
+        <RepoStats stars={coreStats.stars} forks={coreStats.forks} />
+        <span class="text-muted-foreground text-xs">NixOS {nixosVersion}</span>
+      </div>
     </a>
 
     {
@@ -56,15 +63,18 @@ const coreStats = repoStatsFor("nixos");
         <section class="mt-10">
           <h2
             id={slugifyStr(category.title)}
-            class="text-xl font-semibold tracking-wide"
+            class="flex items-center gap-2 text-xl font-semibold tracking-wide"
           >
+            <CategoryIcon icon={category.icon} class="text-accent" />
             {category.title}
           </h2>
           <ul class="mt-4 grid gap-3 sm:grid-cols-2">
             {category.modules.map(module => {
               const stats = moduleStatsFor(module.name);
               return (
-                <li class="border-border rounded-md border p-3">
+                <li
+                  class:list={["rounded-md border p-3", popularityCard(stats)]}
+                >
                   <a
                     href={moduleUrl(module.name)}
                     target="_blank"
@@ -75,18 +85,19 @@ const coreStats = repoStatsFor("nixos");
                       {module.name}
                     </span>
                     {stats.archived && (
-                      <span class="border-border text-muted-foreground ms-2 rounded border px-1.5 py-0.5 align-middle text-xs">
+                      <span class="ms-2 rounded border border-orange-600/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-700 dark:border-orange-400/40 dark:text-orange-400">
                         archived
                       </span>
                     )}
                     <span class="text-muted-foreground mt-1 block text-sm">
                       {module.purpose}
                     </span>
-                    <RepoStats
-                      stars={stats.stars}
-                      forks={stats.forks}
-                      class="mt-2"
-                    />
+                    <div class="mt-2 flex items-center justify-between">
+                      <RepoStats stars={stats.stars} forks={stats.forks} />
+                      <span class="text-muted-foreground text-xs">
+                        NixOS {moduleNixos(module)}
+                      </span>
+                    </div>
                   </a>
                 </li>
               );

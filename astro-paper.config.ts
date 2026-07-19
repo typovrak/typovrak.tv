@@ -23,7 +23,8 @@ export default defineAstroPaperConfig({
   features: {
     lightAndDarkMode: true,
     dynamicOgImage: false,
-    showArchives: true,
+    // No posts yet, so nothing to archive. Re-enable once there are posts.
+    showArchives: false,
     showBackButton: true,
     search: "pagefind",
   },

@@ -1,40 +1,54 @@
 // The NixOS config is one repo per tool. This lists them grouped by purpose;
 // each module lives at github.com/typovrak/nixos-<name>, the umbrella config at
 // github.com/typovrak/nixos. Stars, forks and the archived flag are not stored
-// here: they come from github-repos.json, refreshed daily by the GitHub data
-// workflow.
-import repoStats from "./github-repos.json";
+// here: they come from githubRepos.
+import { repoStatsFor, type RepoStats } from "./githubRepos";
 
 const owner = "https://github.com/typovrak";
 
 export const nixosRepoUrl = `${owner}/nixos`;
 
+// NixOS release every module currently targets. Overridden per module only for
+// exceptions (see nixos below on each entry).
+export const nixosVersion = "26.05";
+
 export const moduleUrl = (name: string) => `${owner}/nixos-${name}`;
-
-export type RepoStats = { stars: number; forks: number; archived: boolean };
-
-const stats: Record<string, RepoStats> = repoStats;
-
-const empty: RepoStats = { stars: 0, forks: 0, archived: false };
-
-export const repoStatsFor = (repo: string): RepoStats => stats[repo] ?? empty;
 
 export const moduleStatsFor = (name: string): RepoStats =>
   repoStatsFor(`nixos-${name}`);
 
+// The more stars and forks, the more visible the card: accent border and a
+// rising accent background tint. The tint stays light so text contrast holds;
+// 0 falls back to the neutral border.
+export const popularityCard = (repo: RepoStats): string => {
+  const score = repo.stars + repo.forks;
+  if (score >= 6) return "border-accent bg-accent/15";
+  if (score >= 3) return "border-accent/60 bg-accent/10";
+  if (score >= 1) return "border-accent/30 bg-accent/5";
+  return "border-border";
+};
+
 export type NixosModule = {
   name: string;
   purpose: string;
+  // Supported NixOS release, only when it differs from nixosVersion.
+  nixos?: string;
 };
+
+export const moduleNixos = (module: NixosModule): string =>
+  module.nixos ?? nixosVersion;
 
 export type NixosCategory = {
   title: string;
+  // Lucide icon name, rendered by CategoryIcon.
+  icon: string;
   modules: NixosModule[];
 };
 
 export const nixosCategories: NixosCategory[] = [
   {
     title: "Window manager and desktop",
+    icon: "app-window",
     modules: [
       {
         name: "i3",
@@ -66,6 +80,7 @@ export const nixosCategories: NixosCategory[] = [
   },
   {
     title: "Terminal",
+    icon: "square-terminal",
     modules: [
       {
         name: "alacritty",
@@ -80,6 +95,7 @@ export const nixosCategories: NixosCategory[] = [
   },
   {
     title: "Shell",
+    icon: "chevrons-right",
     modules: [
       {
         name: "bash",
@@ -93,6 +109,7 @@ export const nixosCategories: NixosCategory[] = [
   },
   {
     title: "Development",
+    icon: "code-xml",
     modules: [
       {
         name: "nvim",
@@ -109,6 +126,7 @@ export const nixosCategories: NixosCategory[] = [
   },
   {
     title: "CLI tools",
+    icon: "wrench",
     modules: [
       {
         name: "bat",
@@ -130,11 +148,13 @@ export const nixosCategories: NixosCategory[] = [
       {
         name: "neofetch",
         purpose: "Neofetch system info with a per-user config",
+        nixos: "24.11",
       },
     ],
   },
   {
     title: "Audio",
+    icon: "audio-lines",
     modules: [
       {
         name: "audio",
@@ -150,6 +170,7 @@ export const nixosCategories: NixosCategory[] = [
   },
   {
     title: "Theming and fonts",
+    icon: "palette",
     modules: [
       {
         name: "gtk",
@@ -169,6 +190,7 @@ export const nixosCategories: NixosCategory[] = [
   },
   {
     title: "System",
+    icon: "cpu",
     modules: [
       {
         name: "locale",
@@ -188,13 +210,23 @@ export const nixosCategories: NixosCategory[] = [
   },
 ];
 
-export const moduleCount = nixosCategories.reduce(
-  (total, category) => total + category.modules.length,
+const allModules = nixosCategories.flatMap(category => category.modules);
+
+export const moduleCount = allModules.length;
+
+// Cumulative stars and forks across the umbrella repo and every module. Scoped
+// to nixos repos on purpose, so external repos in githubRepos never leak in.
+const nixosRepos = [
+  repoStatsFor("nixos"),
+  ...allModules.map(module => moduleStatsFor(module.name)),
+];
+
+export const totalStars = nixosRepos.reduce(
+  (total, repo) => total + repo.stars,
   0
 );
 
-// Cumulative stars across the umbrella repo and every module.
-export const totalStars = Object.values(stats).reduce(
-  (total, repo) => total + repo.stars,
+export const totalForks = nixosRepos.reduce(
+  (total, repo) => total + repo.forks,
   0
 );

@@ -9,12 +9,21 @@ import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
 import Card from "@/components/Card.astro";
 import GithubWall from "@/components/GithubWall.astro";
+import CategoryIcon from "@/components/CategoryIcon.astro";
+import RepoStats from "@/components/RepoStats.astro";
 import HeadingLinks from "@/components/HeadingLinks.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { useTranslations } from "@/i18n";
 import { serialiseJsonLd } from "@/utils/jsonLd";
-import { moduleCount, totalStars } from "@/data/nixos";
+import {
+  moduleCount,
+  totalStars,
+  totalForks,
+  nixosCategories,
+} from "@/data/nixos";
+import { contributions } from "@/data/contributions";
+import { repoStatsFor } from "@/data/githubRepos";
 import config from "@/config";
 
 const { socials, posts: postsConfig } = config;
@@ -126,12 +135,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
 
     {
       featuredPosts.length > 0 && (
-        <section
-          class:list={[
-            "pt-12 pb-6",
-            { "border-border border-b": recentPosts.length > 0 },
-          ]}
-        >
+        <section class="border-border border-b pt-12 pb-6">
           <h2 id="featured" class="text-2xl font-semibold tracking-wide">
             {t.home.featured}
           </h2>
@@ -143,6 +147,61 @@ const homePath = getRelativeLocaleUrl(locale, "");
         </section>
       )
     }
+
+    <section
+      class:list={[
+        "pt-12 pb-6",
+        { "border-border border-b": recentPosts.length > 0 },
+      ]}
+    >
+      <div class="border-accent/40 bg-accent/5 rounded-lg border p-6 sm:p-8">
+        <h2 id="nixos" class="text-2xl font-semibold tracking-wide">
+          NixOS config
+        </h2>
+        <p class="text-muted-foreground mt-2 max-w-prose">
+          My NixOS setup is split into one module per tool, each in its own
+          repo, from the window manager down to the shell.
+        </p>
+
+        <div class="text-accent/80 mt-5 flex flex-wrap gap-4">
+          {
+            nixosCategories.map(category => (
+              <span title={`${category.title} modules`} class="inline-flex">
+                <CategoryIcon icon={category.icon} class="h-6 w-6" />
+              </span>
+            ))
+          }
+        </div>
+
+        <div class="mt-6 flex flex-wrap items-center gap-x-10 gap-y-4">
+          <div class="text-center">
+            <div class="text-accent text-3xl leading-none font-bold">
+              {moduleCount}
+            </div>
+            <div class="text-muted-foreground mt-1 text-sm">modules</div>
+          </div>
+          <div class="text-center">
+            <div class="text-accent text-3xl leading-none font-bold">
+              {totalStars}
+            </div>
+            <div class="text-muted-foreground mt-1 text-sm">stars</div>
+          </div>
+          <div class="text-center">
+            <div class="text-accent text-3xl leading-none font-bold">
+              {totalForks}
+            </div>
+            <div class="text-muted-foreground mt-1 text-sm">forks</div>
+          </div>
+          <a
+            href="/nixos"
+            class="focus-outline bg-accent text-accent-foreground ms-auto inline-flex items-center gap-2 rounded-md px-4 py-2 font-medium transition-opacity hover:opacity-90"
+          >
+            Browse the config
+            <IconArrowRight class="rtl:-rotate-180" />
+          </a>
+        </div>
+      </div>
+    </section>
 
     {
       recentPosts.length > 0 && (
@@ -167,33 +226,49 @@ const homePath = getRelativeLocaleUrl(locale, "");
     </div>
 
     <section class="border-border border-t pt-12 pb-6">
-      <h2 id="nixos" class="text-2xl font-semibold tracking-wide">
-        NixOS config
+      <h2 id="contributions" class="text-2xl font-semibold tracking-wide">
+        Open source contributions
       </h2>
-      <p class="mt-2">
-        My NixOS setup is split into one module per tool, each in its own repo.
+      <p class="text-muted-foreground mt-2 max-w-prose">
+        Projects I contribute to beyond my own.
       </p>
-      <div class="mt-5 flex flex-wrap items-center gap-x-10 gap-y-4">
-        <div>
-          <div class="text-accent text-3xl leading-none font-bold">
-            {moduleCount}
-          </div>
-          <div class="text-muted-foreground mt-1 text-sm">modules</div>
-        </div>
-        <div>
-          <div class="text-accent text-3xl leading-none font-bold">
-            {totalStars}
-          </div>
-          <div class="text-muted-foreground mt-1 text-sm">stars</div>
-        </div>
-        <LinkButton
-          class="hover:text-accent underline decoration-dashed underline-offset-4"
-          href="/nixos"
-        >
-          Browse the config
-          <IconArrowRight class="inline-block rtl:-rotate-180" />
-        </LinkButton>
-      </div>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+        {
+          contributions.map(project => {
+            const stats = repoStatsFor(project.repo);
+            return (
+              <li class="border-border rounded-md border p-3">
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="focus-outline group block"
+                >
+                  <span class="text-accent font-semibold group-hover:underline">
+                    {project.repo}
+                  </span>
+                  {project.inactive && (
+                    <span
+                      title="No longer maintained"
+                      class="ms-2 rounded border border-orange-600/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-700 dark:border-orange-400/40 dark:text-orange-400"
+                    >
+                      inactive
+                    </span>
+                  )}
+                  <span class="text-muted-foreground mt-1 block text-sm">
+                    {project.description}
+                  </span>
+                  <RepoStats
+                    stars={stats.stars}
+                    forks={stats.forks}
+                    class="mt-2"
+                  />
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
     </section>
   </main>
   <Footer />
