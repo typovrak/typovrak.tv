@@ -1,7 +1,6 @@
 - [ ] mettre en place une partie dactylographie sur le site où on écrit mon code source de mes propres repo
 
 - [ ] mettre en place altcha comme sur webphl pour l'anti-bot
-- [ ] mettre l'envoie d'email automatique en cas de demande de module
 
 - [ ] Page /uses (matériel, clavier, layout, outils) en complément de /nixos. Naturel pour ton audience.
 

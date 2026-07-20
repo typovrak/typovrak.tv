@@ -1,7 +1,12 @@
 import type { APIRoute } from "astro";
 import { getSql } from "@/utils/db";
 import { buildModuleRequestEmail } from "@/utils/moduleRequestEmail";
-import { BREVO_API_KEY, DISCORD_WEBHOOK_URL } from "astro:env/server";
+import { verifyCaptcha } from "@/utils/captcha";
+import {
+  BREVO_API_KEY,
+  CAPTCHA_SECRET,
+  DISCORD_WEBHOOK_URL,
+} from "astro:env/server";
 import config from "@/config";
 
 export const prerender = false;
@@ -58,6 +63,16 @@ export const POST: APIRoute = async ({ request }) => {
     return Response.json({ error: "invalid" }, { status: 400 });
   }
 
+  // Fails closed: without a secret the captcha cannot be checked, so nothing is
+  // accepted rather than silently dropping the protection.
+  if (!CAPTCHA_SECRET) {
+    console.error("captcha: CAPTCHA_SECRET is unset, refusing the request");
+    return new Response(null, { status: 503 });
+  }
+  if (!verifyCaptcha(body.captchaToken, body.captchaCode, CAPTCHA_SECRET)) {
+    return Response.json({ error: "captcha" }, { status: 400 });
+  }
+
   const sql = getSql();
 
   const recent = await sql`
@@ -65,7 +80,10 @@ export const POST: APIRoute = async ({ request }) => {
     WHERE email = ${email} AND created_at > now() - interval '1 day'
   `;
   if (Number(recent[0]?.count ?? 0) >= MAX_PER_DAY) {
-    return Response.json({ error: "too_many" }, { status: 429 });
+    return Response.json(
+      { error: "too_many", limit: MAX_PER_DAY },
+      { status: 429 }
+    );
   }
 
   await sql`

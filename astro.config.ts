@@ -140,6 +140,11 @@ export default defineConfig({
         context: "server",
         optional: true,
       }),
+      CAPTCHA_SECRET: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
     },
   },
   experimental: {
