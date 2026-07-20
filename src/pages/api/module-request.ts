@@ -23,6 +23,21 @@ const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const clean = (value: unknown, max: number): string =>
   typeof value === "string" ? value.trim().slice(0, max) : "";
 
+// Third-party calls are best-effort: the request is already stored, so a
+// failure must not fail the response. It still gets logged, otherwise a
+// rejected send vanishes and there is nothing to debug.
+async function report(label: string, call: () => Promise<Response>) {
+  try {
+    const response = await call();
+    if (!response.ok) {
+      const body = await response.text().catch(() => "");
+      console.error(`${label} failed:`, response.status, body.slice(0, 500));
+    }
+  } catch (error) {
+    console.error(`${label} failed:`, error);
+  }
+}
+
 export const POST: APIRoute = async ({ request }) => {
   const body = await request.json().catch(() => null);
   if (!body) return new Response(null, { status: 400 });
@@ -60,7 +75,8 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Best-effort Discord notification; a webhook failure must not fail the
   // request. allowed_mentions is emptied so submitted text cannot ping anyone.
-  if (DISCORD_WEBHOOK_URL) {
+  const webhook = DISCORD_WEBHOOK_URL;
+  if (webhook) {
     const content = [
       "**New NixOS module request**",
       `Module: ${module}`,
@@ -70,37 +86,44 @@ export const POST: APIRoute = async ({ request }) => {
       .filter(Boolean)
       .join("\n")
       .slice(0, 1900);
-    await fetch(DISCORD_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
-    }).catch(() => {});
+    await report("discord", () =>
+      fetch(webhook, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
+      })
+    );
   }
 
   // Best-effort confirmation to the requester; a mail failure must not fail the
   // request, which is already stored.
-  if (BREVO_API_KEY) {
+  const brevoKey = BREVO_API_KEY;
+  if (brevoKey) {
     const message = buildModuleRequestEmail({
       module,
       details,
       siteUrl: config.site.url,
     });
-    await fetch("https://api.brevo.com/v3/smtp/email", {
-      method: "POST",
-      headers: {
-        "api-key": BREVO_API_KEY,
-        "content-type": "application/json",
-        accept: "application/json",
-      },
-      body: JSON.stringify({
-        sender: SENDER,
-        to: [{ email }],
-        replyTo: { email: REPLY_TO },
-        subject: message.subject,
-        htmlContent: message.html,
-        textContent: message.text,
-      }),
-    }).catch(() => {});
+    await report("brevo", () =>
+      fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "api-key": brevoKey,
+          "content-type": "application/json",
+          accept: "application/json",
+        },
+        body: JSON.stringify({
+          sender: SENDER,
+          to: [{ email }],
+          replyTo: { email: REPLY_TO },
+          subject: message.subject,
+          htmlContent: message.html,
+          textContent: message.text,
+        }),
+      })
+    );
+  } else {
+    console.error("brevo: BREVO_API_KEY is unset, no confirmation email sent");
   }
 
   return Response.json({ ok: true });
