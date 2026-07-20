@@ -135,6 +135,11 @@ export default defineConfig({
         context: "server",
         optional: true,
       }),
+      BREVO_API_KEY: envField.string({
+        access: "secret",
+        context: "server",
+        optional: true,
+      }),
     },
   },
   experimental: {

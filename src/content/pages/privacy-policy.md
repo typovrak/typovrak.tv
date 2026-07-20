@@ -39,6 +39,7 @@ The data is used for two purposes only: audience measurement, to know which arti
 - **Vercel Speed Insights**: cookieless performance metrics.
 - **Neon**: hosts the database where the audience data and module requests are stored.
 - **Discord**: when you send a module request, its content (including your email) is delivered to a private Discord channel through a webhook, so the publisher is notified.
+- **Brevo**: sends the confirmation email you receive after a module request. It processes your email address and the content of your request to deliver that message. Brevo is a French company and processes this data in the European Union.
 - **giscus** (GitHub Discussions): powers the comments. The widget is loaded from GitHub only when you click to load it, which exposes your IP address to GitHub at that point. Posting a comment requires a GitHub account, under GitHub's own terms.
 
 The site does not use Google Analytics or Hotjar.
@@ -76,6 +77,7 @@ The data is accessible only to the publisher. It is processed by the following p
 - Vercel (hosting, analytics, and performance),
 - Neon (database hosting),
 - Discord (module request notifications),
+- Brevo (module request confirmation emails),
 - GitHub (comments, via giscus).
 
 No personal data is sold, rented, or transferred to third parties for their own purposes.

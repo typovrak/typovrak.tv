@@ -1,8 +1,21 @@
 import type { APIRoute } from "astro";
 import { getSql } from "@/utils/db";
-import { DISCORD_WEBHOOK_URL } from "astro:env/server";
+import { buildModuleRequestEmail } from "@/utils/moduleRequestEmail";
+import { BREVO_API_KEY, DISCORD_WEBHOOK_URL } from "astro:env/server";
+import config from "@/config";
 
 export const prerender = false;
+
+// Sender must be on a domain authenticated in Brevo.
+const SENDER = { name: "typovrak", email: "noreply@typovrak.tv" };
+
+// A reachable reply address; a no-reply sender with nowhere to answer scores
+// worse with spam filters.
+const REPLY_TO = "typovrak@gmail.com";
+
+// The confirmation email goes to an address the submitter types, so cap how
+// many a single address can trigger per day.
+const MAX_PER_DAY = 3;
 
 const MAX = { module: 100, details: 2000, email: 200 };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -31,6 +44,15 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const sql = getSql();
+
+  const recent = await sql`
+    SELECT count(*)::int AS count FROM module_request
+    WHERE email = ${email} AND created_at > now() - interval '1 day'
+  `;
+  if (Number(recent[0]?.count ?? 0) >= MAX_PER_DAY) {
+    return Response.json({ error: "too_many" }, { status: 429 });
+  }
+
   await sql`
     INSERT INTO module_request (module, details, email)
     VALUES (${module}, ${details}, ${email})
@@ -52,6 +74,32 @@ export const POST: APIRoute = async ({ request }) => {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ content, allowed_mentions: { parse: [] } }),
+    }).catch(() => {});
+  }
+
+  // Best-effort confirmation to the requester; a mail failure must not fail the
+  // request, which is already stored.
+  if (BREVO_API_KEY) {
+    const message = buildModuleRequestEmail({
+      module,
+      details,
+      siteUrl: config.site.url,
+    });
+    await fetch("https://api.brevo.com/v3/smtp/email", {
+      method: "POST",
+      headers: {
+        "api-key": BREVO_API_KEY,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: SENDER,
+        to: [{ email }],
+        replyTo: { email: REPLY_TO },
+        subject: message.subject,
+        htmlContent: message.html,
+        textContent: message.text,
+      }),
     }).catch(() => {});
   }
 
