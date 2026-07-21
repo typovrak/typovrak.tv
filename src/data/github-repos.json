@@ -145,7 +145,7 @@
     "archived": false
   },
   "nixos-stylus": {
-    "stars": 1,
+    "stars": 2,
     "forks": 0,
     "archived": false
   },
@@ -165,8 +165,8 @@
     "archived": false
   },
   "freeCodeCamp/freeCodeCamp": {
-    "stars": 452102,
-    "forks": 45600,
+    "stars": 452147,
+    "forks": 45605,
     "archived": false
   },
   "Racketlon17/2d-collision-simulator": {
