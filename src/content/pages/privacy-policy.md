@@ -100,4 +100,4 @@ This privacy policy may change to stay compliant with current law. The date belo
 
 ---
 
-**Date of last modification:** 19 July 2026
+**Date of last modification:** 20 July 2026

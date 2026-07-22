@@ -1,7 +1,5 @@
 - [ ] mettre en place une partie dactylographie sur le site où on écrit mon code source de mes propres repo
 
-- [ ] mettre en place altcha comme sur webphl pour l'anti-bot
-
 - [ ] Page /uses (matériel, clavier, layout, outils) en complément de /nixos. Naturel pour ton audience.
 
 Callouts / admonitions (note, warning, tip) thémés Catppuccin. Tu as évoqué des composants « façon AWS » : c'est la base.
