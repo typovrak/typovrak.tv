@@ -1,5 +1,5 @@
 {
-  "total": 1307,
+  "total": 1316,
   "weeks": [
     {
       "days": [
@@ -2043,13 +2043,18 @@
         },
         {
           "date": "2026-07-21",
-          "count": 0,
-          "level": 0
+          "count": 1,
+          "level": 1
         },
         {
           "date": "2026-07-22",
-          "count": 0,
-          "level": 0
+          "count": 3,
+          "level": 1
+        },
+        {
+          "date": "2026-07-23",
+          "count": 5,
+          "level": 1
         }
       ]
     }
