@@ -11,6 +11,7 @@ import Card from "@/components/Card.astro";
 import GithubWall from "@/components/GithubWall.astro";
 import CategoryIcon from "@/components/CategoryIcon.astro";
 import RepoStats from "@/components/RepoStats.astro";
+import TypingTrainer from "@/components/TypingTrainer.astro";
 import HeadingLinks from "@/components/HeadingLinks.astro";
 import LinkButton from "@/components/LinkButton.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
@@ -96,15 +97,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
         had to work out myself: Arch setups, terminal configuration, and how the
         parts of a stack behave once you look closely.
       </p>
-      <p class="mt-2">
-        Posts are below. There's also{" "}
-        <LinkButton
-          class="hover:text-accent underline decoration-dashed underline-offset-4"
-          href="/about"
-        >
-          more about me
-        </LinkButton>.
-      </p>
+      <p class="mt-2">Posts are below.</p>
 
       <div class="mt-6">
         <GithubWall />
@@ -344,6 +337,20 @@ const homePath = getRelativeLocaleUrl(locale, "");
           })
         }
       </ul>
+    </section>
+
+    {/* Hidden on phones: the exercise needs a physical keyboard. */}
+    <section class="border-border border-t pt-12 pb-6 max-sm:hidden">
+      <h2 id="typing" class="text-2xl font-semibold tracking-wide">
+        Type some Star Rune
+      </h2>
+      <p class="text-muted-foreground mt-2 max-w-prose">
+        A random excerpt from the Star Rune website source, drawn fresh on every
+        visit. Click the code and start typing.
+      </p>
+      <div class="mt-4">
+        <TypingTrainer />
+      </div>
     </section>
   </main>
   <Footer />

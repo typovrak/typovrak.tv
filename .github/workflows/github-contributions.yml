@@ -37,14 +37,19 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/fetch-github-repos.mjs
 
+      - name: "⌨️ Fetch typing snippets"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/fetch-typing-snippets.mjs
+
       - name: "📤 Commit if changed"
         run: |
-          if git diff --quiet src/data/github-contributions.json src/data/github-repos.json; then
+          if git diff --quiet src/data/github-contributions.json src/data/github-repos.json src/data/typing-snippets.json; then
             echo "No change."
           else
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add src/data/github-contributions.json src/data/github-repos.json
+            git add src/data/github-contributions.json src/data/github-repos.json src/data/typing-snippets.json
             git commit -m "chore: refresh github data"
             git push
           fi

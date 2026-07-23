@@ -5,7 +5,7 @@ export default {
     home: "Home",
     posts: "Posts",
     tags: "Tags",
-    about: "About",
+    nixos: "NixOS",
     archives: "Archives",
     search: "Search",
   },

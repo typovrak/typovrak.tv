@@ -1,0 +1,63 @@
+{
+  "repo": "typovrak/star-rune-landing-page",
+  "branch": "main",
+  "url": "https://github.com/typovrak/star-rune-landing-page",
+  "snippets": [
+    {
+      "path": ".storybook/main.ts",
+      "code": "const config: StorybookConfig = {\n  \"stories\": [\n    \"../stories/**/*.mdx\",\n    \"../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)\"\n  ],\n  \"addons\": [\n    \"@chromatic-com/storybook\",\n    \"@storybook/addon-docs\",\n    \"@storybook/addon-onboarding\","
+    },
+    {
+      "path": "app/credits/page.tsx",
+      "code": "export default function Credits({ }: ICredits) {\n  return (\n    <Page className=\"bg-white\">\n      <>\n        <Header />"
+    },
+    {
+      "path": "app/layout.tsx",
+      "code": "const fontPrimary = Geist({\n  subsets: [\"latin\"],\n  display: \"swap\",\n  variable: \"--font-primary\",\n});"
+    },
+    {
+      "path": "app/legal-notice/page.tsx",
+      "code": "export default function LegalNotice({ }: ILegalNotice) {\n  return (\n    <Page className=\"bg-white\">\n      <>\n        <Header />"
+    },
+    {
+      "path": "app/page.tsx",
+      "code": "<BlockHero />\n<BlockResume id={data.homeLinks[0].id} dataAppearThreshold={0.2} />\n<BlockFeatures id={data.homeLinks[1].id} />\n<BlockAbilities id={data.homeLinks[2].id} />\n<BlockTestimonials id={data.homeLinks[3].id} />\n<BlockTeam id={data.homeLinks[4].id} />\n<BlockCommunity id={data.homeLinks[5].id} />"
+    },
+    {
+      "path": "app/sitemap.xml/route.ts",
+      "code": "// generate xml\nconst xml = `<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n  <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n    ${urls.map((url) => {\n  return `\n      <url>\n          <loc>https://${data.domain}${url}</loc>\n      </url>\n    `;"
+    },
+    {
+      "path": "blocks/block-abilities.tsx",
+      "code": "const slides = [\n  {\n    id: 0,\n    icon: <Shield />,\n    iconHover: <Shield className=\"fill-blue-400\" />,\n    iconColor: \"text-blue-400\",\n    title: \"Auto Deflect\","
+    },
+    {
+      "path": "blocks/block-community.tsx",
+      "code": "const items = [\n  {\n    icon: <Discord />,\n    iconHover: <DiscordFill />,\n    title: \"Discord\","
+    },
+    {
+      "path": "blocks/block-conversion.tsx",
+      "code": "export default function BlockConversion({ }: IBlockConversion) {\n  return (\n    <div className=\"bg-white\">\n      <section className=\"w-full py-12 lg:py-16 bg-yellow-400/25\">\n        <div className=\"container px-4\">"
+    },
+    {
+      "path": "blocks/block-features.tsx",
+      "code": "const cards = [\n  {\n    icon: <Sword />,\n    iconHover: <Sword className=\"fill-white\" />,\n    title: \"Every stroke = Action\",\n    content:\n      <>\n        <p>"
+    },
+    {
+      "path": "blocks/block-hero.tsx",
+      "code": ">\n  <div className=\"absolute inset-0\" >\n    <Image\n      src=\"/star-rune-hero.webp\"\n      alt={`${data.brand} game background`}\n      className=\"w-full h-full object-cover object-top\"\n    />\n  </div>"
+    },
+    {
+      "path": "blocks/block-resume.tsx",
+      "code": "const cards = [\n  {\n    icon: <Keyboard />,\n    iconHover: <KeyboardFill className=\"fill-emerald-400\" />,\n    iconColor: \"text-emerald-400\",\n    title: \"Every stroke = Action\",\n    text: \"Feel the rush with every keystroke\","
+    },
+    {
+      "path": "blocks/block-team.tsx",
+      "code": "export default function BlockTeam({ id }: IBlockTeam) {\n  return (\n    <SectionWrapper\n      id={id}\n      badge={{\n        icon: <Star />,\n        title: \"The team\"\n      }}\n      title=\"From the creator\""
+    },
+    {
+      "path": "blocks/block-testimonials.tsx",
+      "code": "const items: TItemClient[] = [\n  {\n    id: 0,\n    src: profilePicture,\n    names: \"Rowan\",\n    about: \"9 years old\","
+    }
+  ]
+}

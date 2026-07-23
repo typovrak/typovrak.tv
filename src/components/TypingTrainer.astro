@@ -1,0 +1,315 @@
+---
+// Type real Star Rune source. The snippets ship as JSON so a new one can be
+// drawn on every run without a request; they are refreshed daily by the GitHub
+// data workflow.
+import snippets from "@/data/typing-snippets.json";
+
+const { repo, branch, url, snippets: list } = snippets;
+
+const repoName = repo.split("/")[1] ?? repo;
+// Each snippet links to the exact file it was taken from.
+const fileBase = `${url}/blob/${branch}/`;
+---
+
+{
+  list.length > 0 && (
+    <div
+      data-typing
+      data-snippets={JSON.stringify(list)}
+      data-file-base={fileBase}
+      class="border-border bg-background rounded-lg border p-4 sm:p-6"
+    >
+      <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <p class="text-muted-foreground flex flex-wrap items-baseline gap-1 text-sm">
+          <span>Typing</span>
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent underline-offset-4 hover:underline"
+          >
+            {repoName}
+          </a>
+          <span aria-hidden="true">·</span>
+          <a
+            data-typing-path
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent underline-offset-4 hover:underline"
+          />
+        </p>
+        <div class="text-muted-foreground flex items-center gap-4 text-sm tabular-nums">
+          <span>
+            <span data-typing-wpm class="text-accent font-bold">
+              0
+            </span>{" "}
+            wpm
+          </span>
+          <span>
+            <span data-typing-accuracy class="text-accent font-bold">
+              100
+            </span>
+            %
+          </span>
+          <span>
+            <span data-typing-time class="text-accent font-bold">
+              0.0
+            </span>
+            s
+          </span>
+          <span>
+            <span data-typing-errors class="font-bold">
+              0
+            </span>{" "}
+            err
+          </span>
+        </div>
+      </div>
+
+      {/* tabindex makes it focusable, so keystrokes are captured only once the
+          visitor deliberately clicks or tabs into it. */}
+      <div
+        data-typing-surface
+        tabindex="0"
+        role="textbox"
+        aria-label="Typing practice. Click to start, then type the code shown."
+        class="focus-outline border-border mt-3 cursor-text rounded-md border p-3"
+      >
+        <pre
+          data-typing-code
+          aria-hidden="true"
+          class="font-app text-muted-foreground text-sm leading-relaxed break-words whitespace-pre-wrap"
+        />
+      </div>
+
+      <div class="mt-3 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          data-typing-restart
+          class="focus-outline border-border hover:text-accent rounded-md border px-3 py-1.5 text-sm"
+        >
+          Restart
+        </button>
+        <button
+          type="button"
+          data-typing-next
+          class="focus-outline border-border hover:text-accent rounded-md border px-3 py-1.5 text-sm"
+        >
+          New snippet
+        </button>
+        <p data-typing-hint class="text-muted-foreground text-xs">
+          Click the code to start. Press Enter at each line break; indentation
+          is filled in.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+<script>
+  type Snippet = { path: string; code: string };
+
+  const root = document.querySelector<HTMLElement>("[data-typing]");
+  if (root) {
+    const surface = root.querySelector<HTMLElement>("[data-typing-surface]")!;
+    const codeEl = root.querySelector<HTMLElement>("[data-typing-code]")!;
+    const pathEl = root.querySelector<HTMLAnchorElement>("[data-typing-path]")!;
+    const fileBase = root.dataset.fileBase ?? "";
+    const wpmEl = root.querySelector<HTMLElement>("[data-typing-wpm]")!;
+    const accuracyEl = root.querySelector<HTMLElement>(
+      "[data-typing-accuracy]"
+    )!;
+    const timeEl = root.querySelector<HTMLElement>("[data-typing-time]")!;
+    const errorsEl = root.querySelector<HTMLElement>("[data-typing-errors]")!;
+    const hintEl = root.querySelector<HTMLElement>("[data-typing-hint]")!;
+    const restartBtn = root.querySelector<HTMLButtonElement>(
+      "[data-typing-restart]"
+    )!;
+    const nextBtn =
+      root.querySelector<HTMLButtonElement>("[data-typing-next]")!;
+
+    const snippets: Snippet[] = JSON.parse(root.dataset.snippets ?? "[]");
+
+    let current: Snippet | null = null;
+    let target = "";
+    let typed = "";
+    let errors = 0;
+    let startedAt = 0;
+    let timer: number | undefined;
+    let done = false;
+
+    // Only the leading spaces of a line are filled in: nobody wants to type
+    // eight spaces. Line breaks are on the typist, so Enter has to be pressed.
+    const isAuto = (index: number) => {
+      const char = target[index];
+      if (char !== " ") return false;
+      let start = index;
+      while (start > 0 && target[start - 1] === " ") start--;
+      return start === 0 || target[start - 1] === "\n";
+    };
+
+    const skipIndent = () => {
+      while (typed.length < target.length && isAuto(typed.length)) {
+        typed += target[typed.length];
+      }
+    };
+
+    // Trailing spaces first, then the word itself. A line break is a hard stop,
+    // so one shortcut never swallows the previous line.
+    const deleteWord = () => {
+      const last = () => typed[typed.length - 1];
+      if (typed.length === 0) return;
+      if (last() === "\n") {
+        typed = typed.slice(0, -1);
+        return;
+      }
+      while (typed.length > 0 && last() === " ") typed = typed.slice(0, -1);
+      while (typed.length > 0 && last() !== " " && last() !== "\n") {
+        typed = typed.slice(0, -1);
+      }
+    };
+
+    const render = () => {
+      codeEl.replaceChildren();
+      for (let i = 0; i < target.length; i++) {
+        const char = target[i];
+        const span = document.createElement("span");
+        span.textContent = char;
+        if (i < typed.length) {
+          span.className =
+            typed[i] === char
+              ? "text-accent"
+              : "text-orange-700 underline decoration-wavy dark:text-orange-400";
+        } else if (i === typed.length) {
+          span.className = "typing-caret";
+        }
+        codeEl.append(span);
+      }
+    };
+
+    const stats = () => {
+      const elapsed = startedAt ? (performance.now() - startedAt) / 1000 : 0;
+      timeEl.textContent = elapsed.toFixed(1);
+      const words = typed.length / 5;
+      wpmEl.textContent =
+        elapsed > 0 ? String(Math.round((words / elapsed) * 60)) : "0";
+      const total = typed.length + errors;
+      accuracyEl.textContent =
+        total > 0 ? String(Math.round((typed.length / total) * 100)) : "100";
+      errorsEl.textContent = String(errors);
+    };
+
+    const stop = () => {
+      if (timer) window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const load = (snippet: Snippet) => {
+      stop();
+      current = snippet;
+      target = snippet.code;
+      typed = "";
+      errors = 0;
+      startedAt = 0;
+      done = false;
+      pathEl.textContent = snippet.path;
+      pathEl.href = `${fileBase}${snippet.path}`;
+      hintEl.textContent =
+        "Click the code to start. Press Enter at each line break; indentation is filled in.";
+      skipIndent();
+      render();
+      stats();
+    };
+
+    const pick = () => {
+      const next = snippets[Math.floor(Math.random() * snippets.length)];
+      load(next);
+    };
+
+    surface.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        surface.blur();
+        return;
+      }
+      if (done) return;
+
+      // Ctrl/Alt/Cmd + Backspace deletes a word, as in any editor. Every other
+      // modifier combo is left to the browser and the command palette.
+      const wordDelete =
+        event.key === "Backspace" &&
+        (event.ctrlKey || event.altKey || event.metaKey);
+      if ((event.metaKey || event.ctrlKey || event.altKey) && !wordDelete) {
+        return;
+      }
+
+      const isChar = event.key.length === 1;
+      if (!isChar && event.key !== "Backspace" && event.key !== "Enter") return;
+      event.preventDefault();
+
+      if (!startedAt) {
+        startedAt = performance.now();
+        timer = window.setInterval(stats, 100);
+        hintEl.textContent = "";
+      }
+
+      if (event.key === "Backspace") {
+        if (wordDelete) {
+          deleteWord();
+        } else if (typed.length > 0) {
+          typed = typed.slice(0, -1);
+        }
+        // Never leave the caret parked inside auto-filled whitespace, or the
+        // next real character would be scored against a space.
+        while (typed.length > 0 && isAuto(typed.length - 1)) {
+          typed = typed.slice(0, -1);
+        }
+        skipIndent();
+      } else {
+        const expected = target[typed.length];
+        const key = event.key === "Enter" ? "\n" : event.key;
+        if (key !== expected) errors++;
+        typed += key;
+        skipIndent();
+      }
+
+      if (typed.length >= target.length) {
+        done = true;
+        stop();
+        hintEl.textContent = "Done. Restart, or draw a new snippet.";
+      }
+
+      render();
+      stats();
+    });
+
+    surface.addEventListener("focus", () => {
+      if (!done && !startedAt) hintEl.textContent = "Go ahead, type.";
+    });
+
+    restartBtn.addEventListener("click", () => {
+      if (current) load(current);
+      surface.focus();
+    });
+
+    nextBtn.addEventListener("click", () => {
+      pick();
+      surface.focus();
+    });
+
+    pick();
+  }
+</script>
+
+<style is:global>
+  /* Only the caret needs custom CSS; correct and wrong characters use theme
+     utilities. Drawn as a border so it never shifts the layout, and kept
+     transparent until the surface has focus so an idle block looks inert. */
+  .typing-caret {
+    border-inline-start: 2px solid transparent;
+    margin-inline-start: -2px;
+  }
+  [data-typing-surface]:focus .typing-caret {
+    border-inline-start-color: var(--accent);
+  }
+</style>
