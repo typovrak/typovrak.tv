@@ -68,8 +68,19 @@ export default defineConfig({
   integrations: [
     mdx(),
     sitemap({
-      filter: page =>
-        config.features?.showArchives !== false || !page.endsWith("/archives/"),
+      // Pages a crawler must not be pointed at. Compared on the normalised
+      // pathname, never on a trailing slash, which trailingSlash: never removed
+      // and which silently broke the previous archives filter.
+      filter: page => {
+        const path = new URL(page).pathname.replace(/\/$/, "") || "/";
+        // The search page is noindex; listing it here would contradict that.
+        if (path === "/search") return false;
+        // When archives are off the route serves the 404 body with a 200.
+        if (path === "/archives" && config.features?.showArchives === false) {
+          return false;
+        }
+        return true;
+      },
       serialize(item) {
         const path = new URL(item.url).pathname.replace(/\/$/, "") || "/";
         const lastmod = lastmodByPath.get(path);
