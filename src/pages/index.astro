@@ -9,7 +9,7 @@ import Footer from "@/components/Footer.astro";
 import Socials from "@/components/Socials.astro";
 import Card from "@/components/Card.astro";
 import GithubWall from "@/components/GithubWall.astro";
-import CategoryIcon from "@/components/CategoryIcon.astro";
+import LucideIcon from "@/components/LucideIcon.astro";
 import RepoStats from "@/components/RepoStats.astro";
 import TypingTrainer from "@/components/TypingTrainer.astro";
 import HeadingLinks from "@/components/HeadingLinks.astro";
@@ -160,7 +160,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
           {
             nixosCategories.map(category => (
               <span title={`${category.title} modules`} class="inline-flex">
-                <CategoryIcon icon={category.icon} class="h-6 w-6" />
+                <LucideIcon icon={category.icon} class="h-6 w-6" />
               </span>
             ))
           }

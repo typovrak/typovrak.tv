@@ -214,8 +214,14 @@ Frontmatter schema is defined in [src/content.config.ts](src/content.config.ts).
 `title`, `description`, `pubDatetime`. Notable optional fields: `modDatetime`, `featured`,
 `draft`, `tags`, `ogImage`, `canonicalURL`.
 
-**Tags are flat and free-form** — no categories, no series, no controlled vocabulary. Pick what
-fits the post (`arch-linux`, `neovim`, `docker`, ...). Tag pages are generated automatically.
+**Tags are flat but curated.** No categories and no series, but the vocabulary is closed: every
+tag must be registered in [src/data/tags.ts](src/data/tags.ts) with a label, a one-line
+description and a Lucide icon (a name that exists in
+[LucideIcon.astro](src/components/LucideIcon.astro)). `tagInfo()` throws on an unregistered tag,
+so using one in frontmatter without registering it **fails the build** rather than shipping a tag
+card with no description. The description is reused as the tag page heading and its meta
+description, so write it as a sentence, not a keyword list. Tag pages themselves are still
+generated automatically from the posts.
 
 Static pages (`about`) live in [src/content/pages/](src/content/pages/).
 
