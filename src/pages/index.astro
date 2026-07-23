@@ -69,6 +69,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
   <Header />
   <main
     id="main-content"
+    data-pagefind-body
     data-layout="index"
     data-home-path={homePath}
     class="app-layout"
@@ -94,8 +95,8 @@ const homePath = getRelativeLocaleUrl(locale, "");
 
       <p>
         Notes on Linux, CLI tooling and web development. I write up what I've
-        had to work out myself: Arch setups, terminal configuration, and how the
-        parts of a stack behave once you look closely.
+        had to work out myself: Arch/NixOS setups, terminal configuration, and
+        how the parts of a stack behave once you look closely.
       </p>
       <p class="mt-2">Posts are below.</p>
 
@@ -211,12 +212,16 @@ const homePath = getRelativeLocaleUrl(locale, "");
       )
     }
 
-    <div class="my-8 text-center">
-      <LinkButton href={getRelativeLocaleUrl(locale, "posts")}>
-        {t.home.allPosts}
-        <IconArrowRight class="inline-block rtl:-rotate-180" />
-      </LinkButton>
-    </div>
+    {
+      sortedPosts.length > 0 && (
+        <div class="my-8 text-center">
+          <LinkButton href={getRelativeLocaleUrl(locale, "posts")}>
+            {t.home.allPosts}
+            <IconArrowRight class="inline-block rtl:-rotate-180" />
+          </LinkButton>
+        </div>
+      )
+    }
 
     <section class="border-border border-t pt-12 pb-6">
       <div class="border-accent/40 bg-accent/5 rounded-lg border p-6 sm:p-8">

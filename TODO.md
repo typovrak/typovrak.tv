@@ -1,7 +1,3 @@
-- [ ] refaire la page Tags, avec une carte ou autre élément qui met plus en valeur qui change et mini description, donc refaire le système de tags qui sera statique et fait à la main pour avoir une description correcte et autre si recommendations ou propositions pertinentes
-
-- [ ] sitemap.xml
-
 Callouts / admonitions (note, warning, tip) thémés Catppuccin. Tu as évoqué des composants « façon AWS » : c'est la base.
 Bloc Q&A / FAQ par article (aussi dans ton TODO) avec JSON-LD FAQPage : lisibilité + gain SEO réel (rich snippets).
 Diagrammes Mermaid rendus au build en SVG (via rehype, pas de JS client) : schémas d'archi sans casser la CSP.

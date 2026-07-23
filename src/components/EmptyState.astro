@@ -1,0 +1,37 @@
+---
+// The 404 body, reused wherever a page has nothing to show. Same shape
+// everywhere: a big accent glyph, a shrug, a line of explanation and a way out.
+import { getRelativeLocaleUrl } from "astro:i18n";
+import LinkButton from "@/components/LinkButton.astro";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+type Props = {
+  /** The large accent glyph, e.g. a status code or a count. */
+  glyph: string;
+  message: string;
+  class?: string;
+};
+
+const { glyph, message, class: className } = Astro.props;
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+---
+
+<div
+  class:list={[
+    "mb-14 flex flex-col items-center justify-center text-center",
+    className,
+  ]}
+>
+  <p class="text-accent text-9xl font-bold">{glyph}</p>
+  <span aria-hidden="true"> ¯\_(ツ)_/¯ </span>
+  <p class="mt-4 text-2xl sm:text-3xl">{message}</p>
+  <LinkButton
+    href={getRelativeLocaleUrl(locale, "")}
+    class="my-6 text-lg underline decoration-dashed underline-offset-8"
+  >
+    {t.notFound.goHome}
+  </LinkButton>
+</div>

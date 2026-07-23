@@ -4,6 +4,7 @@ import PostLayout from "@/layouts/PostLayout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Datetime from "@/components/Datetime.astro";
+import { readingTime } from "@/utils/readingTime";
 import Tag from "@/components/Tag.astro";
 import { getPostSlug, getPostUrl } from "@/utils/getPostPaths";
 import { getSortedPosts } from "@/utils/getSortedPosts";
@@ -72,6 +73,7 @@ const {
 } = post.data;
 
 const { Content } = await render(post);
+const minutes = readingTime(post.body ?? "");
 
 let ogImageUrl: string | undefined;
 
@@ -118,6 +120,8 @@ const ogImage = ogImageUrl
 
     <div class="my-2 flex items-center gap-2">
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
+      <span aria-hidden="true" class="text-muted-foreground">|</span>
+      <span class="text-muted-foreground">{minutes} min read</span>
       <span aria-hidden="true" class="text-muted-foreground">|</span>
       <PageViews class="text-muted-foreground" />
     </div>

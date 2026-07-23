@@ -8,6 +8,7 @@ import Main from "@/components/Main.astro";
 import Card from "@/components/Card.astro";
 import Footer from "@/components/Footer.astro";
 import Pagination from "@/components/Pagination.astro";
+import EmptyState from "@/components/EmptyState.astro";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { useTranslations } from "@/i18n";
 import config from "@/config";
@@ -28,10 +29,22 @@ const t = useTranslations(locale);
 
   <Breadcrumb />
 
-  <Main pageTitle={t.pages.postsTitle} pageDesc={t.pages.postsDesc}>
-    <ul>
-      {page.data.map(data => <Card {...data} />)}
-    </ul>
+  <Main
+    pageTitle={t.pages.postsTitle}
+    pageDesc={t.pages.postsDesc}
+    class={page.data.length === 0 ? "flex flex-1 flex-col" : undefined}
+  >
+    {
+      page.data.length > 0 ? (
+        <ul>
+          {page.data.map(data => (
+            <Card {...data} />
+          ))}
+        </ul>
+      ) : (
+        <EmptyState glyph="0" message={t.pages.postsEmpty} class="flex-1" />
+      )
+    }
   </Main>
 
   <Pagination {page} />

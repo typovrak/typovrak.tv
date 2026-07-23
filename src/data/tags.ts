@@ -33,16 +33,6 @@ export const tags: Record<string, TagInfo> = {
     description: "Containers, images and reproducible local environments.",
     icon: "container",
   },
-  docs: {
-    label: "Docs",
-    description: "Writing documentation, and the tooling that renders it.",
-    icon: "book-open",
-  },
-  example: {
-    label: "Example",
-    description: "Placeholder tag from the starter posts. Remove with them.",
-    icon: "hash",
-  },
   linux: {
     label: "Linux",
     description: "The system underneath: kernel, shell and daily plumbing.",
@@ -52,16 +42,6 @@ export const tags: Record<string, TagInfo> = {
     label: "Neovim",
     description: "Editing text at speed: configuration, plugins and motions.",
     icon: "file-code",
-  },
-  some: {
-    label: "Some",
-    description: "Placeholder tag from the starter posts. Remove with them.",
-    icon: "hash",
-  },
-  tags: {
-    label: "Tags",
-    description: "Placeholder tag from the starter posts. Remove with them.",
-    icon: "tag",
   },
   tools: {
     label: "Tools",

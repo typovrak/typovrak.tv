@@ -7,6 +7,7 @@ import Breadcrumb from "@/components/Breadcrumb.astro";
 import Main from "@/components/Main.astro";
 import Footer from "@/components/Footer.astro";
 import LucideIcon from "@/components/LucideIcon.astro";
+import EmptyState from "@/components/EmptyState.astro";
 import { getUniqueTags } from "@/utils/getUniqueTags";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { getPostUrl } from "@/utils/getPostPaths";
@@ -47,8 +48,22 @@ const t = useTranslations(locale);
 
   <Breadcrumb />
 
-  <Main pageTitle={t.pages.tagsTitle} pageDesc={t.pages.tagsDesc}>
-    <ul class="mt-2 grid gap-4 sm:grid-cols-2">
+  <Main
+    pageTitle={t.pages.tagsTitle}
+    pageDesc={t.pages.tagsDesc}
+    class={cards.length === 0 ? "flex flex-1 flex-col" : undefined}
+  >
+    {
+      cards.length === 0 && (
+        <EmptyState glyph="0" message={t.pages.tagsEmpty} class="flex-1" />
+      )
+    }
+    <ul
+      class:list={[
+        "mt-2 grid gap-4 sm:grid-cols-2",
+        { hidden: cards.length === 0 },
+      ]}
+    >
       {
         cards.map(({ tag, info, count, latest }) => (
           <li class="border-border hover:border-accent/60 rounded-lg border p-4 transition-colors">

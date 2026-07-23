@@ -5,9 +5,9 @@ export default defineAstroPaperConfig({
     url: "https://typovrak.tv/",
     title: "typovrak",
     description:
-      "Notes on Linux, CLI tooling and web development, written up from problems I had to solve myself.",
+      "Notes on Arch Linux, NixOS, CLI tooling and web development, written up from problems I had to solve myself.",
     keywords:
-      "linux, arch linux, cli, terminal, neovim, docker, web development, astro, typescript, self-hosting",
+      "linux, arch linux, nixos, cli, terminal, neovim, docker, web development, astro, typescript, self-hosting",
     author: "typovrak",
     profile: "https://github.com/typovrak",
     lang: "en",
