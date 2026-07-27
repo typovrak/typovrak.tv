@@ -254,17 +254,19 @@ const fileBase = `${url}/blob/${branch}/`;
       }
 
       if (event.key === "Backspace") {
+        // The auto-filled indentation at the caret was never typed, so step
+        // past it first. Then remove one real character: a typed one, or the
+        // line break, which the caret can now reach and delete. No skipIndent
+        // afterwards: refilling the indentation would trap the caret against
+        // the newline and make it impossible to erase.
+        while (typed.length > 0 && isAuto(typed.length - 1)) {
+          typed = typed.slice(0, -1);
+        }
         if (wordDelete) {
           deleteWord();
         } else if (typed.length > 0) {
           typed = typed.slice(0, -1);
         }
-        // Never leave the caret parked inside auto-filled whitespace, or the
-        // next real character would be scored against a space.
-        while (typed.length > 0 && isAuto(typed.length - 1)) {
-          typed = typed.slice(0, -1);
-        }
-        skipIndent();
       } else {
         const expected = target[typed.length];
         const key = event.key === "Enter" ? "\n" : event.key;

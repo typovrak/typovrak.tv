@@ -6,7 +6,9 @@ Casts de terminal en SVG animé (type svg-term, généré au build) : montrer un
 ---
 
 AFTER THE FIRST POST IS DONE :
-- [ ] Google site verification + bing
+- [x] Google site verification
+  - [ ] fait pas DNS cloudflare donc pas besoin de la variable .env et du code lui étant lié (à nettoyer)
+- [ ] bing ?
 
 - [ ] add components like AWS does it in every article to make it more enjoyable
 - [ ] add at the end, before the comment section, a Q&A for every article with a result (like AWS)
