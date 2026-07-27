@@ -25,7 +25,7 @@
     "archived": false
   },
   "nixos-btop": {
-    "stars": 0,
+    "stars": 1,
     "forks": 0,
     "archived": false
   },
@@ -45,7 +45,7 @@
     "archived": false
   },
   "nixos-fonts": {
-    "stars": 0,
+    "stars": 1,
     "forks": 0,
     "archived": false
   },
@@ -165,8 +165,8 @@
     "archived": false
   },
   "freeCodeCamp/freeCodeCamp": {
-    "stars": 452820,
-    "forks": 45674,
+    "stars": 452896,
+    "forks": 45692,
     "archived": false
   },
   "Racketlon17/2d-collision-simulator": {
