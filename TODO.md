@@ -3,19 +3,13 @@ Bloc Q&A / FAQ par article (aussi dans ton TODO) avec JSON-LD FAQPage : lisibili
 Diagrammes Mermaid rendus au build en SVG (via rehype, pas de JS client) : schémas d'archi sans casser la CSP.
 Casts de terminal en SVG animé (type svg-term, généré au build) : montrer une session CLI sans lecteur JS externe. Parfait pour tes tutos.
 
----
-
-AFTER THE FIRST POST IS DONE :
-- [x] Google site verification
-  - [ ] fait pas DNS cloudflare donc pas besoin de la variable .env et du code lui étant lié (à nettoyer)
-- [ ] bing ?
-
 - [ ] add components like AWS does it in every article to make it more enjoyable
 - [ ] add at the end, before the comment section, a Q&A for every article with a result (like AWS)
 
 ---
 
 ARTICLES :
+- [ ] sur .git/info/exclude pour exclure des fichiers sans passer par le git ignore (très utile avec NixOS et son fichier shell.nix qui lui est si particulier)
 - [ ] sur mon matériel
 - [ ] sur mon clavier
 - [ ] sur ma disposition particulière des touches de mon clavier
