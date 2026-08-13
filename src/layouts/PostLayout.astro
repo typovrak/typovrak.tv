@@ -1,6 +1,12 @@
 ---
 import Layout from "./Layout.astro";
 import { serialiseJsonLd } from "@/utils/jsonLd";
+import {
+  personNode,
+  personRef,
+  websiteNode,
+  websiteRef,
+} from "@/utils/identity";
 import config from "@/config";
 
 type Props = {
@@ -28,24 +34,28 @@ const {
 const pageUrl = canonicalURL ?? new URL(Astro.url.pathname, Astro.site).href;
 const keywords = tags.length > 0 ? tags.join(", ") : undefined;
 
-const person = {
-  "@type": "Person",
-  name: site.author,
-  ...(site.profile && { url: site.profile }),
-};
-
+// The article references the author and site by @id; the full nodes travel
+// with the page so it resolves on its own, which is what an LLM crawler sees.
 const structuredData = {
   "@context": "https://schema.org",
-  "@type": "BlogPosting",
-  headline: title ?? site.title,
-  ...(description && { description }),
-  image: ogImage,
-  mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
-  ...(keywords && { keywords }),
-  ...(pubDatetime && { datePublished: pubDatetime.toISOString() }),
-  ...(modDatetime && { dateModified: modDatetime.toISOString() }),
-  author: [person],
-  publisher: person,
+  "@graph": [
+    {
+      "@type": "BlogPosting",
+      "@id": `${pageUrl}#article`,
+      headline: title ?? site.title,
+      ...(description && { description }),
+      image: ogImage,
+      mainEntityOfPage: { "@type": "WebPage", "@id": pageUrl },
+      isPartOf: websiteRef,
+      ...(keywords && { keywords }),
+      ...(pubDatetime && { datePublished: pubDatetime.toISOString() }),
+      ...(modDatetime && { dateModified: modDatetime.toISOString() }),
+      author: personRef,
+      publisher: personRef,
+    },
+    personNode,
+    websiteNode,
+  ],
 };
 ---
 

@@ -283,6 +283,28 @@ Banned, because they are what makes text read as AI-written:
 The tell to check for: if a sentence exists for *rhythm* rather than *information*, cut it.
 Read it back and ask what fact the reader gained. If none, it goes.
 
+### Writing to be cited (GEO)
+
+An LLM or an AI Overview copies a sentence into an answer only if it stands on its own, without
+its surrounding context. Write for extraction, on top of the rules above (which already kill the
+"AI tells" that get a passage discarded):
+
+- **Answer first.** A section's opening sentence states the fact, before any setup. "Neovim's LSP
+  needs three pieces: a client, a server, and a config that wires them." Most citations come from
+  the top of a section.
+- **Headings are questions**, and the answer lands in the first ~50 words under them ("How do you
+  install Arch without archinstall?").
+- **Be specific and assertive.** Exact commands, versions, dates, numbers. Hedged prose
+  ("it might be worth considering") is never quoted. State it.
+- **Name sources with a direct link** to the exact page, not the homepage.
+- **Comparison tables** get reused far more than prose. When comparing options, use a real
+  Markdown table (it renders through [ResponsiveTable.astro](src/components/ResponsiveTable.astro)).
+
+Structured-data identity is already wired ([identity.ts](src/utils/identity.ts)): one Person and
+one WebSite node with a stable `@id`, referenced from every page and every `BlogPosting`. Do not
+add `LocalBusiness`, `Organization`, pricing or address schema: this is a personal blog with no
+product and no service, and fabricating a business entity would mislead the engines, not help.
+
 ## GDPR
 
 **Hard requirement.** typovrak is in France, so the CNIL is the regulator. When a feature could
