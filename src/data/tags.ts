@@ -33,6 +33,11 @@ export const tags: Record<string, TagInfo> = {
     description: "Containers, images and reproducible local environments.",
     icon: "container",
   },
+  gnome: {
+    label: "GNOME",
+    description: "The GNOME desktop, its tweaks, extensions and daily use.",
+    icon: "app-window",
+  },
   linux: {
     label: "Linux",
     description: "The system underneath: kernel, shell and daily plumbing.",
@@ -57,6 +62,11 @@ export const tags: Record<string, TagInfo> = {
     label: "Web",
     description: "Browsers, standards and how pages behave once shipped.",
     icon: "globe",
+  },
+  zsh: {
+    label: "zsh",
+    description: "The zsh shell: plugins, prompt, completion and aliases.",
+    icon: "chevrons-right",
   },
 };
 

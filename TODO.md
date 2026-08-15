@@ -1,3 +1,12 @@
+- mettre le premier article en ligne sur ma config Arch 2024
+  - renommer les images en anglais + optimisation SEO/GEO
+  - vérifier que chacune est bien compressé et optimiser le format (webp/avif)
+
+
+- mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
+
+---
+
 Callouts / admonitions (note, warning, tip) thémés Catppuccin. Tu as évoqué des composants « façon AWS » : c'est la base.
 Bloc Q&A / FAQ par article (aussi dans ton TODO) avec JSON-LD FAQPage : lisibilité + gain SEO réel (rich snippets).
 Diagrammes Mermaid rendus au build en SVG (via rehype, pas de JS client) : schémas d'archi sans casser la CSP.

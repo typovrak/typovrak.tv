@@ -13,6 +13,8 @@
     "astro": "astro",
     "format:check": "prettier --check .",
     "format": "prettier --write .",
+    "clean:text": "node scripts/clean-invisibles.mjs",
+    "clean:check": "node scripts/clean-invisibles.mjs --check",
     "lint": "eslint .",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage"

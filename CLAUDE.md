@@ -260,8 +260,10 @@ Verify contrast when changing any token — compute the ratios, don't eyeball th
 
 ## Writing (site copy, posts, README)
 
-Plain, direct, technical. Short declarative sentences. State the thing, then move on.
-Assume the reader is a competent developer — don't set scenes, don't build up, don't sell.
+Two registers. The **site itself** (UI strings, page copy, meta, this README) is plain, direct,
+technical: short declarative sentences, state the thing and move on, assume a competent developer,
+don't set scenes, don't sell. **Blog posts** keep the same respect for facts but carry a personal,
+playful voice, see "Blog posts have a voice" below.
 
 Banned, because they are what makes text read as AI-written:
 
@@ -277,11 +279,26 @@ Banned, because they are what makes text read as AI-written:
 - **Marketing verbs**: dive into, delve, unlock, leverage, elevate, craft, unleash, harness.
 - **Marketing adjectives**: seamless, robust, powerful, comprehensive, elegant, modern, curated.
 - **"Whether you're X or Y"** openers, and rhetorical questions used as section intros.
-- **Hype punctuation**: no exclamation marks, no emoji in prose.
+- **Emoji**: never, anywhere, site copy and blog posts alike.
+- **Exclamation marks**: none in site copy, UI or README; a genuinely earned one is fine in a blog
+  post.
 - Sentence fragments used for emphasis. Write full sentences.
 
 The tell to check for: if a sentence exists for *rhythm* rather than *information*, cut it.
 Read it back and ask what fact the reader gained. If none, it goes.
+
+### Blog posts have a voice
+
+The banned list keeps the *site* plain: UI, page copy, meta, this README. Blog posts are written
+for a human who chose to read them, so they carry personality. Jokes and a dry wit are welcome, and
+an exclamation mark that is genuinely earned is fine. The point is to be enjoyable to read, not a
+dry manual. Emojis stay banned even here.
+
+What still holds even here: no em dashes (a typographic AI tell, and it hurts citation), no
+marketing verbs or adjectives, and the facts stay exact. A joke can ride alongside a fact, never
+replace it, and the answer-first, question-heading GEO rules below still apply so a paragraph reads
+well quoted out of context. Emojis and personality do not hurt citation; generic, hedged,
+AI-sounding filler does.
 
 ### Writing to be cited (GEO)
 
