@@ -10,26 +10,8 @@
   --font-app: var(--font-google-sans-code);
 }
 
-/* Catppuccin Latte — green accent */
-:root,
-[data-theme="light"] {
-  --background: #eff1f5; /* base */
-  --foreground: #4c4f69; /* text */
-  /* Latte green (#40a02b) at the same hue and saturation, darkened from 40%
-     to 23% lightness. --accent is used as a text color (post titles, links,
-     tags), and the stock value only reaches 2.96:1 on base — below AA. */
-  --accent: #255c19;
-  --accent-foreground: #eff1f5; /* base */
-  --muted: #ccd0da; /* surface0 */
-  /* subtext1 (#5c5f77) at the same hue and saturation, darkened from 41% to
-     34% lightness. As dates and view counts, it must clear AAA on base; the
-     stock value only reaches 5.53:1. */
-  --muted-foreground: #4c4e62;
-  --border: #bcc0cc; /* surface1 */
-}
-
-/* Catppuccin Mocha — green accent */
-[data-theme="dark"] {
+/* Catppuccin Mocha — green accent. Dark only: the site has no light mode. */
+:root {
   --background: #1e1e2e; /* base */
   --foreground: #cdd6f4; /* text */
   --accent: #a6e3a1; /* green */

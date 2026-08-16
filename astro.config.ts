@@ -111,8 +111,7 @@ export default defineConfig({
       ],
     }),
     shikiConfig: {
-      themes: { light: "catppuccin-latte", dark: "catppuccin-mocha" },
-      defaultColor: false,
+      theme: "catppuccin-mocha",
       wrap: false,
       transformers: [
         transformerFileName({ style: "v2", hideDot: false }),

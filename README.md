@@ -36,9 +36,7 @@ Files whose name starts with `_` are excluded from the collection. `_adding-new-
 
 ## Theme
 
-Colors are [Catppuccin](https://catppuccin.com): Latte in light mode, Mocha in dark, with a green accent. All seven design tokens live in [`src/styles/theme.css`](src/styles/theme.css) and nothing is hardcoded elsewhere. Contrast meets WCAG AAA in both modes.
-
-The light accent is a darkened Latte green (`#255c19`). The stock `#40a02b` only reaches 2.96:1 against Latte base, which fails WCAG AA for text.
+Colors are [Catppuccin](https://catppuccin.com) Mocha with a green accent. The site is dark only, with no light mode and no theme toggle. All seven design tokens live in [`src/styles/theme.css`](src/styles/theme.css) and nothing is hardcoded elsewhere. Contrast meets WCAG AAA.
 
 ## License
 

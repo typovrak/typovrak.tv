@@ -7,7 +7,6 @@ const locale = Astro.currentLocale ?? config.site.lang;
 const l = (path: string) => getRelativeLocaleUrl(locale, path);
 
 const enabled = config.features.search === "pagefind";
-const themeEnabled = config.features.lightAndDarkMode;
 const bundlePath = getAssetPath("pagefind/");
 
 // Nicer labels than the auto-generated ones for a few paths.
@@ -127,22 +126,6 @@ pages.push({
                   </a>
                 </li>
               ))}
-              {themeEnabled && (
-                <li>
-                  <button
-                    type="button"
-                    id="cp-action-theme"
-                    data-cp-item
-                    data-cp-action="theme"
-                    data-label="Toggle theme"
-                    role="option"
-                    aria-selected="false"
-                    class="cp-item w-full text-start"
-                  >
-                    <span class="cp-item-title">Toggle theme</span>
-                  </button>
-                </li>
-              )}
             </ul>
           </div>
           <div data-cp-results-section hidden>
@@ -374,14 +357,6 @@ pages.push({
           open();
         })
       );
-
-    // Toggle theme reuses the header button, so the logic lives in one place.
-    palette
-      .querySelector<HTMLElement>('[data-cp-action="theme"]')
-      ?.addEventListener("click", () => {
-        document.getElementById("theme-btn")?.click();
-        close();
-      });
 
     // The shortcut is Ctrl on Linux/Windows (the rendered default) and Cmd on
     // Apple platforms.

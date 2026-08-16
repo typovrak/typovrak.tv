@@ -52,11 +52,6 @@ const enabled = !!(c && c.repoId && c.categoryId);
   );
   const container = document.getElementById("giscus-container");
 
-  const giscusTheme = () =>
-    document.documentElement.getAttribute("data-theme") === "dark"
-      ? "catppuccin_mocha"
-      : "catppuccin_latte";
-
   // giscus emits discussion metadata (with emitMetadata on). Show the comment
   // count in the heading once it arrives. Origin-checked: the message is
   // attacker-controlled otherwise.
@@ -86,24 +81,10 @@ const enabled = !!(c && c.repoId && c.categoryId);
       reactionsEnabled: "1",
       emitMetadata: "1",
       inputPosition: "bottom",
-      theme: giscusTheme(),
+      theme: "catppuccin_mocha",
       lang: "en",
       loading: "lazy",
     });
     container.appendChild(script);
-
-    // Keep giscus in sync with the light/dark toggle.
-    new MutationObserver(() => {
-      const frame = document.querySelector<HTMLIFrameElement>(
-        "iframe.giscus-frame"
-      );
-      frame?.contentWindow?.postMessage(
-        { giscus: { setConfig: { theme: giscusTheme() } } },
-        "https://giscus.app"
-      );
-    }).observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-theme"],
-    });
   });
 </script>

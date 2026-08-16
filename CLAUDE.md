@@ -242,21 +242,22 @@ schema or OG assets unprompted.
 
 ## Theme
 
-Catppuccin: **Latte** in light mode, **Mocha** in dark, **green** as the accent in both. The
-seven design tokens in [src/styles/theme.css](src/styles/theme.css) are the only place colors
-are defined — no hex values anywhere else, and Tailwind 4 has no JS config to hold a palette.
-Code blocks use the `catppuccin-latte` / `catppuccin-mocha` Shiki themes.
+Catppuccin **Mocha** with a **green** accent. The site is **dark only**: there is no light mode,
+no theme toggle, no `data-theme` switching and no `dark:` Tailwind variant. Do not add a light
+palette or a toggle back. A single static `dark` class sits on `<html>` (in
+[Layout.astro](src/layouts/Layout.astro)): the rehype-callouts obsidian theme keys its dark
+palette on `.dark .callout`, so removing that class makes every callout render its light colors
+and go invisible on the Mocha background. Keep it. The seven design tokens in [src/styles/theme.css](src/styles/theme.css)
+are the only place colors are defined (no hex values anywhere else, and Tailwind 4 has no JS
+config to hold a palette). They live on bare `:root`. Code blocks use the single `catppuccin-mocha`
+Shiki theme, so Shiki inlines each token's color and no light/dark CSS variable plumbing is needed.
 
 Accessibility is a hard requirement: **target WCAG AAA (7:1)**, and never regress below AA.
 `--accent` is used mostly as a *text* color (post titles, links, tags, 404), so it must clear
-the text threshold against `--background`, not just the 3:1 UI threshold.
+the text threshold against `--background`, not just the 3:1 UI threshold. Mocha green (`#a6e3a1`
+on base `#1e1e2e`) reaches 11:1, so it needs no adjustment.
 
-This is why light mode's `--accent` is `#255c19` and not Catppuccin's `#40a02b`: the official
-Latte green only reaches 2.96:1 on Latte base. `#255c19` keeps the exact hue (109.2°) and
-saturation (57.6%) and drops lightness to 23%, reaching 7.08:1. **Do not "fix" it back to the
-stock value.** Mocha green needs no adjustment (11:1).
-
-Verify contrast when changing any token — compute the ratios, don't eyeball them.
+Verify contrast when changing any token, computing the ratios rather than eyeballing them.
 
 ## Writing (site copy, posts, README)
 

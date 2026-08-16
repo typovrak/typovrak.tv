@@ -152,9 +152,7 @@ const field =
     // Orange for problems, matching the archived badge on this page.
     const setStatus = (text: string, tone: "ok" | "error") => {
       status.className =
-        tone === "ok"
-          ? "text-accent text-sm"
-          : "text-sm text-orange-700 dark:text-orange-400";
+        tone === "ok" ? "text-accent text-sm" : "text-sm text-orange-400";
       status.textContent = text;
     };
 

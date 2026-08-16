@@ -28,7 +28,7 @@ export default {
   },
   home: {
     socialLinks: "Social Links",
-    featured: "Featured",
+    featured: "Featured posts",
     recentPosts: "Recent Posts",
     allPosts: "All Posts",
   },
@@ -58,7 +58,6 @@ export default {
     skipToContent: "Skip to content",
     openMenu: "Open menu",
     closeMenu: "Close menu",
-    toggleTheme: "Toggle theme",
     searchPlaceholder: "Search posts...",
     noResults: "No results found",
     goToPreviousPage: "Go to previous page",

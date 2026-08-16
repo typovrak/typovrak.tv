@@ -1,5 +1,3 @@
-- supprimer entièrement le light mode, cela ajoute des contraites d'accessibilité en plus + je n'aime vraiment pas le light mode, je veux que le site soit minimaliste, je l'enlève donc.
-
 - mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
 
 - ajouter un composant en début d'article pour les variables faisant que dans l'article et le code, cela sera les bonnes valeurs comme à la place de <USER> -> typovrak pour des commandes cli sur mon utilisateur

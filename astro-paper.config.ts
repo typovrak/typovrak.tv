@@ -21,7 +21,6 @@ export default defineAstroPaperConfig({
     scheduledPostMargin: 15 * 60 * 1000,
   },
   features: {
-    lightAndDarkMode: true,
     dynamicOgImage: false,
     // No posts yet, so nothing to archive. Re-enable once there are posts.
     showArchives: false,
