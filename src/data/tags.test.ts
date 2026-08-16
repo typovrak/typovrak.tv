@@ -7,7 +7,7 @@ describe("tagInfo", () => {
   });
 
   it("throws on an unknown tag, naming it so the build error is actionable", () => {
-    expect(() => tagInfo("not-a-real-tag")).toThrowError(/not-a-real-tag/);
+    expect(() => tagInfo("not-a-real-tag")).toThrow(/not-a-real-tag/);
   });
 });
 
