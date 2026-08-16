@@ -13,6 +13,8 @@ import remarkToc from "remark-toc";
 import remarkCollapse from "remark-collapse";
 import rehypeCallouts from "rehype-callouts";
 import { rehypeExternalLinks } from "./src/utils/rehypeExternalLinks";
+import { rehypeImageCaptions } from "./src/utils/rehypeImageCaptions";
+import { rehypeDetailsClose } from "./src/utils/rehypeDetailsClose";
 import {
   transformerNotationDiff,
   transformerNotationHighlight,
@@ -101,7 +103,12 @@ export default defineConfig({
         remarkToc,
         [remarkCollapse, { test: "Table of contents" }],
       ],
-      rehypePlugins: [rehypeCallouts, rehypeExternalLinks],
+      rehypePlugins: [
+        rehypeCallouts,
+        rehypeExternalLinks,
+        rehypeImageCaptions,
+        rehypeDetailsClose,
+      ],
     }),
     shikiConfig: {
       themes: { light: "catppuccin-latte", dark: "catppuccin-mocha" },

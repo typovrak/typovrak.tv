@@ -1,4 +1,9 @@
+- supprimer entièrement le light mode, cela ajoute des contraites d'accessibilité en plus + je n'aime vraiment pas le light mode, je veux que le site soit minimaliste, je l'enlève donc.
+
 - mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
+
+- ajouter un composant en début d'article pour les variables faisant que dans l'article et le code, cela sera les bonnes valeurs comme à la place de <USER> -> typovrak pour des commandes cli sur mon utilisateur
+  - et ajouter des paramètres tel que remplacer "vim" par "nano" dans les commandes par exemple
 
 ---
 
@@ -23,3 +28,4 @@ ARTICLES :
 - [ ] sur comment lancer le projet freeCodeCamp sous NixOS (bug Prisma non supporté par freeCodeCamp pour le moment)
 - [ ] sur mon ancienne configuration Arch Linux x Gnome
 - [ ] Star Rune, comment j'ai aidé un jeu de dactylographie à lever plus de 15 000 $
+- [ ] Créer un article se basant sur toutes les lois de atomic habite afin de devenir un développeur freelance

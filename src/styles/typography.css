@@ -83,11 +83,29 @@
     }
 
     details:not(.callout) {
-      @apply text-foreground inline-block cursor-pointer select-none [&_p]:hidden [&_ul]:my-0!;
+      @apply text-foreground block [&_p:empty]:hidden [&_ul]:my-0!;
+    }
+
+    /* When open, a left accent bar spans summary and content, so its bottom
+       edge marks where the disclosure ends. */
+    details:not(.callout)[open] {
+      @apply border-s-accent/80 border-s-2 ps-4;
+    }
+
+    .details-close {
+      @apply text-accent mt-4 inline-flex cursor-pointer items-center border-0 bg-transparent p-0 text-sm underline decoration-dashed underline-offset-4;
     }
 
     summary {
-      @apply focus-visible:outline-accent focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dashed;
+      @apply focus-visible:outline-accent cursor-pointer select-none focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dashed;
+    }
+
+    figure {
+      @apply mx-auto my-6 flex flex-col items-center;
+    }
+
+    figcaption {
+      @apply mt-2 text-center text-sm opacity-70;
     }
 
     pre {

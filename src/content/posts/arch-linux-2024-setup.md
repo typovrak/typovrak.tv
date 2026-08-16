@@ -56,7 +56,10 @@ Then bring the whole system up to date:
 yay -u
 ```
 
-One habit worth keeping: update weekly, not once a quarter. A three-month backlog is how you end up with five apps breaking at the same time. Docker in particular sulks after a system update, and the fix is gloriously dumb: reboot and it behaves again.
+One habit worth keeping: update weekly, not once a quarter. A three-month backlog is how you end up with five apps breaking at the same time.
+
+> [!bug] Docker sulks after a system update
+> The fix is gloriously dumb: reboot and it behaves again.
 
 ![Docker daemon error after a system update, before a reboot](/img/posts/arch-2024-setup/docker-daemon-error-before-reboot.webp)
 
@@ -96,21 +99,21 @@ Most of the list explains itself. A few picks deserve a word, folded away so the
 <details>
 <summary>The reasoning behind a few of them</summary>
 
-**docker** is my single tool for install, development and production. One file pins a project to a specific Node version, puts an API and its front end on the same private network, and gives PostgreSQL its own private network that only the API can reach. That last part enforces good architecture for free: nothing stops a beginner from calling a database straight from React until the network does.
+**docker** is my single tool for install, development and production. One file pins a project to a specific Node version and puts its services on a private network, exposing only a separate external proxy network to the reverse proxy. The database sits on the private network alone, so nothing outside the VPS can reach it. That enforces good architecture for free: nothing stops a beginner from calling a database straight from React until the network does.
 
-<!-- TODO image: a docker-compose file with the api/front/postgres private networks -->
+![A production docker-compose file with an external proxy network and a private app network, keeping the database unreachable from outside the VPS](/img/posts/arch-2024-setup/docker-compose-from-real-project-in-production.avif)
 
-**chromium over firefox** for daily driving. Chromium is smoother and faster, and Firefox now harvests personal data to resell. I keep Firefox for one niche move: replaying an XHR request to walk past a front-end form validation.
+**chromium over firefox** for daily driving. Chromium is smoother and faster, and Firefox [deleted its old promise never to sell your personal data](https://github.com/mozilla/bedrock/commit/d459addab846d8144b61939b7f4310eb80c5470e). I keep Firefox for one niche move: replaying an XHR request to walk past a front-end form validation.
 
-<!-- TODO image: replaying an XHR request in Firefox devtools -->
+![Firefox devtools editing and resending an XHR request to walk past a front-end form validation](/img/posts/arch-2024-setup/firefox-xhr-edit-and-resend-feature.avif)
 
 **fzf** is a must-have, inside Neovim and on the command line both. It is the fastest way I know to find anything on a Linux system.
 
-<!-- TODO image: fzf narrowing a file search -->
+![fzf narrowing a file search on the system](/img/posts/arch-2024-setup/fzf-system-search.avif)
 
 **lazygit** puts a UI on git without leaving the terminal. git is simple enough day to day that I only reach for it to read complex commit graphs and branches.
 
-<!-- TODO image: lazygit showing a branch graph -->
+![lazygit showing the branch graph of the typovrak.tv repository](/img/posts/arch-2024-setup/lazygit-in-typovrak-tv-repository.avif)
 
 </details>
 
@@ -135,12 +138,12 @@ Once the machine is back, GNOME Software can install anything on [Flathub](https
 > [!NOTE] On NixOS today
 > In 2024 I barely opened Neovim. It is now my daily editor, and my whole [Neovim config](https://github.com/typovrak/nixos-nvim), every custom plugin pinned, gets cloned on every `nixos-rebuild`. 100% reproducible, zero interaction during install and build.
 
-<!-- TODO image: neovim with my config and plugins loaded -->
+![My declarative Neovim configuration running on NixOS](/img/posts/arch-2024-setup/declarative-nvim-configuration.avif)
 
 > [!NOTE] On NixOS today
 > Installing an app like Insomnia [means adding its name](https://github.com/typovrak/nixos/blob/main/configuration.nix#L274) to my NixOS config and nothing else. No pacman, no yay, no clicking through GNOME Software.
 
-<!-- TODO image: the systemPackages line that installs Insomnia -->
+![Installing Insomnia by adding one line to the NixOS configuration](/img/posts/arch-2024-setup/installing-insomnia-with-nixos-in-one-line.avif)
 
 ## How do I run Docker without sudo?
 
@@ -161,7 +164,7 @@ newgrp docker
 > [!NOTE] On NixOS today
 > This whole dance is [one line in my config](https://github.com/typovrak/nixos/blob/main/configuration.nix#L228): `extraGroups = [ "docker" ];`, written once and applied on every rebuild. No `usermod`, no `newgrp`.
 
-<!-- TODO image: the extraGroups line in configuration.nix -->
+![Adding the docker group in one line of the NixOS configuration](/img/posts/arch-2024-setup/setup-docker-group-in-one-line-on-nixos.avif)
 
 Test it with the throwaway `hello-world` image:
 
@@ -197,7 +200,7 @@ That should print `/usr/bin/zsh`. The shell is switched, but it is bare until yo
 
 ## Adding a Nerd Font
 
-A Nerd Font ships the extra glyphs and icons a good terminal theme needs, and Powerlevel10k will ask for one. Download one from [nerdfonts.com](https://www.nerdfonts.com/font-downloads); I use JetBrains Mono for how it reads while coding, with Fira Code as my occasional favourite for a change of scenery.
+A Nerd Font ships the extra glyphs and icons a good terminal theme needs, and Powerlevel10k will ask for one. Download one from [nerdfonts.com](https://www.nerdfonts.com/font-downloads). I use JetBrains Mono for how it reads while coding, with Fira Code as my occasional favourite for a change of scenery.
 
 Unzip it, delete the `LICENSE.txt` and `README.md` inside, then drop every font file into `~/.local/share/fonts` (create it if missing, and keep it flat, no subfolders). Set that font in your terminal preferences, and if there is both a Mono and a non-Mono variant, pick the non-Mono one for a better terminal render.
 
@@ -408,13 +411,13 @@ GNOME was the right way to start, but I would go straight to i3 now. Everything 
 
 zoxide is a small quality-of-life win. `cd typovrak.tv` jumps to `~/projects/typovrak.tv` from anywhere in the tree, and it is the kind of thing you should live with for a week to feel it. I dropped it anyway. It made me forget my own paths, which is backwards, and as a touch typist I lose almost no time typing a path in full.
 
-<!-- TODO image: zoxide jumping across the tree -->
+![zoxide jumping straight to a project directory from anywhere in the tree](/img/posts/arch-2024-setup/zoxide-in-action.avif#w400)
 
 FileZilla and gedit only survive for production work and the odd one-off. Given the choice, it is SSH and Vim every time.
 
-tmux is here for testing. I prefer zellij, the Rust terminal multiplexer, but it carries more than my daily work needs, so I never made the switch.
+tmux is here for testing. I prefer zellij, the Rust terminal multiplexer, but it carries more than my daily work needs, so I never made the switch. My [zellij config and theme](https://github.com/typovrak/nixos-zellij) are on GitHub if you want them. The setup adapts with or without NixOS.
 
-<!-- TODO image: zellij with a couple of panes -->
+![zellij split into three panes with the Catppuccin Mocha green theme](/img/posts/arch-2024-setup/zellij-with-3-pane-and-catppuccin-mocha-green-theme.avif)
 
 ## What changed since?
 
