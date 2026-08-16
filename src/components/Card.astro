@@ -4,17 +4,18 @@ import { getPostUrl } from "@/utils/getPostPaths";
 import { normalisePath } from "@/utils/paths";
 import Datetime from "./Datetime.astro";
 import PageViews from "./PageViews.astro";
+import { readingTime } from "@/utils/readingTime";
 
 type Props = {
   variant?: "h2" | "h3";
 } & CollectionEntry<"posts">;
 
-const { variant: Heading = "h2", id, data, filePath } = Astro.props;
+const { variant: Heading = "h2", id, data, filePath, body } = Astro.props;
 
 const { title, description, ...props } = data;
+const minutes = readingTime(body ?? "");
 
-// Normalised so it matches the keys the API returns (which strips the trailing
-// slash); otherwise the client lookup misses and the count is dropped.
+// normalise to match the api keys (trailing slash stripped), else the count drops
 const postUrl = getPostUrl(id, filePath, Astro.currentLocale);
 const postPath = normalisePath(postUrl) ?? postUrl;
 ---
@@ -32,9 +33,13 @@ const postPath = normalisePath(postUrl) ?? postUrl;
       {title}
     </Heading>
   </a>
-  <div class="flex items-center gap-2">
+  <div class="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
     <Datetime {...props} />
-    <span aria-hidden="true" class="text-muted-foreground">|</span>
+    <span aria-hidden="true" class="text-muted-foreground max-sm:hidden">|</span
+    >
+    <span class="text-muted-foreground text-sm">{minutes} min read</span>
+    <span aria-hidden="true" class="text-muted-foreground max-sm:hidden">|</span
+    >
     <PageViews path={postPath} class="text-muted-foreground text-sm" />
   </div>
   <p>{description}</p>

@@ -3,6 +3,16 @@
 @import "./typography.css";
 @import "rehype-callouts/theme/obsidian";
 
+/* match the prose body line-height in callout asides */
+.callout-content {
+  line-height: 1.75;
+}
+
+/* drop the last child's margin so the callout bottom matches its top padding */
+.callout-content > :last-child {
+  margin-bottom: 0;
+}
+
 @layer base {
   * {
     @apply border-border outline-accent/75;
@@ -31,12 +41,32 @@
   @apply underline decoration-wavy decoration-2 underline-offset-8;
 }
 
+/* quiz state classes, toggled at runtime so tailwind still generates them */
+/* lock a graded question without disabling inputs, so picks keep their colour */
+[data-quiz-question].is-graded .quiz-option {
+  @apply pointer-events-none;
+}
+.quiz-option.is-correct {
+  @apply border-accent bg-accent/10;
+}
+.quiz-option.is-wrong {
+  @apply border-orange-400/60 bg-orange-500/10;
+}
+.quiz-mark {
+  @apply mt-3 text-sm font-medium;
+}
+.quiz-mark.is-ok {
+  @apply text-accent;
+}
+.quiz-mark.is-ko {
+  @apply text-orange-400;
+}
+
 :target {
   scroll-margin-block: 1rem;
 }
 
-/* Respect a reduced-motion preference: near-instant transitions and
-   animations, no smooth scroll, no view-transition animation. WCAG 2.3.3. */
+/* wcag 2.3.3: near-instant motion when reduced-motion is set */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

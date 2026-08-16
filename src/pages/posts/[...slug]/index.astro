@@ -14,6 +14,7 @@ import BackButton from "./_components/BackButton.astro";
 import BackToTopButton from "./_components/BackToTopButton.astro";
 import AdjacentPostNav from "./_components/AdjacentPostNav.astro";
 import Comments from "@/components/Comments.astro";
+import Quiz from "@/components/Quiz.astro";
 import HeadingLinks from "@/components/HeadingLinks.astro";
 import PageViews from "@/components/PageViews.astro";
 import config from "@/config";
@@ -118,11 +119,15 @@ const ogImage = ogImageUrl
       {title}
     </h1>
 
-    <div class="my-2 flex items-center gap-2">
+    <div class="my-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
       <Datetime {pubDatetime} {modDatetime} {timezone} size="lg" />
-      <span aria-hidden="true" class="text-muted-foreground">|</span>
+      <span aria-hidden="true" class="text-muted-foreground max-sm:hidden">
+        |
+      </span>
       <span class="text-muted-foreground">{minutes} min read</span>
-      <span aria-hidden="true" class="text-muted-foreground">|</span>
+      <span aria-hidden="true" class="text-muted-foreground max-sm:hidden">
+        |
+      </span>
       <PageViews class="text-muted-foreground" />
     </div>
 
@@ -143,6 +148,12 @@ const ogImage = ogImageUrl
     <hr class="my-8 border-dashed" />
 
     <AdjacentPostNav {prevPost} {nextPost} />
+
+    {
+      post.data.quiz && post.data.quiz.length > 0 && (
+        <Quiz questions={post.data.quiz} />
+      )
+    }
 
     <Comments />
   </main>

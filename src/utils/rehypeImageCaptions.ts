@@ -1,13 +1,5 @@
-// Wraps a standalone content image in <figure> and gives it a <figcaption>
-// built from the alt text, so every image carries a visible caption. A
-// paragraph qualifies when its only non-whitespace child is an <img> with a
-// non-empty alt. Inline images (mixed with text) and alt-less images are left
-// alone. The alt stays on the <img>, so it still serves SEO and screen readers;
-// the caption reuses it, keeping one source of truth.
-//
-// An optional width hint in the src caps the figure: `image.avif#w400` renders
-// at most 400px wide (centred by the figure's own margins). The hint is stripped
-// from the src so the file still resolves.
+// wraps a standalone content image in <figure> + <figcaption> from its alt.
+// a `#wNNN` hint in the src caps the figure width and is stripped off.
 
 interface HastNode {
   type: string;

@@ -1,0 +1,209 @@
+---
+import type { QuizQuestion } from "@/utils/quiz";
+
+interface Props {
+  questions: QuizQuestion[];
+}
+
+const { questions } = Astro.props;
+---
+
+<section
+  data-quiz
+  aria-labelledby="quiz"
+  class="border-border mt-8 rounded-lg border p-5 sm:p-6"
+>
+  <h2 id="quiz" class="text-xl font-semibold tracking-wide">Test yourself</h2>
+
+  <ol class="mt-6 flex list-none flex-col gap-10 p-0">
+    {
+      questions.map((question, qi) => (
+        <li data-quiz-question data-correct={question.correct.join(",")}>
+          <fieldset class="m-0 border-0 p-0">
+            <legend class="font-medium">
+              {qi + 1}. {question.q}
+            </legend>
+            <p class="text-muted-foreground mt-1 text-sm">
+              {question.multiple
+                ? "Select at least 2 answers"
+                : "Select one answer"}
+            </p>
+            <div class="mt-3 flex flex-col gap-2">
+              {question.options.map((option, oi) => (
+                <label class="quiz-option border-border hover:border-accent/60 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 transition-colors">
+                  <input
+                    class="accent-accent"
+                    type={question.multiple ? "checkbox" : "radio"}
+                    name={`quiz-${qi}`}
+                    value={oi}
+                  />
+                  <span>{option}</span>
+                </label>
+              ))}
+            </div>
+            <button
+              type="button"
+              data-quiz-validate
+              hidden
+              class="focus-outline bg-accent text-accent-foreground mt-3 inline-flex w-fit items-center rounded-md px-3 py-1.5 text-sm font-medium transition-opacity hover:opacity-90"
+            >
+              Validate
+            </button>
+            <p data-quiz-mark hidden class="quiz-mark" />
+            {question.explain && (
+              <p
+                data-quiz-explain
+                hidden
+                class="text-muted-foreground mt-1 text-sm"
+              >
+                {question.explain}
+              </p>
+            )}
+          </fieldset>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="mt-6 flex flex-wrap items-center gap-4">
+    <button
+      type="button"
+      data-quiz-retry
+      hidden
+      class="focus-outline border-accent text-accent hover:bg-accent/10 inline-flex items-center rounded-md border px-4 py-2 font-medium transition-colors"
+    >
+      Retry
+    </button>
+    <p
+      data-quiz-score
+      hidden
+      tabindex="-1"
+      aria-live="polite"
+      class="text-accent font-semibold"
+    >
+    </p>
+  </div>
+</section>
+
+<script>
+  import { isAnswerCorrect, scoreQuiz } from "@/utils/quiz";
+
+  const picks = (question: HTMLElement) =>
+    Array.from(question.querySelectorAll<HTMLInputElement>("input"));
+
+  const correctOf = (question: HTMLElement) =>
+    (question.dataset.correct ?? "")
+      .split(",")
+      .filter(value => value !== "")
+      .map(Number);
+
+  function setupQuiz(quiz: HTMLElement): void {
+    const questions = Array.from(
+      quiz.querySelectorAll<HTMLElement>("[data-quiz-question]")
+    );
+    const retry = quiz.querySelector<HTMLButtonElement>("[data-quiz-retry]");
+    const scoreEl = quiz.querySelector<HTMLElement>("[data-quiz-score]");
+    if (!retry || !scoreEl) return;
+
+    // grade one question inline and lock it
+    const gradeQuestion = (question: HTMLElement) => {
+      const correct = correctOf(question);
+      const selected = picks(question)
+        .filter(input => input.checked)
+        .map(input => Number(input.value));
+      const ok = isAnswerCorrect(selected, correct);
+
+      picks(question).forEach(input => {
+        const label = input.closest(".quiz-option");
+        if (!label) return;
+        if (correct.includes(Number(input.value))) {
+          label.classList.add("is-correct");
+        } else if (input.checked) {
+          label.classList.add("is-wrong");
+        }
+      });
+
+      const mark = question.querySelector<HTMLElement>("[data-quiz-mark]");
+      if (mark) {
+        mark.hidden = false;
+        mark.textContent = ok ? "True" : "False";
+        mark.classList.add(ok ? "is-ok" : "is-ko");
+      }
+      const explain = question.querySelector<HTMLElement>(
+        "[data-quiz-explain]"
+      );
+      if (explain) explain.hidden = false;
+
+      question.dataset.validated = "true";
+      question.classList.add("is-graded");
+    };
+
+    // show retry after the first validation, the total once every one is done
+    const updateSummary = () => {
+      const done = questions.filter(q => q.dataset.validated === "true");
+      if (done.length > 0) retry.hidden = false;
+      if (done.length !== questions.length) return;
+
+      const graded = questions.map(question => ({
+        selected: picks(question)
+          .filter(input => input.checked)
+          .map(input => Number(input.value)),
+        correct: correctOf(question),
+      }));
+      const { correct, total, percent } = scoreQuiz(graded);
+      scoreEl.hidden = false;
+      scoreEl.textContent = `You scored ${correct} / ${total} (${percent}%)`;
+      scoreEl.focus();
+    };
+
+    questions.forEach(question => {
+      const validate = question.querySelector<HTMLButtonElement>(
+        "[data-quiz-validate]"
+      );
+      if (!validate) return;
+
+      question.addEventListener("change", () => {
+        if (question.dataset.validated === "true") return;
+        validate.hidden = !picks(question).some(input => input.checked);
+      });
+
+      validate.addEventListener("click", () => {
+        gradeQuestion(question);
+        validate.hidden = true;
+        updateSummary();
+      });
+    });
+
+    retry.addEventListener("click", () => {
+      questions.forEach(question => {
+        delete question.dataset.validated;
+        question.classList.remove("is-graded");
+        picks(question).forEach(input => {
+          input.checked = false;
+          input
+            .closest(".quiz-option")
+            ?.classList.remove("is-correct", "is-wrong");
+        });
+        const validate = question.querySelector<HTMLButtonElement>(
+          "[data-quiz-validate]"
+        );
+        if (validate) validate.hidden = true;
+        const mark = question.querySelector<HTMLElement>("[data-quiz-mark]");
+        if (mark) {
+          mark.hidden = true;
+          mark.textContent = "";
+          mark.classList.remove("is-ok", "is-ko");
+        }
+        const explain = question.querySelector<HTMLElement>(
+          "[data-quiz-explain]"
+        );
+        if (explain) explain.hidden = true;
+      });
+      scoreEl.hidden = true;
+      scoreEl.textContent = "";
+      retry.hidden = true;
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>("[data-quiz]").forEach(setupQuiz);
+</script>

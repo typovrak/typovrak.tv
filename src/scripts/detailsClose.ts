@@ -1,8 +1,5 @@
-// Wires up the close buttons rehypeDetailsClose appends to each <details>.
-// Native disclosures only toggle from their <summary>, so a long open block
-// forces the reader back up to collapse it. One delegated listener handles every
-// disclosure on the page; closing returns the reader (and focus) to the summary.
-// No ClientRouter here, so this runs once on load and never re-binds.
+// closes the parent <details> from the close button and returns focus to the
+// summary. runs once on load; no client router here, so it never re-binds.
 
 function onClick(event: MouseEvent): void {
   const target = event.target as Element | null;

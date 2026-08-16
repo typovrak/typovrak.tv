@@ -1,7 +1,7 @@
 @plugin "@tailwindcss/typography";
 
 @layer base {
-  /* ===== Override default Tailwind Typography styles ===== */
+  /* tailwind typography overrides */
   .app-prose {
     @apply prose;
 
@@ -86,8 +86,7 @@
       @apply text-foreground block [&_p:empty]:hidden [&_ul]:my-0!;
     }
 
-    /* When open, a left accent bar spans summary and content, so its bottom
-       edge marks where the disclosure ends. */
+    /* open: left accent bar marks where the disclosure ends */
     details:not(.callout)[open] {
       @apply border-s-accent/80 border-s-2 ps-4;
     }
@@ -97,7 +96,27 @@
     }
 
     summary {
-      @apply focus-visible:outline-accent cursor-pointer select-none focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dashed;
+      @apply focus-visible:outline-accent hover:text-accent flex cursor-pointer list-none items-center gap-3 underline decoration-dashed underline-offset-4 select-none focus-visible:no-underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-dashed;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    /* green chevron marking the open/closed state, rotates > into v */
+    summary::before {
+      content: "";
+      flex: none;
+      width: 0.45em;
+      height: 0.45em;
+      border-right: 0.16em solid var(--accent);
+      border-bottom: 0.16em solid var(--accent);
+      transform: rotate(-45deg);
+      transition: transform 0.15s ease;
+    }
+
+    details[open] > summary::before {
+      transform: rotate(45deg);
     }
 
     figure {
@@ -113,13 +132,22 @@
     }
   }
 
-  /* ===== Code Blocks & Syntax Highlighting ===== */
+  /* code blocks */
   .astro-code {
     @apply outline-border flex border;
+    scrollbar-color: var(--accent) transparent;
   }
 
-  /* Styles for Shiki transformers */
-  /* https://shiki.style/packages/transformers */
+  .astro-code::-webkit-scrollbar {
+    height: 0.5rem;
+  }
+
+  .astro-code::-webkit-scrollbar-thumb {
+    background-color: var(--accent);
+    border-radius: 0.25rem;
+  }
+
+  /* shiki transformers: https://shiki.style/packages/transformers */
   .astro-code {
     .line.diff.add {
       @apply relative inline-block w-full bg-green-400/20 before:absolute before:-left-3 before:text-green-500 before:content-['+'];

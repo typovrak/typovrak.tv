@@ -432,10 +432,11 @@ cannot be unsent: the only fix is rotating it.
 ## Conventions
 
 - Match the surrounding code. Prettier + ESLint decide formatting; don't hand-format.
-- **Do not over-comment.** No docblocks restating what the code says, no narrating the next
-  line. Write a comment only for a constraint the code cannot express (a gotcha, a why, a
-  non-obvious trade-off), and keep it to one line. Explanations belong in the chat or in
-  this file, not scattered through the source.
+- **Comments are rare and terse.** Default to none. Add one only for a constraint the code
+  cannot express (a gotcha, a why, a non-obvious trade-off). Keep it to one short line, all
+  lowercase, opened with `//` in code or a short `/* */` in CSS. No docblocks, no multi-line
+  banners, no narrating the next line, no restating what the code says. Explanations belong
+  in the chat or in this file, not scattered through the source.
 - Path alias `@/` maps to `src/` (see [tsconfig.json](tsconfig.json)).
 - Route-local components live next to their route under `_components/` (e.g.
   [src/pages/posts/[...slug]/_components/](src/pages/posts/%5B...slug%5D/_components/)); shared

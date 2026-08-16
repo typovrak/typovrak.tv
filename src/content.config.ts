@@ -5,6 +5,31 @@ import config from "@/config";
 
 export const BLOG_PATH = "src/content/posts";
 
+// correct = indices into options; the refines below fail the build on a bad quiz
+const quizQuestion = z
+  .object({
+    q: z.string(),
+    multiple: z.boolean().default(false),
+    options: z.array(z.string()).min(2).max(4),
+    correct: z.array(z.number().int().nonnegative()).min(1),
+    explain: z.string().optional(),
+  })
+  .refine(
+    question => question.correct.every(i => i < question.options.length),
+    {
+      message: "quiz: a correct index points past the options",
+    }
+  )
+  .refine(
+    question => new Set(question.correct).size === question.correct.length,
+    {
+      message: "quiz: duplicate correct index",
+    }
+  )
+  .refine(question => question.multiple || question.correct.length === 1, {
+    message: "quiz: a single-answer question needs exactly one correct option",
+  });
+
 const posts = defineCollection({
   loader: glob({ pattern: "**/[^_]*.{md,mdx}", base: `./${BLOG_PATH}` }),
   schema: ({ image }) =>
@@ -20,6 +45,7 @@ const posts = defineCollection({
       description: z.string(),
       canonicalURL: z.string().optional(),
       timezone: z.string().optional(),
+      quiz: z.array(quizQuestion).optional(),
     }),
 });
 

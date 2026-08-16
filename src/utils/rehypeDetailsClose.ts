@@ -1,13 +1,7 @@
-// Appends a close control to each <details> disclosure so a reader can collapse
-// it from the bottom instead of scrolling back up to the summary. The button is
-// inert without JS (src/scripts/detailsClose.ts wires it up); native summary
-// toggling still works, so this only ever adds capability, never removes it.
-//
-// Both disclosures on a page arrive as raw HTML nodes, not hast elements: the
-// table of contents is emitted by remark-collapse as raw <details> strings, and
-// content blocks are authored as raw HTML in markdown. So the main path rewrites
-// raw nodes, inserting the button right before each </details>. The element path
-// is kept for any disclosure that does reach us parsed.
+// appends a close button before each </details> so a long disclosure can be
+// collapsed from the bottom. both disclosures arrive as raw html (the toc from
+// remark-collapse, content blocks authored inline), so the raw path is the real
+// one; the element path is a fallback. the button is wired by detailsClose.ts.
 
 interface HastNode {
   type: string;

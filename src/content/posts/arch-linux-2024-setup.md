@@ -10,6 +10,56 @@ tags:
   - docker
   - cli
 description: "The exact setup I built on a fresh 2024 Arch install: GNOME, yay, my package list, zsh with zinit and Powerlevel10k, Docker, SSH and Git. Since rebuilt as a declarative NixOS config."
+quiz:
+  - q: "What does yay give you that plain pacman does not?"
+    options:
+      - "A faster mirror"
+      - "Access to the AUR"
+      - "Automatic snapshots"
+      - "A graphical installer"
+    correct: [1]
+    explain: "yay wraps pacman and adds the AUR, so yay -Syu updates official and AUR packages together and can install AUR-only ones (this setup uses it for nvm)."
+  - q: "How does this setup run Docker without sudo?"
+    options:
+      - "chmod 777 the Docker socket"
+      - "Alias docker to sudo docker"
+      - "Add your user to the docker group"
+      - "Run the daemon rootless"
+    correct: [2]
+    explain: "sudo usermod -aG docker $USER, then a reboot or newgrp docker."
+  - q: "Docker fails right after a system update. What is the fix?"
+    options:
+      - "Reinstall Docker"
+      - "Reboot"
+      - "Roll back the kernel"
+      - "Restart only the network"
+    correct: [1]
+    explain: "Docker sulks after an update until you reboot, then it behaves again."
+  - q: "Why did the author eventually drop zoxide?"
+    options:
+      - "It was too slow to jump"
+      - "It needed a background daemon"
+      - "It stopped working on NixOS"
+      - "It made him forget his own paths"
+    correct: [3]
+    explain: "As a touch typist he loses little typing a full path, and zoxide made him forget where things live."
+  - q: "With hindsight, what would the author start with instead of GNOME?"
+    options:
+      - "KDE Plasma"
+      - "Xfce"
+      - "i3"
+      - "Cinnamon"
+    correct: [2]
+    explain: "He would go straight to i3 for full keyboard control."
+  - q: "What does the NixOS rewrite give the author?"
+    multiple: true
+    options:
+      - "A reproducible Neovim config cloned on every build"
+      - "A faster kernel"
+      - "Installing a tool by writing its name once"
+      - "A five-minute rebuild with zero interaction"
+    correct: [0, 2, 3]
+    explain: "NixOS rebuilds his Neovim config every time, installs tools by naming them, and takes about five minutes with no interaction."
 ---
 
 This is the exact setup I built on a fresh Arch install in 2024: GNOME, yay, my package list, a zsh config with zinit and Powerlevel10k, then Docker, SSH and Git. I have since rebuilt the whole thing as a declarative [NixOS config](/nixos), so read this as a time capsule, proof of how far the setup has come. Every command below is one I actually ran.
