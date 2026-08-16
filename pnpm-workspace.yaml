@@ -1,3 +1,10 @@
 allowBuilds:
   esbuild: true
   sharp: true
+
+# rehype-callouts pulls @types/hast ^3.0.4 while Astro's markdown pipeline uses
+# 3.0.5. Two copies make their unified/rehype types nominally incompatible and
+# fail astro check. Force one version. pnpm 11 reads overrides from here, not
+# from the package.json pnpm field.
+overrides:
+  "@types/hast": 3.0.5

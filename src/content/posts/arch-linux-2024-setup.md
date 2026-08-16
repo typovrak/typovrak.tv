@@ -14,15 +14,17 @@ description: "The exact setup I built on a fresh 2024 Arch install: GNOME, yay, 
 
 This is the exact setup I built on a fresh Arch install in 2024: GNOME, yay, my package list, a zsh config with zinit and Powerlevel10k, then Docker, SSH and Git. I have since rebuilt the whole thing as a declarative [NixOS config](/nixos), so read this as a time capsule, proof of how far the setup has come. Every command below is one I actually ran.
 
-If you are doing this today, the shape still holds. Only the last mile, keeping it all reproducible, is what I do differently now.
+I ran it on two machines: a ROG Strix G731GU, and a 500-euro 15-inch Asus that shipped with 8 GB of RAM. Windows barely codes on the Asus. Arch runs it like a much pricier laptop, within the limits of what 8 GB allows. That gap is most of why I left Windows behind.
+
+What I run today grew straight out of this. It has since moved to NixOS, picked up far more tools, swapped several for more modern and more secure ones, and gained an end-to-end Catppuccin Mocha green theme. This is where it started.
 
 ## Table of contents
 
 ## Which desktop did I run?
 
-GNOME, because it is simple, fast, and needs almost no tweaking to do what I want. I like spending my configuration budget on the terminal, not on the window manager.
+GNOME, because it is simple, fast, and needs almost no tweaking to do what I want. I would rather spend the effort on my terminal than on the window manager.
 
-![My GNOME desktop](/img/posts/arch-2024-setup/gnome.jpg)
+![Arch Linux running the GNOME desktop](/img/posts/arch-2024-setup/arch-linux-gnome-desktop.avif)
 
 ## Why yay instead of plain pacman?
 
@@ -56,7 +58,7 @@ yay -u
 
 One habit worth keeping: update weekly, not once a quarter. A three-month backlog is how you end up with five apps breaking at the same time. Docker in particular sulks after a system update, and the fix is gloriously dumb: reboot and it behaves again.
 
-![Docker error after a system update without a reboot](/img/posts/arch-2024-setup/docker-after-yay-u.jpg)
+![Docker daemon error after a system update, before a reboot](/img/posts/arch-2024-setup/docker-daemon-error-before-reboot.webp)
 
 ## Which packages do I install first?
 
@@ -89,6 +91,29 @@ Here is why each one earns its place:
 | filezilla      | SFTP client, for docs aimed at non-technical people.                                   |
 | gedit          | Because vim refuses to cooperate with FileZilla's edit feature. vim > everything else. |
 
+Most of the list explains itself. A few picks deserve a word, folded away so the walkthrough keeps moving.
+
+<details>
+<summary>The reasoning behind a few of them</summary>
+
+**docker** is my single tool for install, development and production. One file pins a project to a specific Node version, puts an API and its front end on the same private network, and gives PostgreSQL its own private network that only the API can reach. That last part enforces good architecture for free: nothing stops a beginner from calling a database straight from React until the network does.
+
+<!-- TODO image: a docker-compose file with the api/front/postgres private networks -->
+
+**chromium over firefox** for daily driving. Chromium is smoother and faster, and Firefox now harvests personal data to resell. I keep Firefox for one niche move: replaying an XHR request to walk past a front-end form validation.
+
+<!-- TODO image: replaying an XHR request in Firefox devtools -->
+
+**fzf** is a must-have, inside Neovim and on the command line both. It is the fastest way I know to find anything on a Linux system.
+
+<!-- TODO image: fzf narrowing a file search -->
+
+**lazygit** puts a UI on git without leaving the terminal. git is simple enough day to day that I only reach for it to read complex commit graphs and branches.
+
+<!-- TODO image: lazygit showing a branch graph -->
+
+</details>
+
 One package needs the AUR, so it goes through yay instead of pacman:
 
 ```bash
@@ -105,7 +130,17 @@ Rebooting from the terminal instead of the menu changes nothing, it just looks c
 
 Once the machine is back, GNOME Software can install anything on [Flathub](https://flathub.org) directly.
 
-![Flathub linked into GNOME Software](/img/posts/arch-2024-setup/flathub-with-software.jpg)
+![Flathub linked into GNOME Software](/img/posts/arch-2024-setup/flathub-in-gnome-software.avif)
+
+> [!NOTE] On NixOS today
+> In 2024 I barely opened Neovim. It is now my daily editor, and my whole [Neovim config](https://github.com/typovrak/nixos-nvim), every custom plugin pinned, gets cloned on every `nixos-rebuild`. 100% reproducible, zero interaction during install and build.
+
+<!-- TODO image: neovim with my config and plugins loaded -->
+
+> [!NOTE] On NixOS today
+> Installing an app like Insomnia [means adding its name](https://github.com/typovrak/nixos/blob/main/configuration.nix#L274) to my NixOS config and nothing else. No pacman, no yay, no clicking through GNOME Software.
+
+<!-- TODO image: the systemPackages line that installs Insomnia -->
 
 ## How do I run Docker without sudo?
 
@@ -123,19 +158,24 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
+> [!NOTE] On NixOS today
+> This whole dance is [one line in my config](https://github.com/typovrak/nixos/blob/main/configuration.nix#L228): `extraGroups = [ "docker" ];`, written once and applied on every rebuild. No `usermod`, no `newgrp`.
+
+<!-- TODO image: the extraGroups line in configuration.nix -->
+
 Test it with the throwaway `hello-world` image:
 
 ```bash
 docker run hello-world
 ```
 
-![docker run hello-world output](/img/posts/arch-2024-setup/docker-hello-world.jpg)
+![docker run hello-world output](/img/posts/arch-2024-setup/docker-run-hello-world-output.webp)
 
 If the first line reads **Hello from Docker!**, you are done.
 
 ## How do I make zsh the default shell?
 
-`chsh` changes the login shell; point it at zsh, which is already installed. bash is fine, zsh is better, so:
+`chsh` changes the login shell. Point it at zsh, which is already installed. bash is fine, zsh is better, so:
 
 ```bash
 chsh $USER
@@ -161,7 +201,7 @@ A Nerd Font ships the extra glyphs and icons a good terminal theme needs, and Po
 
 Unzip it, delete the `LICENSE.txt` and `README.md` inside, then drop every font file into `~/.local/share/fonts` (create it if missing, and keep it flat, no subfolders). Set that font in your terminal preferences, and if there is both a Mono and a non-Mono variant, pick the non-Mono one for a better terminal render.
 
-![Choosing the Nerd Font in terminal preferences](/img/posts/arch-2024-setup/preferences-nerd-font.jpg)
+![Choosing the JetBrainsMono Nerd Font in GNOME Terminal preferences](/img/posts/arch-2024-setup/gnome-terminal-jetbrainsmono-nerd-font.webp)
 
 This is also where I set the size. With JetBrains Mono I use 12, to spare my eyes over a long day.
 
@@ -278,13 +318,13 @@ Reload to apply it:
 source ~/.zshrc
 ```
 
-The GitHub and GitLab SSH lines are commented out; uncomment them if your keys share those names, or point them at yours. The aliases are the part I miss most on any machine that is not mine: `e` to exit a terminal in one keystroke, `c` to clear, and `v`/`vim`/`vi` all pointing at Neovim.
+The GitHub and GitLab SSH lines are commented out. Uncomment them if your keys share those names, or point them at yours. The aliases are the part I miss most on any machine that is not mine: `e` to exit a terminal in one keystroke, `c` to clear, and `v`/`vim`/`vi` all pointing at Neovim.
 
-![ls with colours, from the config above](/img/posts/arch-2024-setup/ls-prompt.jpg)
+![Coloured ls output from the zsh config](/img/posts/arch-2024-setup/zsh-ls-colored-output.webp)
 
-The first time you open a terminal after this, Powerlevel10k walks you through building a prompt. Answer the questions to taste; the full options live in the [Powerlevel10k docs](https://github.com/romkatv/powerlevel10k).
+The first time you open a terminal after this, Powerlevel10k walks you through building a prompt. Answer the questions to taste. The full options live in the [Powerlevel10k docs](https://github.com/romkatv/powerlevel10k).
 
-![My finished zsh prompt](/img/posts/arch-2024-setup/zsh-theme.jpg)
+![The finished zsh prompt with Powerlevel10k](/img/posts/arch-2024-setup/zsh-powerlevel10k-prompt.webp)
 
 ## How do I enable SSH?
 
@@ -338,32 +378,50 @@ The GUI apps that pacman and yay cannot give me come from [Flathub](https://flat
 
 ## Which GNOME tweaks do I always make?
 
-Three small ones, and they matter more than the list suggests.
+Three small ones, and I set all three on every machine.
 
-**Volume above 100%.** GNOME caps output at 100 by default; this unlocks a 150% boost for quiet laptops:
+First, volume above 100%. GNOME caps output at 100% by default, and this one setting unlocks a 150% boost that a quiet laptop needs:
 
 ```bash
 gsettings set org.gnome.desktop.sound allow-volume-above-100-percent 'true'
 ```
 
-![Volume boosted to 150%](/img/posts/arch-2024-setup/volume-boost.jpg)
+![GNOME volume boosted to 150 percent](/img/posts/arch-2024-setup/gnome-volume-over-100-percent.webp)
 
-**The minimize button.** In GNOME Tweaks I enable **Minimize**, so windows get a minimize button. Small thing, non-negotiable for me.
+Second, the minimize button. GNOME ships without one, so I turn it back on in GNOME Tweaks. Small thing, non-negotiable for me.
 
-![Minimize enabled in GNOME Tweaks](/img/posts/arch-2024-setup/gnome-tweaks-minimize.jpg)
+![Minimize and maximize buttons enabled in GNOME Tweaks](/img/posts/arch-2024-setup/gnome-tweaks-minimize-maximize-buttons.webp)
 
-**Three extensions**, from Extension Manager:
+Third, three extensions from Extension Manager:
 
 - **Just Perfection**, to reshape the GNOME interface. I mostly toggle the battery percentage and the keyboard-layout indicator, since I switch layouts all day.
 - **Quick Settings Audio Panel**, to set the volume per app from the top-right menu.
 - **Tray Icons: Reloaded**, to show background apps like Discord or Slack in the tray.
 
-![My GNOME extensions](/img/posts/arch-2024-setup/gnome-extensions.jpg)
+![My GNOME Shell extensions](/img/posts/arch-2024-setup/gnome-shell-extensions-list.webp)
+
+## What would I do differently?
+
+Three calls I would change with two years of hindsight.
+
+GNOME was the right way to start, but I would go straight to i3 now. Everything runs from the keyboard: every app, window, workspace and command. One screen with i3 in the hands does the work of two, three, sometimes four screens under GNOME, and the whole application layout bends to how you actually work.
+
+zoxide is a small quality-of-life win. `cd typovrak.tv` jumps to `~/projects/typovrak.tv` from anywhere in the tree, and it is the kind of thing you should live with for a week to feel it. I dropped it anyway. It made me forget my own paths, which is backwards, and as a touch typist I lose almost no time typing a path in full.
+
+<!-- TODO image: zoxide jumping across the tree -->
+
+FileZilla and gedit only survive for production work and the odd one-off. Given the choice, it is SSH and Vim every time.
+
+tmux is here for testing. I prefer zellij, the Rust terminal multiplexer, but it carries more than my daily work needs, so I never made the switch.
+
+<!-- TODO image: zellij with a couple of panes -->
 
 ## What changed since?
 
 Everything above is imperative: run commands, click through GNOME, hope the next machine ends up the same. It worked, but it lived in my head and in screenshots like these, not in a file.
 
-The setup is now a [declarative NixOS config](/nixos), one module per tool, so a fresh machine rebuilds to the exact same state from source. The tools barely changed, zsh, Docker, Neovim and the rest are all still here. What changed is that I no longer follow a guide to get them, the guide is the config. That is the real distance between the 2024 me writing this and the one linking it back to you now.
+Setting Arch up by hand took me about two hours of installing and clicking, and it never ran unattended. The same result on NixOS takes five minutes: I write the config once, start the build, and go make a coffee while the machine installs and configures everything with zero interaction. I never pulled that off on Arch, and it is the single biggest reason I moved.
+
+The setup is now a [declarative NixOS config](/nixos), one module per tool, so a fresh machine rebuilds to the same state from source. It has also grown well past this list, traded several tools for more modern and more secure ones, and picked up an end-to-end Catppuccin Mocha green theme. The 2024 list you just read is the foundation the rest was built on.
 
 If you are on Arch today, this still gets you a clean, developer-ready system. When you get tired of doing it by hand, you know where to look next.

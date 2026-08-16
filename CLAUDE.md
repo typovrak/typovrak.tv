@@ -287,6 +287,15 @@ Banned, because they are what makes text read as AI-written:
 The tell to check for: if a sentence exists for *rhythm* rather than *information*, cut it.
 Read it back and ask what fact the reader gained. If none, it goes.
 
+**The balanced closer.** A semicolon or a dash that joins two mirror-symmetric clauses into a
+tidy final beat ("this is where it began; the current one goes further") reads as AI, even though
+the punctuation is correct on its own. Cut the symmetry, not the semicolon: semicolons are not
+banned, the mirrored-closer shape is.
+
+Before publishing a post, run the **`avoid-ai-writing`** skill over it (a detect-and-rewrite pass
+for the AI tells above), then `pnpm clean:check` for the invisible characters. The skill catches
+phrasing this list misses; the check catches characters the eye misses.
+
 ### Blog posts have a voice
 
 The banned list keeps the *site* plain: UI, page copy, meta, this README. Blog posts are written

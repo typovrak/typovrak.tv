@@ -1,8 +1,3 @@
-- mettre le premier article en ligne sur ma config Arch 2024
-  - renommer les images en anglais + optimisation SEO/GEO
-  - vérifier que chacune est bien compressé et optimiser le format (webp/avif)
-
-
 - mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
 
 ---
