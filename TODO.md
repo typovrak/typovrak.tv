@@ -1,4 +1,7 @@
 - stocker les scores anonymements + mettre des confettis quand le score est parfait
+  - mettre à jours les mentions légales + politique de conf
+
+- mettre les schémas de DB en format tableau dans le site dans privacy policy par exemple ? pour encore plus de transparence.
 
 - mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
 

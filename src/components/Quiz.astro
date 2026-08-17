@@ -87,6 +87,7 @@ const { questions } = Astro.props;
 
 <script>
   import { isAnswerCorrect, scoreQuiz } from "@/utils/quiz";
+  import { celebrate } from "@/scripts/confetti";
 
   const picks = (question: HTMLElement) =>
     Array.from(question.querySelectorAll<HTMLInputElement>("input"));
@@ -136,6 +137,18 @@ const { questions } = Astro.props;
 
       question.dataset.validated = "true";
       question.classList.add("is-graded");
+
+      // anonymous per-question record, best-effort, one per validation
+      void fetch("/api/quiz-answer", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          path: location.pathname,
+          question: questions.indexOf(question),
+          picked: selected,
+          correct: ok,
+        }),
+      }).catch(() => {});
     };
 
     // show retry after the first validation, the total once every one is done
@@ -154,6 +167,15 @@ const { questions } = Astro.props;
       scoreEl.hidden = false;
       scoreEl.textContent = `You scored ${correct} / ${total} (${percent}%)`;
       scoreEl.focus();
+
+      // anonymous final score, best-effort (per-question answers go out on validation)
+      void fetch("/api/quiz-result", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ path: location.pathname, correct, total }),
+      }).catch(() => {});
+
+      if (total > 0 && correct === total) celebrate();
     };
 
     questions.forEach(question => {

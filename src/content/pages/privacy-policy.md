@@ -29,15 +29,25 @@ The website never collects your IP address (not even hashed), your full user-age
 
 The [NixOS page](/nixos) has an optional form to request a new module. This is the only place the site collects data you type, and only if you choose to fill it in and tick the consent box. It stores what you submit: the module you ask for, the details you add, and your email address so the publisher can reply. There is no newsletter.
 
+### Quiz results
+
+Some posts end with a short quiz. When you answer a question, and again when you finish the quiz, the server records anonymous results: the article, the question number, the answer picked, and whether it was correct, plus the final score. These carry no identifier, so a result cannot be linked to you or to your other answers. They are used only to spot questions that are too hard.
+
 ## 3. Purposes of processing
 
-The data is used for two purposes only: audience measurement, to know which articles are read and to monitor the site's technical performance; and, for the module request form, reading your request and replying to you. It is not used to profile visitors, and is not sold, rented, or shared for other purposes.
+The data is used only for these purposes:
+
+- audience measurement, to know which articles are read and to monitor the site's technical performance,
+- anonymous quiz results, to see which questions are too hard,
+- module requests, to read your request and reply to you.
+
+It is not used to profile visitors, and is not sold, rented, or shared for other purposes.
 
 ## 4. Tools and services used
 
 - **Vercel Web Analytics**: cookieless traffic statistics, without collecting personal data.
 - **Vercel Speed Insights**: cookieless performance metrics.
-- **Neon**: hosts the database where the audience data and module requests are stored.
+- **Neon**: hosts the database where the audience data, quiz results, and module requests are stored.
 - **Discord**: when you send a module request, its content (including your email) is delivered to a private Discord channel through a webhook, so the publisher is notified.
 - **Brevo**: sends the confirmation email you receive after a module request. It processes your email address and the content of your request to deliver that message. Brevo is a French company and processes this data in the European Union.
 - **giscus** (GitHub Discussions): powers the comments. The widget is loaded from GitHub only when you click to load it, which exposes your IP address to GitHub at that point. Posting a comment requires a GitHub account, under GitHub's own terms.
@@ -59,6 +69,8 @@ The module request form is based on your consent (GDPR art. 6(1)(a)), given by t
 ## 7. Data retention period
 
 Audience-measurement data is kept for at most 25 months, in line with the CNIL's cap, then deleted.
+
+Anonymous quiz results are kept on the same basis, at most 25 months, then deleted.
 
 Module requests are kept only as long as needed to handle them, and at the latest for 12 months, then deleted.
 
@@ -86,7 +98,7 @@ No personal data is sold, rented, or transferred to third parties for their own 
 
 Under the GDPR you have the right to access, rectify, and erase your data, to object to and restrict its processing, and to withdraw consent.
 
-Audience-measurement rows carry no identifier, so they usually cannot be linked back to you, which limits what can be acted on in practice. Data you send through the module request form is tied to your email address, so you can ask to access or erase it by writing from that address.
+Audience-measurement rows and quiz results carry no identifier, so they usually cannot be linked back to you, which limits what can be acted on in practice. Data you send through the module request form is tied to your email address, so you can ask to access or erase it by writing from that address.
 
 To exercise a right, email [typovrak@gmail.com](mailto:typovrak@gmail.com). The data controller is Morgan Scholz.
 
@@ -100,4 +112,4 @@ This privacy policy may change to stay compliant with current law. The date belo
 
 ---
 
-**Date of last modification:** 20 July 2026
+**Date of last modification:** 17 August 2026

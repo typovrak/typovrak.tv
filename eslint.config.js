@@ -23,5 +23,14 @@ export default [
   // API routes run on the server, where logging a failed third-party call is
   // the only way to diagnose it.
   { files: ["src/pages/api/**"], rules: { "no-console": "off" } },
-  { ignores: ["dist/**", ".astro/**", ".vercel/**", "public/pagefind/**"] },
+  {
+    ignores: [
+      "dist/**",
+      ".astro/**",
+      ".vercel/**",
+      "public/pagefind/**",
+      "coverage/**",
+      ".unlighthouse/**",
+    ],
+  },
 ];

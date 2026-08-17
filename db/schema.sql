@@ -49,3 +49,54 @@ create index if not exists module_request_created_at_idx on module_request (crea
 
 -- Retention: keep only while a request is being handled. Purge by hand.
 -- delete from module_request where created_at < now() - interval '12 months';
+
+-- Anonymous quiz results, one row per completed quiz. No identifier, so a row
+-- can never be tied to a visitor: only which post, the score, and when.
+create table if not exists quiz_result (
+  id bigint generated always as identity primary key,
+  path text not null,
+  correct smallint not null,
+  total smallint not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists quiz_result_path_idx on quiz_result (path);
+
+-- Retention: audience-adjacent, purge by hand like the rest.
+-- delete from quiz_result where created_at < now() - interval '25 months';
+
+-- Score distribution per post: completions, average score, perfect-score count:
+-- select path, count(*) as completions,
+--        round(avg(100.0 * correct / total), 1) as avg_pct,
+--        count(*) filter (where correct = total) as perfect
+-- from quiz_result group by path order by completions desc;
+
+-- One row per answered question, to see which question is too hard and which
+-- wrong option tempts people. `question` is the 0-based index in the quiz.
+-- `picked` is the 0-based indices of the chosen options, comma-joined, so it
+-- holds a single answer ("2") or a multi-select one ("0,3"). Still anonymous.
+create table if not exists quiz_answer (
+  id bigint generated always as identity primary key,
+  path text not null,
+  question smallint not null,
+  picked text not null,
+  correct boolean not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists quiz_answer_path_idx on quiz_answer (path);
+
+-- Retention: audience-adjacent, purge by hand like the rest.
+-- delete from quiz_answer where created_at < now() - interval '25 months';
+
+-- Which question is hardest (highest wrong rate):
+-- select path, question,
+--        count(*) filter (where not correct) as wrong,
+--        count(*) as attempts,
+--        round(100.0 * count(*) filter (where not correct) / count(*), 1) as wrong_pct
+-- from quiz_answer group by path, question order by wrong_pct desc, attempts desc;
+
+-- Which option tempts people in wrong answers (works for single and multi):
+-- select path, question, opt, count(*) as picks
+-- from quiz_answer, unnest(string_to_array(picked, ',')) as opt
+-- where not correct group by path, question, opt order by picks desc;
