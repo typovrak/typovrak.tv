@@ -33,6 +33,46 @@ The [NixOS page](/nixos) has an optional form to request a new module. This is t
 
 Some posts end with a short quiz. When you answer a question, and again when you finish the quiz, the server records anonymous results: the article, the question number, the answer picked, and whether it was correct, plus the final score. These carry no identifier, so a result cannot be linked to you or to your other answers. They are used only to spot questions that are too hard.
 
+### What each table stores
+
+For full transparency, here is every table in the database with example rows. Every value in the tables below is made up, shown only to illustrate the format. The exact schema, with column types and comments, is in [db/schema.sql](https://github.com/typovrak/typovrak.tv/blob/main/db/schema.sql).
+
+Every table below also stores when each row was written and an internal row number, except the totals, which is just a count per page. Those are left out of the examples to keep them readable.
+
+**Page views:** One row each time a page is opened. No IP address, no full user-agent, no identifier.
+
+| path                         | referrer_host | country | device  |
+| ---------------------------- | ------------- | ------- | ------- |
+| /posts/arch-linux-2024-setup | google.com    | FR      | desktop |
+| /nixos                       | (none)        | DE      | mobile  |
+
+**Page view totals:** A running count per page, so a page can show its view number without re-counting every visit.
+
+| path                         | views |
+| ---------------------------- | ----- |
+| /posts/arch-linux-2024-setup | 1493  |
+| /nixos                       | 271   |
+
+**Quiz answers:** One row each time you validate a question, to see which questions are too hard. `question` is its position in the quiz, `picked` holds the option numbers you chose. No identifier.
+
+| path                         | question | picked | correct |
+| ---------------------------- | -------- | ------ | ------- |
+| /posts/arch-linux-2024-setup | 0        | 1      | true    |
+| /posts/arch-linux-2024-setup | 5        | 0,2,3  | true    |
+| /posts/arch-linux-2024-setup | 3        | 0      | false   |
+
+**Quiz scores:** One row when you finish a quiz, holding the final score. No identifier.
+
+| path                         | correct | total |
+| ---------------------------- | ------- | ----- |
+| /posts/arch-linux-2024-setup | 6       | 6     |
+
+**Module requests:** The one place data you type is stored, and only if you fill the form and tick the consent box. Your email is kept so the publisher can reply.
+
+| module         | details                                   | email             |
+| -------------- | ----------------------------------------- | ----------------- |
+| home-assistant | A module to expose Home Assistant sensors | `you@example.com` |
+
 ## 3. Purposes of processing
 
 The data is used only for these purposes:

@@ -1,9 +1,6 @@
-- stocker les scores anonymements + mettre des confettis quand le score est parfait
-  - mettre à jours les mentions légales + politique de conf
-
-- mettre les schémas de DB en format tableau dans le site dans privacy policy par exemple ? pour encore plus de transparence.
-
 - mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
+
+- afficher après chaque réponse et résultat final de quiz le % de réussite ? et le % de personne qui ont choisi chaque réponse ?
 
 - ajouter un composant en début d'article pour les variables faisant que dans l'article et le code, cela sera les bonnes valeurs comme à la place de <USER> -> typovrak pour des commandes cli sur mon utilisateur
   - et ajouter des paramètres tel que remplacer "vim" par "nano" dans les commandes par exemple
