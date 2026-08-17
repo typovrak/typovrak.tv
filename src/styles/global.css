@@ -3,6 +3,12 @@
 @import "./typography.css";
 @import "rehype-callouts/theme/obsidian";
 
+/* readable title text (the per-type colour failed contrast on the dark tint);
+   the icon and left border still carry the type colour */
+.callout-title-text {
+  color: var(--foreground);
+}
+
 /* match the prose body line-height in callout asides */
 .callout-content {
   line-height: 1.75;
