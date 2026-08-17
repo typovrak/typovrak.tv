@@ -69,8 +69,8 @@ Every table below also stores when each row was written and an internal row numb
 
 **Module requests:** The one place data you type is stored, and only if you fill the form and tick the consent box. Your email is kept so the publisher can reply.
 
-| module         | details                                   | email             |
-| -------------- | ----------------------------------------- | ----------------- |
+| module         | details                                   | email              |
+| -------------- | ----------------------------------------- | ------------------ |
 | home-assistant | A module to expose Home Assistant sensors | typovrak@gmail.com |
 
 ## 3. Purposes of processing
