@@ -9,6 +9,8 @@ const { repo, branch, url, snippets: list } = snippets;
 const repoName = repo.split("/")[1] ?? repo;
 // Each snippet links to the exact file it was taken from.
 const fileBase = `${url}/blob/${branch}/`;
+// seed the typed-path link so it is never an empty link (a11y)
+const firstPath = list[0]?.path ?? "";
 ---
 
 {
@@ -33,11 +35,13 @@ const fileBase = `${url}/blob/${branch}/`;
           <span aria-hidden="true">·</span>
           <a
             data-typing-path
-            href={url}
+            href={`${fileBase}${firstPath}`}
             target="_blank"
             rel="noopener noreferrer"
             class="text-accent underline-offset-4 hover:underline"
-          />
+          >
+            {firstPath}
+          </a>
         </p>
         <div class="text-muted-foreground flex items-center gap-4 text-sm tabular-nums">
           <span>

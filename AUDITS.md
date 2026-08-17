@@ -13,8 +13,6 @@ report "not enough data" until the site has visitors.
 | Tool | URL | Notes |
 | --- | --- | --- |
 | WAVE | https://wave.webaim.org | Visual report, one page at a time. Best first pass. |
-| axe DevTools | https://www.deque.com/axe/devtools/ | _(extension)_ Industry-standard rules, few false positives. |
-| Accessibility Insights | https://accessibilityinsights.io | _(extension)_ Microsoft. Guided manual checks + automated scan. |
 | WebAIM Contrast Checker | https://webaim.org/resources/contrastchecker/ | Verify a token pair. We target AAA (7:1). |
 | Lighthouse | Chrome DevTools > Lighthouse | _(local)_ Accessibility category. Also SEO/perf/best-practices. |
 | Pa11y | https://pa11y.org | _(CLI)_ `npx pa11y https://typovrak.tv`. Scriptable for CI. |

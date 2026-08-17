@@ -1,7 +1,5 @@
 ---
-// Appends a hover "#" anchor link to each content heading, so any prose page
-// (posts, legal notices) gets the same behaviour. Rendered inside the page;
-// the script runs once on load (no ClientRouter).
+// appends a hover # permalink to each content heading, wired on load
 ---
 
 <script>
@@ -9,12 +7,15 @@
     "#main-content :is(h2, h3, h4, h5, h6)[id]"
   )) {
     heading.classList.add("group");
+    // read the heading text before appending, or the # ends up in the name
+    const label = heading.textContent?.trim() ?? "";
     const link = document.createElement("a");
-    // text-accent so the "#" matches on non-prose pages (the home) too, where
-    // it would otherwise inherit the body colour.
+    // text-accent so the # matches on non-prose pages (the home) too
     link.className =
       "heading-link text-accent ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100";
     link.href = `#${heading.id}`;
+    link.ariaLabel = label ? `Link to ${label}` : "Permalink";
+    link.title = link.ariaLabel;
     const hash = document.createElement("span");
     hash.ariaHidden = "true";
     hash.textContent = "#";
