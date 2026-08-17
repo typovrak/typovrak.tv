@@ -15,7 +15,6 @@ report "not enough data" until the site has visitors.
 | WAVE | https://wave.webaim.org | Visual report, one page at a time. Best first pass. |
 | WebAIM Contrast Checker | https://webaim.org/resources/contrastchecker/ | Verify a token pair. We target AAA (7:1). |
 | Lighthouse | Chrome DevTools > Lighthouse | _(local)_ Accessibility category. Also SEO/perf/best-practices. |
-| Pa11y | https://pa11y.org | _(CLI)_ `npx pa11y https://typovrak.tv`. Scriptable for CI. |
 | Unlighthouse | https://unlighthouse.dev | _(CLI)_ Crawls every page and runs Lighthouse on all of them. |
 
 Automated tools catch roughly half of WCAG issues. Keyboard-only navigation and
