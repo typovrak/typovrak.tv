@@ -71,7 +71,7 @@ Every table below also stores when each row was written and an internal row numb
 
 | module         | details                                   | email             |
 | -------------- | ----------------------------------------- | ----------------- |
-| home-assistant | A module to expose Home Assistant sensors | `you@example.com` |
+| home-assistant | A module to expose Home Assistant sensors | typovrak@gmail.com |
 
 ## 3. Purposes of processing
 

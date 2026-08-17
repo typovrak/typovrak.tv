@@ -161,6 +161,12 @@ is `knownPaths.ts` drifting from `getStaticPaths` — only the build diff shows 
 
 ## Git workflow
 
+- **Never commit or push on typovrak's behalf.** Do not run `git add`, `git commit`, or
+  `git push`, even when he says to ship something. When work is ready, report what changed and
+  propose a commit message, then let typovrak stage and commit it himself. `git add -A` is the
+  specific trap: it sweeps up his own uncommitted edits along with yours, so a change he made by
+  hand can get committed and pushed without his say. Read-only git (`status`, `diff`, `log`,
+  `show`) is fine, and so is writing out the exact command for him to run.
 - **Never put a double quote (`"`) in a commit message.** Not in the subject, not in the body.
   Commits are written with `git commit -m "..."`, so a `"` terminates the message early and
   mangles it. Use single quotes, backticks, or no quotes at all. Apostrophes are fine.
