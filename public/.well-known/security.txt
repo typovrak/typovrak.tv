@@ -1,0 +1,6 @@
+# Security policy for typovrak.tv, per RFC 9116 (https://www.rfc-editor.org/rfc/rfc9116).
+
+Contact: mailto:typovrak@gmail.com
+Expires: 2027-08-01T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://typovrak.tv/.well-known/security.txt

@@ -5,6 +5,10 @@
 - ajouter un composant en début d'article pour les variables faisant que dans l'article et le code, cela sera les bonnes valeurs comme à la place de <USER> -> typovrak pour des commandes cli sur mon utilisateur
   - et ajouter des paramètres tel que remplacer "vim" par "nano" dans les commandes par exemple
 
+- /about page
+
+- améliorer le security.txt
+
 ---
 
 Callouts / admonitions (note, warning, tip) thémés Catppuccin. Tu as évoqué des composants « façon AWS » : c'est la base.
