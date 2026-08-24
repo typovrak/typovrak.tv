@@ -48,6 +48,24 @@ export const tags: Record<string, TagInfo> = {
     description: "Editing text at speed: configuration, plugins and motions.",
     icon: "file-code",
   },
+  nixos: {
+    label: "NixOS",
+    description:
+      "Declaring a whole machine in Nix, from system config to per-project dev shells.",
+    icon: "package",
+  },
+  "open-source": {
+    label: "Open source",
+    description:
+      "Contributing to other people's projects, and what happens to the patches.",
+    icon: "git-pull-request",
+  },
+  prisma: {
+    label: "Prisma",
+    description:
+      "The Prisma ORM, its generated client and its engine binaries.",
+    icon: "database",
+  },
   tools: {
     label: "Tools",
     description: "Small programs that earn their place in the toolbox.",

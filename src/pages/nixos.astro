@@ -74,26 +74,31 @@ const coreStats = repoStatsFor("nixos");
               const stats = moduleStatsFor(module.name);
               return (
                 <li
-                  class:list={["rounded-md border p-3", popularityCard(stats)]}
+                  class:list={[
+                    "flex rounded-md border p-3",
+                    popularityCard(stats),
+                  ]}
                 >
                   <a
                     href={moduleUrl(module.name)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="focus-outline group block"
+                    class="focus-outline group flex flex-1 flex-col"
                   >
-                    <span class="text-accent font-semibold group-hover:underline">
-                      {module.name}
-                    </span>
-                    {stats.archived && (
-                      <span class="ms-2 rounded border border-orange-400/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-400">
-                        archived
+                    <span>
+                      <span class="text-accent font-semibold group-hover:underline">
+                        {module.name}
                       </span>
-                    )}
+                      {stats.archived && (
+                        <span class="ms-2 rounded border border-orange-400/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-400">
+                          archived
+                        </span>
+                      )}
+                    </span>
                     <span class="text-muted-foreground mt-1 block text-sm">
                       {module.purpose}
                     </span>
-                    <div class="mt-2 flex items-center justify-between">
+                    <div class="mt-auto flex items-center justify-between pt-2">
                       <RepoStats stars={stats.stars} forks={stats.forks} />
                       <span class="text-muted-foreground text-xs">
                         NixOS {moduleNixos(module)}

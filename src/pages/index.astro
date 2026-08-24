@@ -300,31 +300,33 @@ const homePath = getRelativeLocaleUrl(locale, "");
           contributions.map(project => {
             const stats = repoStatsFor(project.repo);
             return (
-              <li class="border-border rounded-md border p-3">
+              <li class="border-border flex rounded-md border p-3">
                 <a
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="focus-outline group block"
+                  class="focus-outline group flex flex-1 flex-col"
                 >
-                  <span class="text-accent font-semibold group-hover:underline">
-                    {project.repo}
-                  </span>
-                  {project.inactive && (
-                    <span
-                      title="No longer maintained"
-                      class="ms-2 rounded border border-orange-400/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-400"
-                    >
-                      inactive
+                  <span>
+                    <span class="text-accent font-semibold group-hover:underline">
+                      {project.repo}
                     </span>
-                  )}
+                    {project.inactive && (
+                      <span
+                        title="No longer maintained"
+                        class="ms-2 rounded border border-orange-400/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-400"
+                      >
+                        inactive
+                      </span>
+                    )}
+                  </span>
                   <span class="text-muted-foreground mt-1 block text-sm">
                     {project.description}
                   </span>
                   <RepoStats
                     stars={stats.stars}
                     forks={stats.forks}
-                    class="mt-2"
+                    class="mt-auto pt-2"
                   />
                 </a>
               </li>
