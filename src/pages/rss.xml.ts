@@ -1,6 +1,7 @@
 import rss from "@astrojs/rss";
 import { getCollection, render } from "astro:content";
 import { experimental_AstroContainer as AstroContainer } from "astro/container";
+import mdxRenderer from "@astrojs/mdx/server.js";
 import { getSortedPosts } from "@/utils/getSortedPosts";
 import { getPostUrl } from "@/utils/getPostPaths";
 import { slugifyStr } from "@/utils/slugify";
@@ -27,6 +28,8 @@ export async function GET() {
   // Renders each post through the real pipeline, so the feed carries the same
   // HTML as the site (Shiki highlighting included) with no extra dependency.
   const container = await AstroContainer.create();
+  // mdx posts compile to jsx, which the bare container cannot render
+  container.addServerRenderer({ name: "astro:jsx", renderer: mdxRenderer });
 
   const items = await Promise.all(
     sortedPosts.map(async post => {

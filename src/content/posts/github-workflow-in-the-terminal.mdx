@@ -1,0 +1,177 @@
+---
+title: "From issue to merge in the terminal: the git and gh workflow"
+pubDatetime: 2026-09-01T00:00:00+02:00
+featured: true
+draft: false
+tags:
+  - cli
+  - git
+  - github
+  - open-source
+description: "The issue-to-merge loop is nine commands in git and gh. The catch: the branch linked to an issue does not close it, only a Closes keyword in the PR body does."
+quiz:
+  - q: "What does `gh issue develop 32 --checkout` do?"
+    options:
+      - "Opens issue #32 in the browser"
+      - "Creates a branch linked to issue #32 and checks it out locally"
+      - "Merges issue #32 into main"
+      - "Marks issue #32 as in progress and nothing else"
+    correct: [1]
+    explain: "It creates a branch on the remote that GitHub links to the issue, visible in the issue's Development section, and --checkout switches your working tree to it in the same command."
+  - q: "What actually makes the merge close the linked issue?"
+    options:
+      - "The branch having been created with gh issue develop"
+      - "A closing keyword like Closes #32 in the PR body, merged into the default branch"
+      - "Choosing Rebase and merge in the menu"
+      - "Running gh issue close by hand afterwards"
+    correct: [1]
+    explain: "GitHub documents auto-close only for a closing keyword that merges into the repository's default branch. The linked branch shows the work in progress but is not a documented closing link."
+  - q: "Which gh pr merge flag keeps history linear by replaying your commits with no merge commit?"
+    options:
+      - "--merge"
+      - "--squash"
+      - "--rebase"
+      - "--auto"
+    correct: [2]
+    explain: "--rebase replays each commit onto the base with no merge commit. --squash also stays linear but collapses the branch into one commit, and --merge adds a merge commit."
+  - q: "Contributing to a repo you cannot push to, which parts of this loop change?"
+    multiple: true
+    options:
+      - "You fork and clone first with gh repo fork --clone"
+      - "Your PR targets the upstream default branch from your fork"
+      - "You run gh pr merge yourself to land it"
+      - "You still create the linked branch on their repo with gh issue develop"
+    correct: [0, 1]
+    explain: "You fork, branch on your fork, and open the PR into upstream. You cannot create a linked branch on their repo or merge the PR without write access, so the maintainer is the one who merges."
+---
+
+import AsciinemaPlayer from "@/components/AsciinemaPlayer.astro";
+
+Filing an issue, branching, opening the pull request and merging it all run in `git` and `gh`, with no browser tab open. The whole loop is nine commands.
+
+I kept this as a [public gist](https://gist.github.com/typovrak/8034fe822905c3febbe4c3c9a84f065d) for two years and run it on every repo I touch. This post is that gist, with the flags that skip the prompts and the one line that makes the merge close the issue for you.
+
+Everything below is `gh` [2.96.0](https://github.com/cli/cli/releases/tag/v2.96.0) and `git` [2.54.0](https://github.com/git/git/releases/tag/v2.54.0), run from inside a repository you can push to.
+
+export const markers = [
+  [0.0, "gh issue create"],
+  [48.6, "gh issue develop 32 --checkout"],
+  [58.7, "vim README.md"],
+  [81.2, "git add README.md"],
+  [83.7, "git commit"],
+  [98.8, "git push"],
+  [103.9, "gh pr create --fill --body 'Closes #32'"],
+  [117.6, "gh pr merge --rebase --delete-branch"],
+  [131.7, "git switch main && git pull --prune"],
+  [152.0, "vim README.md"],
+  [174.9, "gh issue list"],
+  [179.2, "git status"],
+  [182.6, "lazygit"],
+];
+
+<AsciinemaPlayer
+  src="/casts/gh-issue-pr.cast"
+  caption="The whole loop in one terminal, from gh issue create to a synced main."
+  thumbnail={{
+    src: "/img/posts/github-workflow-in-the-terminal/lazygit-rebase-with-cli-result-on-typovrak.tv-repository.avif",
+    width: 1070,
+    height: 658,
+  }}
+  cols={87}
+  rows={23}
+  markers={markers}
+/>
+
+## Table of contents
+
+## The whole loop
+
+```bash
+gh issue create                         # file it, note the number (say 32)
+gh issue develop 32 --checkout          # branch linked to #32, checked out locally
+# write the code, then:
+git add .
+git commit -m 'feat(translation): this is an example'
+git push
+gh pr create --fill --body "Closes #32" # open the PR, keyword set
+gh pr merge --rebase --delete-branch    # rebase onto main, close #32, drop the branch
+git switch main && git pull --prune     # bring the merge home, tidy stale refs
+```
+
+Run `gh auth login` once and every command after that runs as you. `gh` works out which repository you mean from the git remote of the current directory, so all of this happens from inside the checkout.
+
+`gh issue create` prints the URL of the issue it filed, and the number on the end of that URL is the `32` every later command refers to. To pick up an issue that already exists instead, list them and read the number off the left column:
+
+```bash
+gh issue list
+```
+
+Three flags do the work of the prompts. [`--checkout`](https://cli.github.com/manual/gh_issue_develop) creates the linked branch and switches to it in one go, so the branch name never has to be typed. [`--fill`](https://cli.github.com/manual/gh_pr_create) takes the PR title and body from your commits. [`--rebase --delete-branch`](https://cli.github.com/manual/gh_pr_merge) skips the merge menu and removes the branch from both your machine and the remote.
+
+The `git push` in that block needs no `-u`. gh created the branch on the remote before checking it out, so its upstream is already set. A branch you make yourself with `git switch -c` has none, which is why the fork section below pushes with `-u origin <branch>`. One setting covers both cases:
+
+```bash
+git config --global push.autoSetupRemote true
+```
+
+Available since git 2.37, it makes the first push on a new branch a plain `git push`. It is why `-u` never shows up in my own shell history.
+
+## What actually closes the issue?
+
+Only a closing keyword in the PR body, merged into the default branch, closes an issue.
+
+`gh issue develop` links the branch to the issue, and the link shows up in the issue's Development section. That is enough to make you assume the merge closes it. It does not. GitHub documents auto-close for a [closing keyword](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue) landing on the repository's default branch, and for nothing else.
+
+So the keyword goes in the PR body:
+
+```bash
+gh pr create --fill --body "Closes #32"
+```
+
+The two flags are not redundant. `--fill` takes the title and the body from your commits, then `--body` overwrites the body it just filled in and leaves the title alone, [which gh documents](https://cli.github.com/manual/gh_pr_create). So the PR gets a title from your commits, exactly `Closes #32` as its body, and no prompt. Drop `--fill` and gh has no title, so it stops to ask for one.
+
+Which title depends on how many commits the branch carries. With a single commit, `--fill` takes that commit's subject. With several, it takes the branch name and turns the dashes into spaces, so a branch named by `gh issue develop` gives `32 adding french translation`, which is the title [#33](https://github.com/typovrak/typovrak.tv/pull/33) below ended up with. Pass `--fill-first` to use the first commit's subject either way.
+
+`close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves` and `resolved` all work, each followed by `#` and the number, anywhere in the body. To keep the commit text in the body as well, drop `--body` and write the keyword into the commit message instead.
+
+Merge into a release branch or a `develop` branch and the issue stays open, keyword or not.
+
+Here is [issue #32](https://github.com/typovrak/typovrak.tv/issues/32) on this repository, closed by the merge with nobody touching the issue itself:
+
+![Issue #32 on typovrak.tv, closed automatically by the pull request that merged](/img/posts/github-workflow-in-the-terminal/github-typovrak.tv-issue-32-closed-with-cli.avif)
+
+## Which merge strategy?
+
+Run `gh pr merge` with no strategy flag and it asks. The three differ only in what lands on the default branch:
+
+| Strategy     | Flag       | What lands on `main`                | Resulting history                |
+| ------------ | ---------- | ----------------------------------- | -------------------------------- |
+| Rebase       | `--rebase` | your commits, replayed onto `main`  | linear, every commit kept        |
+| Squash       | `--squash` | one new commit combining the branch | linear, one commit per PR        |
+| Merge commit | `--merge`  | your commits plus a merge commit    | keeps the PR as a visible bubble |
+
+> [!TIP] Default to rebase
+> `--rebase` is the one to reach for. Your commits land on `main` one by one, so every message you wrote stays in the tree and `git log` reads as a straight line. Squash collapses all of that into a single commit, which is only worth it when the branch is a pile of `wip` and `typo` commits you would rather not keep. Take the merge commit when you specifically want the PR boundary to stay visible.
+
+[Pull request #33](https://github.com/typovrak/typovrak.tv/pull/33) is what that looks like once landed:
+
+![Pull request #33 on typovrak.tv, shown as merged after a rebase onto main](/img/posts/github-workflow-in-the-terminal/github-typovrak.tv-pr-33-merged-with-cli.avif)
+
+And [the commit history for that month](https://github.com/typovrak/typovrak.tv/commits/main/?since=2026-08-01&until=2026-09-01) is a straight line, every commit from the branch still there under its own message:
+
+![The typovrak.tv commit history on main after the rebase, linear with no merge commit](/img/posts/github-workflow-in-the-terminal/github-typovrak.tv-repository-after-rebase.avif)
+
+## Does this work on a repo you cannot push to?
+
+Yes, with two changes. You cannot create a linked branch on a repo you lack push access to, so fork it, branch the ordinary way, and leave the merge to the maintainer:
+
+```bash
+gh repo fork owner/repo --clone
+cd repo
+git switch -c fix-stale-search
+# work, commit, then push to your fork:
+git push -u origin fix-stale-search
+gh pr create --fill --body "Closes #123"
+```
+
+gh notices the clone is a fork and defaults the PR base to the upstream default branch, with your fork's branch as the head. `Closes #123` still closes their issue when they merge it.

@@ -1,0 +1,100 @@
+---
+// asciinema-player 3.x, self-hosted: script-src 'self' covers the bundled
+// script, and the main export runs on the page thread with no Worker. The
+// player itself is imported on click, so the article ships none of it.
+import "asciinema-player/dist/bundle/asciinema-player.css";
+
+type Props = {
+  src: string;
+  caption: string;
+  thumbnail: { src: string; width: number; height: number };
+  cols?: number;
+  rows?: number;
+  idleTimeLimit?: number;
+  /* [seconds, label] pairs, in the recording's own time base */
+  markers?: [number, string][];
+};
+
+const {
+  src,
+  caption,
+  thumbnail,
+  cols,
+  rows,
+  idleTimeLimit = 2,
+  markers,
+} = Astro.props;
+---
+
+<figure class="not-prose my-6">
+  <div
+    class="border-accent w-full overflow-hidden rounded-md border"
+    data-asciinema={src}
+    data-cols={cols}
+    data-rows={rows}
+    data-idle-time-limit={idleTimeLimit}
+    data-markers={markers ? JSON.stringify(markers) : undefined}
+  >
+    <button
+      type="button"
+      class="focus-outline group relative block w-full cursor-pointer"
+      aria-label={`Play the recording: ${caption}`}
+    >
+      <img
+        src={thumbnail.src}
+        alt=""
+        width={thumbnail.width}
+        height={thumbnail.height}
+        class="block w-full border-0"
+      />
+      <span
+        class="bg-background/40 group-hover:bg-background/10 absolute inset-0 flex items-center justify-center transition-colors"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          class="text-accent h-16 w-16 transition-transform group-hover:scale-110"
+        >
+          <path d="M8 5v14l11-7z"></path>
+        </svg>
+      </span>
+    </button>
+  </div>
+  <figcaption class="mt-2 text-center text-sm opacity-70">{caption}</figcaption>
+</figure>
+
+<script>
+  const num = (v: string | undefined) => (v ? Number(v) : undefined);
+
+  // no client router here, so this runs straight on load
+  for (const el of document.querySelectorAll<HTMLElement>("[data-asciinema]")) {
+    el.querySelector("button")?.addEventListener(
+      "click",
+      async () => {
+        const { create } = await import("asciinema-player");
+        el.replaceChildren();
+        create(el.dataset.asciinema!, el, {
+          fit: "width",
+          autoPlay: true,
+          cols: num(el.dataset.cols),
+          rows: num(el.dataset.rows),
+          idleTimeLimit: num(el.dataset.idleTimeLimit),
+          markers: el.dataset.markers
+            ? JSON.parse(el.dataset.markers)
+            : undefined,
+        });
+      },
+      { once: true }
+    );
+  }
+</script>
+
+<style>
+  /* the recording carries its own palette, but only once it has loaded; until
+     then the player falls back to white on black, so lend it the site tokens */
+  :global(.ap-player) {
+    --term-color-background: var(--background);
+    --term-color-foreground: var(--foreground);
+  }
+</style>
