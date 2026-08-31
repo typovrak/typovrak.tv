@@ -1,3 +1,5 @@
+Adding some code for french translation... (only an example here)
+
 # typovrak.tv
 
 [![CI](https://github.com/typovrak/typovrak.tv/actions/workflows/ci.yml/badge.svg)](https://github.com/typovrak/typovrak.tv/actions/workflows/ci.yml)
