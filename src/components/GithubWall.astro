@@ -16,15 +16,18 @@ const PITCH = 14; // 12 cell + 2 gap, in viewBox units
 const width = weeks * PITCH - (PITCH - CELL);
 const height = 7 * PITCH - (PITCH - CELL);
 
-// Empty day uses --muted; levels 1-4 are --accent at rising opacity, so the
-// wall follows the light/dark theme with no second asset.
-const levelClass = [
-  "fill-muted",
-  "fill-accent/30",
-  "fill-accent/60",
-  "fill-accent/80",
-  "fill-accent",
-];
+// Binary on purpose: a day either has activity or it does not. The GraphQL
+// contribution counts undercount, so the four intensity levels drawn from them
+// were misleading. Restore the shading below once the counts are trustworthy.
+const cellClass = (level: number) => (level > 0 ? "fill-accent" : "fill-muted");
+
+// const levelClass = [
+//   "fill-muted",
+//   "fill-accent/30",
+//   "fill-accent/60",
+//   "fill-accent/80",
+//   "fill-accent",
+// ];
 ---
 
 {
@@ -50,7 +53,7 @@ const levelClass = [
               width={CELL}
               height={CELL}
               rx="2"
-              class:list={["wall-cell", levelClass[day.level]]}
+              class:list={["wall-cell", cellClass(day.level)]}
               style={`animation-delay:${300 + Math.round(Math.random() * 2500)}ms`}
             >
               <title>{`${day.count} contribution${day.count === 1 ? "" : "s"} on ${day.date}`}</title>
