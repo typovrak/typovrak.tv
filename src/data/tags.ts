@@ -33,6 +33,17 @@ export const tags: Record<string, TagInfo> = {
     description: "Containers, images and reproducible local environments.",
     icon: "container",
   },
+  git: {
+    label: "git",
+    description: "Branches, commits and the history you leave behind you.",
+    icon: "git-branch",
+  },
+  github: {
+    label: "GitHub",
+    description:
+      "Issues, pull requests and the gh CLI that drives them from a terminal.",
+    icon: "circle-dot",
+  },
   gnome: {
     label: "GNOME",
     description: "The GNOME desktop, its tweaks, extensions and daily use.",

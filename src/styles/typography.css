@@ -68,6 +68,12 @@
       th {
         @apply py-1.5;
       }
+
+      /* child combinator so shiki blocks in a cell keep their own wrapping */
+      th > code,
+      td > code {
+        @apply whitespace-nowrap;
+      }
     }
 
     code {
