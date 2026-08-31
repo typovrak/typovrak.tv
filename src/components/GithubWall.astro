@@ -19,7 +19,10 @@ const height = 7 * PITCH - (PITCH - CELL);
 // Binary on purpose: a day either has activity or it does not. The GraphQL
 // contribution counts undercount, so the four intensity levels drawn from them
 // were misleading. Restore the shading below once the counts are trustworthy.
-const cellClass = (level: number) => (level > 0 ? "fill-accent" : "fill-muted");
+// 60% keeps the active day 3.7:1 against an empty one, well clear of the 3:1
+// graphical threshold, without matching body text at full accent's 11:1.
+const cellClass = (level: number) =>
+  level > 0 ? "fill-accent/60" : "fill-muted";
 
 // const levelClass = [
 //   "fill-muted",
