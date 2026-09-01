@@ -10,10 +10,12 @@ type Props = {
   /** The large accent glyph, e.g. a status code or a count. */
   glyph: string;
   message: string;
+  /** Renders the message as the h1. Only on a page that has no other one. */
+  heading?: boolean;
   class?: string;
 };
 
-const { glyph, message, class: className } = Astro.props;
+const { glyph, message, heading = false, class: className } = Astro.props;
 
 const locale = Astro.currentLocale ?? config.site.lang;
 const t = useTranslations(locale);
@@ -27,7 +29,13 @@ const t = useTranslations(locale);
 >
   <p class="text-accent text-9xl font-bold">{glyph}</p>
   <span aria-hidden="true"> ¯\_(ツ)_/¯ </span>
-  <p class="mt-4 text-2xl sm:text-3xl">{message}</p>
+  {
+    heading ? (
+      <h1 class="mt-4 text-2xl font-semibold sm:text-3xl">{message}</h1>
+    ) : (
+      <p class="mt-4 text-2xl sm:text-3xl">{message}</p>
+    )
+  }
   <LinkButton
     href={getRelativeLocaleUrl(locale, "")}
     class="my-6 text-lg underline decoration-dashed underline-offset-8"

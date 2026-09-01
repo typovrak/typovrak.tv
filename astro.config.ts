@@ -123,6 +123,9 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    // the player is imported on click, which vite's initial scan never sees,
+    // so it would re-optimise mid-session and 504 the dynamic import in dev
+    optimizeDeps: { include: ["asciinema-player"] },
   },
   fonts: [
     {

@@ -54,19 +54,18 @@ I kept this as a [public gist](https://gist.github.com/typovrak/8034fe822905c3fe
 Everything below is `gh` [2.96.0](https://github.com/cli/cli/releases/tag/v2.96.0) and `git` [2.54.0](https://github.com/git/git/releases/tag/v2.54.0), run from inside a repository you can push to.
 
 export const markers = [
-  [0.0, "gh issue create"],
-  [48.6, "gh issue develop 32 --checkout"],
-  [58.7, "vim README.md"],
-  [81.2, "git add README.md"],
-  [83.7, "git commit"],
-  [98.8, "git push"],
-  [103.9, "gh pr create --fill --body 'Closes #32'"],
-  [117.6, "gh pr merge --rebase --delete-branch"],
-  [131.7, "git switch main && git pull --prune"],
-  [152.0, "vim README.md"],
-  [174.9, "gh issue list"],
-  [179.2, "git status"],
-  [182.6, "lazygit"],
+  [0.2, "gh issue create"],
+  [46.0, "gh issue develop 32 --checkout"],
+  [58.9, "vim README.md"],
+  [80.1, "git add README.md"],
+  [84.1, "git commit"],
+  [98.9, "git push"],
+  [102.7, "gh pr create --fill --body 'Closes #32'"],
+  [116.2, "gh pr merge --rebase --delete-branch"],
+  [132.3, "git switch main && git pull --prune"],
+  [147.0, "vim README.md"],
+  [171.4, "gh issue list"],
+  [178.3, "lazygit"],
 ];
 
 <AsciinemaPlayer
@@ -106,15 +105,20 @@ Run `gh auth login` once and every command after that runs as you. `gh` works ou
 gh issue list
 ```
 
+Here it is on [olivierlambert/calrs](https://github.com/olivierlambert/calrs), a project with rather more open issues than this site has. The `#208` on the first row is the number `gh issue develop` wants:
+
+![gh issue list on the calrs repository, its 23 open issues in a table of number, title, labels and age](/img/posts/github-workflow-in-the-terminal/calrs-repository-gh-issue-list-cli.avif)
+
 Three flags do the work of the prompts. [`--checkout`](https://cli.github.com/manual/gh_issue_develop) creates the linked branch and switches to it in one go, so the branch name never has to be typed. [`--fill`](https://cli.github.com/manual/gh_pr_create) takes the PR title and body from your commits. [`--rebase --delete-branch`](https://cli.github.com/manual/gh_pr_merge) skips the merge menu and removes the branch from both your machine and the remote.
 
 The `git push` in that block needs no `-u`. gh created the branch on the remote before checking it out, so its upstream is already set. A branch you make yourself with `git switch -c` has none, which is why the fork section below pushes with `-u origin <branch>`. One setting covers both cases:
 
-```bash
-git config --global push.autoSetupRemote true
-```
-
-Available since git 2.37, it makes the first push on a new branch a plain `git push`. It is why `-u` never shows up in my own shell history.
+> [!TIP] Stop typing `-u`
+> ```bash
+> git config --global push.autoSetupRemote true
+> ```
+>
+> Available since git 2.37, it makes the first push on a new branch a plain `git push`. It is why `-u` never shows up in my own shell history.
 
 ## What actually closes the issue?
 
@@ -134,7 +138,8 @@ Which title depends on how many commits the branch carries. With a single commit
 
 `close`, `closes`, `closed`, `fix`, `fixes`, `fixed`, `resolve`, `resolves` and `resolved` all work, each followed by `#` and the number, anywhere in the body. To keep the commit text in the body as well, drop `--body` and write the keyword into the commit message instead.
 
-Merge into a release branch or a `develop` branch and the issue stays open, keyword or not.
+> [!WARNING] The keyword only fires on the default branch
+> `Closes #32` in a PR that targets a release branch or a `develop` branch links the issue and leaves it open. GitHub documents auto-close for the repository's default branch and nothing else, so a team that merges through a staging branch closes its issues by hand no matter what the PR body says.
 
 Here is [issue #32](https://github.com/typovrak/typovrak.tv/issues/32) on this repository, closed by the merge with nobody touching the issue itself:
 
