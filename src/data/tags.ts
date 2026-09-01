@@ -15,7 +15,7 @@ export const tags: Record<string, TagInfo> = {
     label: "Arch Linux",
     description:
       "Installing, configuring and living with Arch Linux day to day.",
-    icon: "cpu",
+    icon: "arch-linux",
   },
   astro: {
     label: "Astro",
@@ -31,23 +31,23 @@ export const tags: Record<string, TagInfo> = {
   docker: {
     label: "Docker",
     description: "Containers, images and reproducible local environments.",
-    icon: "container",
+    icon: "docker",
   },
   git: {
     label: "git",
     description: "Branches, commits and the history you leave behind you.",
-    icon: "git-branch",
+    icon: "git",
   },
   github: {
     label: "GitHub",
     description:
       "Issues, pull requests and the gh CLI that drives them from a terminal.",
-    icon: "circle-dot",
+    icon: "github",
   },
   gnome: {
     label: "GNOME",
     description: "The GNOME desktop, its tweaks, extensions and daily use.",
-    icon: "app-window",
+    icon: "gnome",
   },
   linux: {
     label: "Linux",
@@ -95,7 +95,7 @@ export const tags: Record<string, TagInfo> = {
   zsh: {
     label: "zsh",
     description: "The zsh shell: plugins, prompt, completion and aliases.",
-    icon: "chevrons-right",
+    icon: "zsh",
   },
 };
 

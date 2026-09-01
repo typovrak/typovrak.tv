@@ -222,8 +222,9 @@ Frontmatter schema is defined in [src/content.config.ts](src/content.config.ts).
 
 **Tags are flat but curated.** No categories and no series, but the vocabulary is closed: every
 tag must be registered in [src/data/tags.ts](src/data/tags.ts) with a label, a one-line
-description and a Lucide icon (a name that exists in
-[LucideIcon.astro](src/components/LucideIcon.astro)). `tagInfo()` throws on an unregistered tag,
+description and an icon (a name that exists in
+[LucideIcon.astro](src/components/LucideIcon.astro), which holds Lucide line icons plus a few
+Simple Icons brand marks, since Lucide ships no logos). `tagInfo()` throws on an unregistered tag,
 so using one in frontmatter without registering it **fails the build** rather than shipping a tag
 card with no description. The description is reused as the tag page heading and its meta
 description, so write it as a sentence, not a keyword list. Tag pages themselves are still
