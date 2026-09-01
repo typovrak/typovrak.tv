@@ -30,14 +30,21 @@ const { questions } = Astro.props;
             </p>
             <div class="mt-3 flex flex-col gap-2">
               {question.options.map((option, oi) => (
-                <label class="quiz-option border-border hover:border-accent/60 flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 transition-colors">
+                <label class="quiz-option border-border hover:border-accent/60 relative flex cursor-pointer items-center gap-2 overflow-hidden rounded-md border px-3 py-2 transition-colors">
+                  <span data-quiz-fill class="quiz-bar" aria-hidden="true" />
+                  <span data-quiz-fill class="quiz-meter" aria-hidden="true" />
                   <input
-                    class="accent-accent"
+                    class="accent-accent relative"
                     type={question.multiple ? "checkbox" : "radio"}
                     name={`quiz-${qi}`}
                     value={oi}
                   />
-                  <span>{option}</span>
+                  <span class="relative">{option}</span>
+                  <span
+                    data-quiz-pct
+                    hidden
+                    class="relative ml-auto pl-2 text-xs tabular-nums"
+                  />
                 </label>
               ))}
             </div>
@@ -59,6 +66,12 @@ const { questions } = Astro.props;
                 {question.explain}
               </p>
             )}
+            <p
+              data-quiz-summary
+              hidden
+              aria-live="polite"
+              class="text-muted-foreground mt-1 text-sm"
+            />
           </fieldset>
         </li>
       ))
@@ -82,11 +95,26 @@ const { questions } = Astro.props;
       class="text-accent font-semibold"
     >
     </p>
+    <p
+      data-quiz-average
+      hidden
+      aria-live="polite"
+      class="text-muted-foreground text-sm"
+    >
+    </p>
   </div>
 </section>
 
 <script>
-  import { isAnswerCorrect, scoreQuiz } from "@/utils/quiz";
+  import {
+    averagePercent,
+    isAnswerCorrect,
+    optionPercents,
+    percentOf,
+    scoreQuiz,
+    type QuizAnswerStats,
+    type QuizResultStats,
+  } from "@/utils/quiz";
   import { celebrate } from "@/scripts/confetti";
 
   const picks = (question: HTMLElement) =>
@@ -98,16 +126,69 @@ const { questions } = Astro.props;
       .filter(value => value !== "")
       .map(Number);
 
+  const options = (question: HTMLElement) =>
+    Array.from(question.querySelectorAll<HTMLElement>(".quiz-option"));
+
+  const post = async <T,>(url: string, body: unknown): Promise<T | null> => {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      return response.ok ? ((await response.json()) as T) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const plural = (count: number, word: string) =>
+    `${count} ${word}${count === 1 ? "" : "s"}`;
+
   function setupQuiz(quiz: HTMLElement): void {
     const questions = Array.from(
       quiz.querySelectorAll<HTMLElement>("[data-quiz-question]")
     );
     const retry = quiz.querySelector<HTMLButtonElement>("[data-quiz-retry]");
     const scoreEl = quiz.querySelector<HTMLElement>("[data-quiz-score]");
-    if (!retry || !scoreEl) return;
+    const averageEl = quiz.querySelector<HTMLElement>("[data-quiz-average]");
+    if (!retry || !scoreEl || !averageEl) return;
+
+    // one POST per question per page load, so retrying cannot inflate the
+    // percentages everyone reads. the reply is cached and replayed instead.
+    const answerStats = new Map<HTMLElement, QuizAnswerStats | null>();
+    let resultStats: QuizResultStats | null = null;
+    let resultSent = false;
+
+    const showAnswerStats = (question: HTMLElement) => {
+      const stats = answerStats.get(question);
+      const summary = question.querySelector<HTMLElement>(
+        "[data-quiz-summary]"
+      );
+      if (!stats || stats.answers === 0) return;
+
+      const labels = options(question);
+      const percents = optionPercents(stats, labels.length);
+      labels.forEach((label, index) => {
+        const width = `${Math.min(percents[index], 100)}%`;
+        label
+          .querySelectorAll<HTMLElement>("[data-quiz-fill]")
+          .forEach(fill => (fill.style.width = width));
+        const pct = label.querySelector<HTMLElement>("[data-quiz-pct]");
+        if (pct) {
+          pct.hidden = false;
+          pct.textContent = `${percents[index]}%`;
+        }
+      });
+
+      if (summary) {
+        summary.hidden = false;
+        summary.textContent = `${percentOf(stats.correct, stats.answers)}% answered this correctly, out of ${plural(stats.answers, "answer")}`;
+      }
+    };
 
     // grade one question inline and lock it
-    const gradeQuestion = (question: HTMLElement) => {
+    const gradeQuestion = async (question: HTMLElement) => {
       const correct = correctOf(question);
       const selected = picks(question)
         .filter(input => input.checked)
@@ -138,21 +219,24 @@ const { questions } = Astro.props;
       question.dataset.validated = "true";
       question.classList.add("is-graded");
 
-      // anonymous per-question record, best-effort, one per validation
-      void fetch("/api/quiz-answer", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          path: location.pathname,
-          question: questions.indexOf(question),
-          picked: selected,
-          correct: ok,
-        }),
-      }).catch(() => {});
+      // anonymous per-question record, best-effort. the reply carries the
+      // aggregate for that question, so no second request is needed.
+      if (!answerStats.has(question)) {
+        answerStats.set(
+          question,
+          await post<QuizAnswerStats>("/api/quiz-answer", {
+            path: location.pathname,
+            question: questions.indexOf(question),
+            picked: selected,
+            correct: ok,
+          })
+        );
+      }
+      showAnswerStats(question);
     };
 
     // show retry after the first validation, the total once every one is done
-    const updateSummary = () => {
+    const updateSummary = async () => {
       const done = questions.filter(q => q.dataset.validated === "true");
       if (done.length > 0) retry.hidden = false;
       if (done.length !== questions.length) return;
@@ -168,14 +252,21 @@ const { questions } = Astro.props;
       scoreEl.textContent = `You scored ${correct} / ${total} (${percent}%)`;
       scoreEl.focus();
 
-      // anonymous final score, best-effort (per-question answers go out on validation)
-      void fetch("/api/quiz-result", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ path: location.pathname, correct, total }),
-      }).catch(() => {});
-
       if (total > 0 && correct === total) celebrate();
+
+      // anonymous final score, best-effort, recorded once per page load
+      if (!resultSent) {
+        resultSent = true;
+        resultStats = await post<QuizResultStats>("/api/quiz-result", {
+          path: location.pathname,
+          correct,
+          total,
+        });
+      }
+      if (resultStats && resultStats.completions > 0) {
+        averageEl.hidden = false;
+        averageEl.textContent = `Average ${averagePercent(resultStats)}% across ${plural(resultStats.completions, "completion")}`;
+      }
     };
 
     questions.forEach(question => {
@@ -190,9 +281,8 @@ const { questions } = Astro.props;
       });
 
       validate.addEventListener("click", () => {
-        gradeQuestion(question);
         validate.hidden = true;
-        updateSummary();
+        void gradeQuestion(question).then(updateSummary);
       });
     });
 
@@ -205,6 +295,16 @@ const { questions } = Astro.props;
           input
             .closest(".quiz-option")
             ?.classList.remove("is-correct", "is-wrong");
+        });
+        options(question).forEach(label => {
+          label
+            .querySelectorAll<HTMLElement>("[data-quiz-fill]")
+            .forEach(fill => (fill.style.width = ""));
+          const pct = label.querySelector<HTMLElement>("[data-quiz-pct]");
+          if (pct) {
+            pct.hidden = true;
+            pct.textContent = "";
+          }
         });
         const validate = question.querySelector<HTMLButtonElement>(
           "[data-quiz-validate]"
@@ -220,9 +320,18 @@ const { questions } = Astro.props;
           "[data-quiz-explain]"
         );
         if (explain) explain.hidden = true;
+        const summary = question.querySelector<HTMLElement>(
+          "[data-quiz-summary]"
+        );
+        if (summary) {
+          summary.hidden = true;
+          summary.textContent = "";
+        }
       });
       scoreEl.hidden = true;
       scoreEl.textContent = "";
+      averageEl.hidden = true;
+      averageEl.textContent = "";
       retry.hidden = true;
     });
   }

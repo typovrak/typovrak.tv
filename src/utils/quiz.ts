@@ -27,3 +27,35 @@ export function scoreQuiz(
   const percent = total === 0 ? 0 : Math.round((correct / total) * 100);
   return { correct, total, percent };
 }
+
+export type QuizAnswerStats = {
+  answers: number;
+  correct: number;
+  // keyed by option index as a string, since it comes back from JSON
+  picks: Record<string, number>;
+};
+
+export type QuizResultStats = {
+  completions: number;
+  sumCorrect: number;
+  sumTotal: number;
+};
+
+export function percentOf(part: number, whole: number): number {
+  if (!Number.isFinite(part) || !Number.isFinite(whole) || whole <= 0) return 0;
+  return Math.round((part / whole) * 100);
+}
+
+// a multi-select answer counts once per option it picked, so these can sum past 100
+export function optionPercents(
+  stats: QuizAnswerStats,
+  optionCount: number
+): number[] {
+  return Array.from({ length: optionCount }, (_, index) =>
+    percentOf(stats.picks[String(index)] ?? 0, stats.answers)
+  );
+}
+
+export function averagePercent(stats: QuizResultStats): number {
+  return percentOf(stats.sumCorrect, stats.sumTotal);
+}

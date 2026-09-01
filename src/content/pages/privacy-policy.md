@@ -31,7 +31,9 @@ The [NixOS page](/nixos) has an optional form to request a new module. This is t
 
 ### Quiz results
 
-Some posts end with a short quiz. When you answer a question, and again when you finish the quiz, the server records anonymous results: the article, the question number, the answer picked, and whether it was correct, plus the final score. These carry no identifier, so a result cannot be linked to you or to your other answers. They are used only to spot questions that are too hard.
+Some posts end with a short quiz. When you answer a question, and again when you finish the quiz, the server records anonymous results: the article, the question number, the answer picked, and whether it was correct, plus the final score. These carry no identifier, so a result cannot be linked to you or to your other answers. They are used to spot questions that are too hard, and to show each question's totals back to readers.
+
+Once you validate a question, the site shows the totals for that question: the share of answers that picked each option, next to the share that were correct and the number of answers recorded. The final score is shown the same way, as an average across everyone who finished the quiz. Only totals are ever displayed, never a single answer, and your own answer is counted in the totals you read. Only your first attempt on a page load is recorded, so the retry button does not add rows or move the percentages.
 
 ### What each table stores
 
@@ -78,7 +80,7 @@ Every table below also stores when each row was written and an internal row numb
 The data is used only for these purposes:
 
 - audience measurement, to know which articles are read and to monitor the site's technical performance,
-- anonymous quiz results, to see which questions are too hard,
+- anonymous quiz results, to see which questions are too hard and to show their totals back to readers,
 - module requests, to read your request and reply to you.
 
 It is not used to profile visitors, and is not sold, rented, or shared for other purposes.
@@ -152,4 +154,4 @@ This privacy policy may change to stay compliant with current law. The date belo
 
 ---
 
-**Date of last modification:** 17 August 2026
+**Date of last modification:** 1 September 2026
