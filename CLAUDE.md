@@ -44,6 +44,17 @@ without a trailing slash.
 Files under `src/pages/` whose name starts with `_` are not routed at all, so an endpoint named
 `_probe.ts` silently produces no function.
 
+**Terminal rendering.** Every post is also prerendered as text: `/posts/<slug>.txt` is plain and
+`/posts/<slug>.ansi.txt` carries ANSI colour, with `/index.txt` and `/index.ansi.txt` for the post
+list. [scripts/terminal-routes.mjs](scripts/terminal-routes.mjs) then adds a rewrite to the Build
+Output config so a command-line user-agent (`curl`, `wget`, `HTTPie`, `xh`) asking for `/` or
+`/posts/<slug>` is served the `.ansi.txt` file, while browsers keep the HTML. Static files only, no
+function. The markdown is walked by [terminal.ts](src/utils/terminal.ts) (pure, tested) from the
+tree [postTree.ts](src/utils/postTree.ts) captures out of Astro's own processor, with `remark-mdx`
+switched on for `.mdx` files only: the MDX grammar reads `{braces}` in prose as an expression, so
+it must not touch a `.md` post. The rewrite cannot be exercised locally; check it on a preview
+deploy with both a browser and `curl` on the same URL.
+
 ## Database
 
 **Neon** (serverless Postgres) via `@neondatabase/serverless`, reached through

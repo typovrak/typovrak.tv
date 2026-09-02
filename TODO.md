@@ -7,28 +7,6 @@
 
 - améliorer le security.txt
 
-- `curl typovrak.tv` : servir les articles en texte ANSI aux clients en ligne de commande
-  - un `.txt` prérendu par article côté Astro, puis une route conditionnelle ajoutée au Build
-    Output config par `scripts/security-headers.mjs` (un `has` sur l'en-tête `user-agent`, sur le
-    modèle du `config.routes.unshift` qu'il fait déjà). Aucune fonction serverless, aucun JS,
-    rien à consentir
-  - piège : les codes ANSI polluent la sortie dès qu'on redirige vers un fichier, donc ne
-    coloriser que si le client ne demande pas du texte pur, ou prévoir une variante `?raw`
-  - piège : `X-Content-Type-Options: nosniff` déjà en place impose de servir le bon content-type
-
-- barre de recherche fixe pour rediriger n'importe où sur le site, comme celle de
-  `morphikweb-project-001` (`front/src/components/ui/SearchBar.tsx`)
-  - toujours visible, ouverture au clic ou par ctrl+k, résultats groupés par catégorie
-  - l'index n'est pas une liste de pages mais une liste d'entrées portant une ancre, donc on
-    atterrit sur la bonne section et pas seulement sur la bonne page
-  - prévoir un champ `keywords` indexé mais jamais affiché, pour les synonymes : sans lui on ne
-    trouve un sujet que par son titre exact
-  - c'est une évolution de `CommandPalette.astro`, qui fait déjà le ctrl+k sur la liste des
-    pages, pas un second composant à côté
-  - `/questions` produit déjà des entrées à ancre prêtes à indexer
-  - la référence est en React avec un routeur client, ici il n'y en a pas (pas de ClientRouter,
-    voir CLAUDE.md), donc chaque résultat est une navigation complète
-
 - mieux stocker la provenance des visiteurs, pour distinguer deux liens posés sur le même
   domaine (deux subreddits, ou le lien en bio contre le lien en commentaire)
   - aujourd'hui `page_view_event.referrer_host` ne garde que l'hôte, donc tout Reddit se

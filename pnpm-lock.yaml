@@ -50,6 +50,9 @@ importers:
       remark-collapse:
         specifier: ^0.1.2
         version: 0.1.2
+      remark-mdx:
+        specifier: ^3.1.1
+        version: 3.1.1
       remark-toc:
         specifier: ^9.0.0
         version: 9.0.0

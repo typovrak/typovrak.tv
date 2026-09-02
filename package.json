@@ -8,7 +8,7 @@
   "packageManager": "pnpm@11.3.0",
   "scripts": {
     "dev": "astro dev",
-    "build": "rm -rf node_modules/.astro && astro check && astro build && pagefind --site .vercel/output/static && node scripts/security-headers.mjs",
+    "build": "rm -rf node_modules/.astro && astro check && astro build && pagefind --site .vercel/output/static && node scripts/security-headers.mjs && node scripts/terminal-routes.mjs",
     "preview": "astro preview",
     "sync": "astro sync",
     "astro": "astro",
@@ -34,6 +34,7 @@
     "astro": "^7.0.3",
     "rehype-callouts": "^2.2.0",
     "remark-collapse": "^0.1.2",
+    "remark-mdx": "^3.1.1",
     "remark-toc": "^9.0.0",
     "satori": "^0.26.0",
     "sharp": "^0.35.2",
