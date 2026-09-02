@@ -4,6 +4,7 @@ export interface UIStrings {
     posts: string;
     tags: string;
     nixos: string;
+    questions: string;
     archives: string;
     search: string;
   };
@@ -35,6 +36,8 @@ export interface UIStrings {
     allRightsReserved: string;
   };
   pages: {
+    homeTitle: string;
+
     tagTitle: string;
     tagDesc: string;
 
@@ -51,6 +54,10 @@ export interface UIStrings {
 
     searchTitle: string;
     searchDesc: string;
+
+    questionsTitle: string;
+    questionsDesc: string;
+    questionsEmpty: string;
   };
   a11y: {
     skipToContent: string;

@@ -32,3 +32,12 @@ export function paginatedPaths(
     i === 0 ? base : `${base}/${i + 1}`
   );
 }
+
+/**
+ * Pagefind indexes directory URLs, so every result it returns ends in a slash
+ * while the site is `trailingSlash: "never"`. Keeps the hash, keeps the root.
+ */
+export function stripResultSlash(url: string): string {
+  const [, path = "", rest = ""] = /^([^#?]*)([\s\S]*)$/.exec(url) ?? [];
+  return (path.replace(/\/+$/, "") || "/") + rest;
+}

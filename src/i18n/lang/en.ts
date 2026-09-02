@@ -6,6 +6,7 @@ export default {
     posts: "Posts",
     tags: "Tags",
     nixos: "NixOS",
+    questions: "Questions",
     archives: "Archives",
     search: "Search",
   },
@@ -37,6 +38,10 @@ export default {
     allRightsReserved: "All rights reserved.",
   },
   pages: {
+    // the home page has no name of its own, so this stands in for one in the
+    // <title>. "typovrak" alone is too short to describe the site to a crawler.
+    homeTitle: "Arch Linux, NixOS, CLI tooling and web development",
+
     tagTitle: "Tag",
     tagDesc: "All the articles with the tag",
 
@@ -53,6 +58,11 @@ export default {
 
     searchTitle: "Search",
     searchDesc: "Search any article ...",
+
+    questionsTitle: "Questions",
+    questionsDesc:
+      "Every question the posts answer, each linking straight to its answer.",
+    questionsEmpty: "No question yet, they appear with the first article.",
   },
   a11y: {
     skipToContent: "Skip to content",

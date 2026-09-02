@@ -241,11 +241,13 @@ timezone `Europe/Paris`, GitHub and mail as the only socials.
 **No other social links** — no X, LinkedIn, Malt, Instagram, TikTok. Do not add socials that
 were not asked for.
 
-`site.ogImage` is intentionally unset and there is no static OG file. With
-`features.dynamicOgImage` on, [resolveDefaultOgImagePath.ts](src/utils/resolveDefaultOgImagePath.ts)
-falls back to the satori-generated `/og.png`. If you ever turn `dynamicOgImage` off, the build
-will fail until a real file is added to `public/`. SEO work is deferred, so don't add meta,
-schema or OG assets unprompted.
+`site.ogImage` is `typovrak-banner-hobbies-radius-min.png` and `features.dynamicOgImage` is
+off, so every page and every post shares that one banner as its social card. **This is
+deliberate**: the site has a single visual identity and posts do not get individual OG images.
+Do not turn `dynamicOgImage` back on, and do not add per-post `ogImage` frontmatter to "improve"
+sharing. The flag being off makes the file mandatory:
+[resolveDefaultOgImagePath.ts](src/utils/resolveDefaultOgImagePath.ts) throws at build time if it
+ever leaves `public/`. SEO work is deferred, so don't add meta, schema or OG assets unprompted.
 
 ## Theme
 

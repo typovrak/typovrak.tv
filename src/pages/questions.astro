@@ -1,0 +1,100 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import EmptyState from "@/components/EmptyState.astro";
+import { getSortedPosts } from "@/utils/getSortedPosts";
+import { getPostUrl } from "@/utils/getPostPaths";
+import { questionHeadings } from "@/utils/questions";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const posts = await getCollection("posts", ({ data }) => !data.draft);
+
+// headings come from render(), so a slug here is the anchor the post renders
+const groups = (
+  await Promise.all(
+    getSortedPosts(posts).map(async post => {
+      const { headings } = await render(post);
+      return {
+        title: post.data.title,
+        url: getPostUrl(post.id, post.filePath),
+        questions: questionHeadings(headings),
+      };
+    })
+  )
+).filter(group => group.questions.length > 0);
+
+const total = groups.reduce(
+  (count, group) => count + group.questions.length,
+  0
+);
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+---
+
+<Layout
+  title={`${t.pages.questionsTitle} | ${config.site.title}`}
+  description={t.pages.questionsDesc}
+>
+  <Header />
+
+  <Breadcrumb />
+
+  <Main
+    pageTitle={t.pages.questionsTitle}
+    pageDesc={t.pages.questionsDesc}
+    indexable={false}
+    class={total === 0 ? "flex flex-1 flex-col" : undefined}
+  >
+    {
+      total === 0 && (
+        <EmptyState glyph="?" message={t.pages.questionsEmpty} class="flex-1" />
+      )
+    }
+
+    {
+      total > 0 && (
+        <p class="text-muted-foreground text-sm tabular-nums">
+          {total} questions across {groups.length}{" "}
+          {groups.length === 1 ? "post" : "posts"}
+        </p>
+      )
+    }
+
+    <ul class="mt-6 flex list-none flex-col gap-8 p-0">
+      {
+        groups.map(group => (
+          <li>
+            <h2 class="text-muted-foreground text-sm">
+              <a
+                href={group.url}
+                class="focus-outline hover:text-accent underline decoration-dashed underline-offset-4"
+              >
+                {group.title}
+              </a>
+            </h2>
+            <ul class="mt-2 flex list-none flex-col gap-1 p-0">
+              {group.questions.map(question => (
+                <li>
+                  <a
+                    href={`${group.url}#${question.slug}`}
+                    class="focus-outline text-accent hover:underline"
+                  >
+                    {question.text}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))
+      }
+    </ul>
+  </Main>
+
+  <Footer />
+</Layout>

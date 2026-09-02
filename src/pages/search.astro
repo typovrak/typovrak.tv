@@ -52,6 +52,8 @@ const t = useTranslations(locale);
 </Layout>
 
 <script>
+  import { stripResultSlash } from "@/utils/paths";
+
   function initSearch() {
     const pageFindSearch: HTMLElement | null =
       document.querySelector("#pagefind-search");
@@ -85,6 +87,18 @@ const t = useTranslations(locale);
         bundlePath,
         showImages: false,
         showSubResults: true,
+        // pagefind indexes directory urls, so without this every result link
+        // ends in a slash and each click costs a 308 back to the slashless one
+        processResult: function (result: {
+          url: string;
+          sub_results?: { url: string }[];
+        }) {
+          result.url = stripResultSlash(result.url);
+          result.sub_results?.forEach(
+            sub => (sub.url = stripResultSlash(sub.url))
+          );
+          return result;
+        },
         processTerm: function (term: string) {
           params.set("q", term); // Update the `q` parameter in the URL
           history.replaceState(history.state, "", "?" + params.toString()); // Push the new URL without reloading

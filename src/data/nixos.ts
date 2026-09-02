@@ -45,7 +45,42 @@ export type NixosCategory = {
   modules: NixosModule[];
 };
 
-export const nixosCategories: NixosCategory[] = [
+export function categoryStats(
+  category: NixosCategory,
+  statsFor: (module: string) => RepoStats
+): RepoStats {
+  return category.modules.reduce(
+    (total, module) => {
+      const repo = statsFor(module.name);
+      return {
+        stars: total.stars + repo.stars,
+        forks: total.forks + repo.forks,
+        archived: false,
+      };
+    },
+    { stars: 0, forks: 0, archived: false }
+  );
+}
+
+// Most stars and forks first, so the section a visitor is most likely to want
+// opens the page. Stars outweigh forks on a tie, then the title decides, so the
+// order depends only on the data and never on the position in the literal.
+export function sortCategoriesByPopularity(
+  categories: NixosCategory[],
+  statsFor: (module: string) => RepoStats
+): NixosCategory[] {
+  return [...categories].sort((a, b) => {
+    const left = categoryStats(a, statsFor);
+    const right = categoryStats(b, statsFor);
+    return (
+      right.stars + right.forks - (left.stars + left.forks) ||
+      right.stars - left.stars ||
+      a.title.localeCompare(b.title)
+    );
+  });
+}
+
+const categories: NixosCategory[] = [
   {
     title: "Window manager and desktop",
     icon: "app-window",
@@ -209,6 +244,11 @@ export const nixosCategories: NixosCategory[] = [
     ],
   },
 ];
+
+export const nixosCategories = sortCategoriesByPopularity(
+  categories,
+  moduleStatsFor
+);
 
 const allModules = nixosCategories.flatMap(category => category.modules);
 

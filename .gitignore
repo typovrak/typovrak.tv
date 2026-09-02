@@ -43,3 +43,6 @@ compose.override.yaml
 
 # audit
 .unlighthouse/
+
+# credentials
+.ACCESS.md

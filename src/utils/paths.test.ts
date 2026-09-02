@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { fileToPath, normalisePath, paginatedPaths } from "./paths";
+import {
+  fileToPath,
+  normalisePath,
+  paginatedPaths,
+  stripResultSlash,
+} from "./paths";
 
 describe("normalisePath", () => {
   it("keeps a plain path", () => {
@@ -75,5 +80,30 @@ describe("paginatedPaths", () => {
 
   it("does not emit an extra page on an exact multiple", () => {
     expect(paginatedPaths("/posts", 8, 4)).toEqual(["/posts", "/posts/2"]);
+  });
+});
+
+describe("stripResultSlash", () => {
+  it("drops the trailing slash a pagefind result carries", () => {
+    expect(stripResultSlash("/tags/github/")).toBe("/tags/github");
+  });
+
+  it("keeps the hash of a sub-result", () => {
+    expect(stripResultSlash("/posts/my-post/#what-closes-it")).toBe(
+      "/posts/my-post#what-closes-it"
+    );
+  });
+
+  it("leaves the root alone rather than emptying it", () => {
+    expect(stripResultSlash("/")).toBe("/");
+    expect(stripResultSlash("/#top")).toBe("/#top");
+  });
+
+  it("leaves a path that already has no trailing slash", () => {
+    expect(stripResultSlash("/posts/my-post")).toBe("/posts/my-post");
+  });
+
+  it("keeps a query string", () => {
+    expect(stripResultSlash("/search/?q=git")).toBe("/search?q=git");
   });
 });

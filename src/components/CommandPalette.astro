@@ -181,18 +181,29 @@ pages.push({
 
     const isOpen = () => !palette.hidden;
 
+    // clears every item, not just the ones in `items`: filterPages() hides the
+    // previously active option, which would otherwise keep aria-selected and
+    // leave a listbox with several selected options.
     function setActive(i: number) {
       active = i;
-      items.forEach((el, idx) => {
-        const on = idx === i;
-        el.classList.toggle("cp-active", on);
-        el.setAttribute("aria-selected", on ? "true" : "false");
-        if (on) {
-          input.setAttribute("aria-activedescendant", el.id);
-          el.scrollIntoView({ block: "nearest" });
-        }
+      const all = [
+        ...pageItems,
+        ...resultsList.querySelectorAll<HTMLElement>("[data-cp-item]"),
+      ];
+      all.forEach(el => {
+        el.classList.remove("cp-active");
+        el.setAttribute("aria-selected", "false");
       });
-      if (i < 0) input.removeAttribute("aria-activedescendant");
+
+      const current = items[i];
+      if (!current) {
+        input.removeAttribute("aria-activedescendant");
+        return;
+      }
+      current.classList.add("cp-active");
+      current.setAttribute("aria-selected", "true");
+      input.setAttribute("aria-activedescendant", current.id);
+      current.scrollIntoView({ block: "nearest" });
     }
 
     function refresh() {

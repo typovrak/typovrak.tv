@@ -47,7 +47,7 @@ const recentPosts = sortedPosts.filter(({ data }) => !data.featured);
 const homePath = getRelativeLocaleUrl(locale, "");
 ---
 
-<Layout>
+<Layout title={`${t.pages.homeTitle} | ${config.site.title}`}>
   <Fragment slot="head">
     <script
       type="application/ld+json"
