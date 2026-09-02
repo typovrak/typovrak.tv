@@ -108,7 +108,7 @@ pages.push({
         <div id="cp-list" role="listbox" class="overflow-y-auto p-2">
           <div data-cp-actions>
             <div class="text-muted-foreground px-2 pt-1 pb-1 text-xs tracking-wide uppercase">
-              Pages
+              Go to
             </div>
             <ul>
               {pages.map((page, i) => (
@@ -129,10 +129,7 @@ pages.push({
             </ul>
           </div>
           <div data-cp-results-section hidden>
-            <div class="text-muted-foreground px-2 pt-2 pb-1 text-xs tracking-wide uppercase">
-              Results
-            </div>
-            <ul data-cp-results />
+            <div data-cp-results />
           </div>
           <p
             data-cp-empty
@@ -148,6 +145,8 @@ pages.push({
 }
 
 <script>
+  import { searchResultKind, stripResultSlash } from "@/utils/paths";
+
   const palette = document.getElementById("command-palette");
   if (palette) {
     const input = palette.querySelector<HTMLInputElement>("[data-cp-input]")!;
@@ -254,30 +253,59 @@ pages.push({
       if (token !== searchToken) return;
 
       resultsList.replaceChildren();
-      data.forEach((entry, i) => {
-        const url = entry.url.replace(/\.html$/, "").replace(/\/$/, "") || "/";
-        const item = document.createElement("a");
-        item.id = `cp-result-${i}`;
-        item.href = url;
-        item.className = "cp-item";
-        item.dataset.cpItem = "";
-        item.setAttribute("role", "option");
-        item.setAttribute("aria-selected", "false");
 
-        const title = document.createElement("span");
-        title.className = "cp-item-title";
-        title.textContent = entry.meta?.title ?? url;
+      // grouped so a post is told apart from a tag page at a glance. pagefind's
+      // ranking is kept inside each group, and the groups follow this order.
+      const found = data.map(entry => ({
+        ...entry,
+        // pagefind indexes directory urls; the site is trailingSlash: never
+        url: stripResultSlash(entry.url.replace(/\.html$/, "")),
+      }));
 
-        const sub = document.createElement("span");
-        sub.className = "cp-item-sub";
-        // Excerpt is our own indexed content (with <mark> highlights).
-        sub.innerHTML = entry.excerpt ?? "";
+      const groups = new Map<string, typeof found>();
+      for (const entry of found) {
+        const kind = searchResultKind(entry.url);
+        groups.set(kind, [...(groups.get(kind) ?? []), entry]);
+      }
 
-        item.append(title, sub);
-        const li = document.createElement("li");
-        li.append(item);
-        resultsList.append(li);
-      });
+      let index = 0;
+      for (const kind of ["Posts", "Tags", "Pages"]) {
+        const entries = groups.get(kind);
+        if (!entries) continue;
+
+        const heading = document.createElement("div");
+        heading.className =
+          "text-muted-foreground px-2 pt-2 pb-1 text-xs tracking-wide uppercase";
+        heading.textContent = kind;
+
+        const list = document.createElement("ul");
+        for (const entry of entries) {
+          const url = entry.url;
+          const item = document.createElement("a");
+          item.id = `cp-result-${index++}`;
+          item.href = url;
+          item.className = "cp-item";
+          item.dataset.cpItem = "";
+          item.setAttribute("role", "option");
+          item.setAttribute("aria-selected", "false");
+
+          const title = document.createElement("span");
+          title.className = "cp-item-title";
+          title.textContent = entry.meta?.title ?? url;
+
+          const sub = document.createElement("span");
+          sub.className = "cp-item-sub";
+          // Excerpt is our own indexed content (with <mark> highlights).
+          sub.innerHTML = entry.excerpt ?? "";
+
+          item.append(title, sub);
+          const li = document.createElement("li");
+          li.append(item);
+          list.append(li);
+        }
+        resultsList.append(heading, list);
+      }
+
       resultsSection.hidden = data.length === 0;
       refresh();
     }

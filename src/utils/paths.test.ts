@@ -3,6 +3,7 @@ import {
   fileToPath,
   normalisePath,
   paginatedPaths,
+  searchResultKind,
   stripResultSlash,
 } from "./paths";
 
@@ -105,5 +106,29 @@ describe("stripResultSlash", () => {
 
   it("keeps a query string", () => {
     expect(stripResultSlash("/search/?q=git")).toBe("/search?q=git");
+  });
+});
+
+describe("searchResultKind", () => {
+  it("calls an article a post", () => {
+    expect(searchResultKind("/posts/arch-linux-2024-setup")).toBe("Posts");
+  });
+
+  it("keeps a sub-result on an article a post", () => {
+    expect(searchResultKind("/posts/my-post#why-yay")).toBe("Posts");
+  });
+
+  it("calls a tag page a tag", () => {
+    expect(searchResultKind("/tags/docker")).toBe("Tags");
+  });
+
+  it("treats the listings themselves as pages, not as their contents", () => {
+    expect(searchResultKind("/posts")).toBe("Pages");
+    expect(searchResultKind("/tags")).toBe("Pages");
+  });
+
+  it("falls back to a page for anything else", () => {
+    expect(searchResultKind("/nixos")).toBe("Pages");
+    expect(searchResultKind("/")).toBe("Pages");
   });
 });

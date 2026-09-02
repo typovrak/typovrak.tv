@@ -41,3 +41,13 @@ export function stripResultSlash(url: string): string {
   const [, path = "", rest = ""] = /^([^#?]*)([\s\S]*)$/.exec(url) ?? [];
   return (path.replace(/\/+$/, "") || "/") + rest;
 }
+
+/**
+ * Which part of the site a search result points at, from its path alone.
+ * The listings themselves (`/posts`, `/tags`) are pages, not their contents.
+ */
+export function searchResultKind(url: string): "Posts" | "Tags" | "Pages" {
+  if (/^\/posts\/[^/]/.test(url)) return "Posts";
+  if (/^\/tags\/[^/]/.test(url)) return "Tags";
+  return "Pages";
+}
