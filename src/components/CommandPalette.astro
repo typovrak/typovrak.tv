@@ -106,7 +106,7 @@ pages.push({
           </kbd>
         </div>
         <div id="cp-list" role="listbox" class="overflow-y-auto p-2">
-          <div data-cp-actions>
+          <div data-cp-actions hidden>
             <div class="text-muted-foreground px-2 pt-1 pb-1 text-xs tracking-wide uppercase">
               Go to
             </div>
@@ -211,6 +211,7 @@ pages.push({
         resultsList.querySelectorAll<HTMLElement>("[data-cp-item]")
       );
       items = [...visiblePages, ...results];
+      actionsList.hidden = visiblePages.length === 0;
       emptyEl.hidden = items.length > 0;
       setActive(
         items.length ? Math.min(Math.max(active, 0), items.length - 1) : -1
@@ -431,8 +432,10 @@ pages.push({
     font-size: 0.75rem;
     color: var(--muted-foreground);
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
   .cp-item-sub mark {
     background: transparent;

@@ -46,14 +46,14 @@ const coreStats = repoStatsFor("nixos");
       <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span class="text-accent text-2xl font-bold group-hover:underline">
           nixos
-        </span>
+        </span>{" "}
         <span class="text-muted-foreground text-sm">the core config</span>
       </div>
       <p class="mt-2">
         The umbrella config that ties every module below together: shell,
         desktop, development tools, window manager, audio, fonts and theming.
       </p>
-      <div class="mt-3 flex items-center justify-between">
+      <div data-pagefind-ignore class="mt-3 flex items-center justify-between">
         <RepoStats stars={coreStats.stars} forks={coreStats.forks} />
         <span class="text-muted-foreground text-xs">NixOS {nixosVersion}</span>
       </div>
@@ -85,20 +85,26 @@ const coreStats = repoStatsFor("nixos");
                     rel="noopener noreferrer"
                     class="focus-outline group flex flex-1 flex-col"
                   >
-                    <span>
+                    <div>
                       <span class="text-accent font-semibold group-hover:underline">
                         {module.name}
                       </span>
                       {stats.archived && (
-                        <span class="ms-2 rounded border border-orange-400/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-400">
+                        <span
+                          data-pagefind-ignore
+                          class="ms-2 rounded border border-orange-400/40 bg-orange-500/10 px-1.5 py-0.5 align-middle text-xs font-medium text-orange-400"
+                        >
                           archived
                         </span>
                       )}
-                    </span>
-                    <span class="text-muted-foreground mt-1 block text-sm">
+                    </div>
+                    <p class="text-muted-foreground mt-1 text-sm">
                       {module.purpose}
-                    </span>
-                    <div class="mt-auto flex items-center justify-between pt-2">
+                    </p>
+                    <div
+                      data-pagefind-ignore
+                      class="mt-auto flex items-center justify-between pt-2"
+                    >
                       <RepoStats stars={stats.stars} forks={stats.forks} />
                       <span class="text-muted-foreground text-xs">
                         NixOS {moduleNixos(module)}
