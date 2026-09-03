@@ -37,6 +37,13 @@ const currentYear = new Date().getFullYear();
       </a>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <a
+        href={getRelativeLocaleUrl(locale, "stats")}
+        class="hover:text-accent underline decoration-dashed underline-offset-4"
+      >
+        Stats
+      </a>
+      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
+      <a
         href={getRelativeLocaleUrl(locale, "privacy-policy")}
         class="hover:text-accent underline decoration-dashed underline-offset-4"
       >

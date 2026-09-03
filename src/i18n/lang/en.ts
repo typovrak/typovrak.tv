@@ -63,6 +63,9 @@ export default {
     questionsDesc:
       "Every question the posts answer, each linking straight to its answer.",
     questionsEmpty: "No question yet, they appear with the first article.",
+
+    statsTitle: "Stats",
+    statsDesc: "What this site records about its own traffic, in the open.",
   },
   a11y: {
     skipToContent: "Skip to content",

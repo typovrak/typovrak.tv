@@ -5,7 +5,8 @@
 
 - /about page
 
-- améliorer le security.txt
+- compléter le security.txt : il existe déjà dans `public/.well-known/`, conforme RFC 9116
+  (`Contact`, `Expires`, `Canonical`), il lui manque `Policy` et `Acknowledgments`
 
 - mieux stocker la provenance des visiteurs, pour distinguer deux liens posés sur le même
   domaine (deux subreddits, ou le lien en bio contre le lien en commentaire)
@@ -32,8 +33,8 @@
 
 ---
 
-Callouts / admonitions (note, warning, tip) thémés Catppuccin. Tu as évoqué des composants « façon AWS » : c'est la base.
-Diagrammes Mermaid rendus au build en SVG (via rehype, pas de JS client) : schémas d'archi sans casser la CSP.
+- diagrammes Mermaid rendus au build en SVG (via rehype, pas de JS client) : schémas d'archi
+  sans casser la CSP. Rien n'est commencé. Les callouts, eux, sont faits (`rehype-callouts`)
 
 - [ ] add components like AWS does it in every article to make it more enjoyable
 
@@ -47,7 +48,6 @@ ARTICLES :
 - [ ] sur data-appear, un composant version natif/react et autres frameworks
 - [ ] sur mon premier paquet NPM, webcam-in-terminal-cli
 - [ ] sur comment faire sa première contribution
-- [ ] sur comment lancer le projet freeCodeCamp sous NixOS (bug Prisma non supporté par freeCodeCamp pour le moment)
-- [ ] sur mon ancienne configuration Arch Linux x Gnome
+- [ ] sur comment lancer le projet freeCodeCamp sous NixOS : écrit (`freecodecamp-on-nixos-prisma.md`), encore en `draft: true`, reste à publier
 - [ ] Star Rune, comment j'ai aidé un jeu de dactylographie à lever plus de 15 000 $
 - [ ] Créer un article se basant sur toutes les lois de atomic habite afin de devenir un développeur freelance

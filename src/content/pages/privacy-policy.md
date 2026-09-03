@@ -37,7 +37,7 @@ Once you validate a question, the site shows the totals for that question: the s
 
 ### What each table stores
 
-For full transparency, here is every table in the database with example rows. Every value in the tables below is made up, shown only to illustrate the format. The exact schema, with column types and comments, is in [db/schema.sql](https://github.com/typovrak/typovrak.tv/blob/main/db/schema.sql).
+The real aggregates behind these tables are published on the [stats page](/stats). For full transparency, here is every table in the database with example rows. Every value in the tables below is made up, shown only to illustrate the format. The exact schema, with column types and comments, is in [db/schema.sql](https://github.com/typovrak/typovrak.tv/blob/main/db/schema.sql).
 
 Every table below also stores when each row was written and an internal row number, except the totals, which is just a count per page. Those are left out of the examples to keep them readable.
 
@@ -154,4 +154,4 @@ This privacy policy may change to stay compliant with current law. The date belo
 
 ---
 
-**Date of last modification:** 1 September 2026
+**Date of last modification:** 3 September 2026

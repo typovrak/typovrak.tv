@@ -55,6 +55,19 @@ switched on for `.mdx` files only: the MDX grammar reads `{braces}` in prose as 
 it must not touch a `.md` post. The rewrite cannot be exercised locally; check it on a preview
 deploy with both a browser and `curl` on the same URL.
 
+**llms.txt.** [/llms.txt](src/pages/llms.txt.ts) is the markdown index from
+[llmstxt.org](https://llmstxt.org) (site summary, then one linked line per post and per content
+page) and [/llms-full.txt](src/pages/llms-full.txt.ts) is the full text of every post. Both reuse
+the terminal pipeline: the `plain` palette already emits valid markdown, so there is no second
+renderer. Prerendered, no function.
+
+`llms-full.txt` carries the pages too, not only the posts: the bio, Star Rune, the open-source
+contributions and the whole NixOS module list. Those are rendered by
+[_llmsPages.ts](src/pages/_llmsPages.ts) **from the same data the pages themselves read** ([profile.ts](src/data/profile.ts),
+[contributions.ts](src/data/contributions.ts), [nixos.ts](src/data/nixos.ts)), so the two cannot
+drift. That is why the home page bio, the Star Rune figures and the NixOS intro live in data
+modules rather than inline in the markup: write the prose there, never twice.
+
 ## Database
 
 **Neon** (serverless Postgres) via `@neondatabase/serverless`, reached through
@@ -112,6 +125,25 @@ verify by diffing against the real build output rather than by reading the code:
 ```sh
 find .vercel/output/static -name '*.html' | sed 's|.vercel/output/static||; s|/index.html$||'
 ```
+
+## Public stats
+
+[/stats](src/pages/stats.astro) publishes the audience aggregates: views per page, referrer hosts,
+countries, device classes and the hardest quiz questions. It collects nothing new, it only reads
+back what is already stored, and it is the honest counterpart to the made-up example rows in the
+privacy policy.
+
+**The page is prerendered and fetches [/api/stats](src/pages/api/stats.ts) on load**, the same
+shape as `PageViewTracker`. That keeps the database rule intact (read only from a route with
+`prerender = false`), keeps the page out of the CSP hash problem a server-rendered page would
+create, and degrades to a notice when the database is down. The seven queries go out in one
+`sql.transaction([...])`, since the HTTP driver would otherwise send seven fetches.
+
+**A row seen fewer than `SMALL_GROUP` times is folded into `Other`** (see
+[stats.ts](src/utils/stats.ts)). A country or a referrer with a count of one is close to naming a
+single visitor, and publishing it would undo the anonymity the rest of the design buys. Device
+classes are exempt: there are only two or three, so no bucket is small. Do not remove the
+threshold to make the page look busier.
 
 `DATABASE_URL` is declared in the `astro:env` schema as `access: "secret", context: "server"`,
 so importing it from client code is a build error rather than a leak. It lives in `.env`
@@ -372,6 +404,10 @@ Never store, whatever the temptation:
   `desktop`) are fine; the raw string is not.
 - **Full referrer URL.** Query strings carry search terms and private tokens. Keep the host only.
 - Any stable per-visitor identifier, which would turn a counter into tracking.
+
+**Publishing aggregates is fine, publishing a bucket of one is not.** The stats page exists
+because the rows carry no identifier; the small-group threshold is what keeps that true once the
+numbers are public.
 
 Safe to store: post slug, timestamp, referrer host, country (`x-vercel-ip-country` is coarse
 enough), and a coarse device class.

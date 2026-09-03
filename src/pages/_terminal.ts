@@ -36,18 +36,29 @@ export async function terminalPaths() {
   }));
 }
 
-export async function postText(post: Post, palette: Palette): Promise<string> {
-  const url = absolute(post);
-  const tree = await parsePostBody(post.body ?? "", {
+export const postUrl = absolute;
+export const postDate = dateOf;
+
+export const postTags = (post: Post) =>
+  post.data.tags.map(tag => tagInfo(slugifyStr(tag)).label);
+
+// the mdx grammar reads {braces} in prose as an expression, so it is only
+// switched on for the files that actually are mdx
+export const postTree = (post: Post) =>
+  parsePostBody(post.body ?? "", {
     mdx: post.filePath?.endsWith(".mdx") ?? false,
   });
+
+export async function postText(post: Post, palette: Palette): Promise<string> {
+  const url = absolute(post);
+  const tree = await postTree(post);
   return renderPost(
     {
       title: post.data.title,
       description: post.data.description,
       date: dateOf(post),
       minutes: readingTime(post.body ?? ""),
-      tags: post.data.tags.map(tag => tagInfo(slugifyStr(tag)).label),
+      tags: postTags(post),
       url,
       plainUrl: `${url}.txt`,
       tree,
@@ -55,6 +66,9 @@ export async function postText(post: Post, palette: Palette): Promise<string> {
     { palette, site }
   );
 }
+
+export const sortedPosts = async () =>
+  getSortedPosts(await getCollection("posts"));
 
 export async function indexText(palette: Palette): Promise<string> {
   const posts = getSortedPosts(await getCollection("posts"));

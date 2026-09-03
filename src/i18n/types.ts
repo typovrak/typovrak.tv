@@ -58,6 +58,9 @@ export interface UIStrings {
     questionsTitle: string;
     questionsDesc: string;
     questionsEmpty: string;
+
+    statsTitle: string;
+    statsDesc: string;
   };
   a11y: {
     skipToContent: string;

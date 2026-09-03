@@ -1,0 +1,286 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Breadcrumb from "@/components/Breadcrumb.astro";
+import Main from "@/components/Main.astro";
+import Footer from "@/components/Footer.astro";
+import { SMALL_GROUP } from "@/utils/stats";
+import { useTranslations } from "@/i18n";
+import config from "@/config";
+
+const locale = Astro.currentLocale ?? config.site.lang;
+const t = useTranslations(locale);
+
+// Sections are declared here and filled from /api/stats on load, so the page
+// itself stays prerendered and the database is only ever read from the route
+// that opts out of prerendering.
+const tables = [
+  {
+    key: "pages",
+    title: "Most read pages",
+    note: "Every page is counted, not just the articles.",
+    columns: ["Page", "Views"],
+  },
+  {
+    key: "referrers",
+    title: "Where visitors arrive from",
+    note: `Only the host of the referring site is kept, never the full URL. A host seen fewer than ${SMALL_GROUP} times is folded into Other.`,
+    columns: ["Source", "Visits", "Share"],
+  },
+  {
+    key: "countries",
+    title: "Countries",
+    note: `From the coarse country header Vercel adds at the edge, never from an IP address. A country seen fewer than ${SMALL_GROUP} times is folded into Other.`,
+    columns: ["Country", "Visits", "Share"],
+  },
+  {
+    key: "devices",
+    title: "Devices",
+    note: "A device class derived from the user-agent, which is never stored in full.",
+    columns: ["Device", "Visits", "Share"],
+  },
+  {
+    key: "questions",
+    title: "Hardest quiz questions",
+    note: "The questions readers get wrong most often, by position in their quiz.",
+    columns: ["Post", "Question", "Answers", "Wrong"],
+  },
+];
+---
+
+<Layout
+  title={`${t.pages.statsTitle} | ${config.site.title}`}
+  description={t.pages.statsDesc}
+>
+  <Header />
+
+  <Breadcrumb />
+
+  <Main
+    pageTitle={t.pages.statsTitle}
+    pageDesc={t.pages.statsDesc}
+    indexable={false}
+  >
+    <p class="text-muted-foreground max-w-prose text-sm">
+      These are the real rows behind the tables described in the{" "}
+      <a
+        href="/privacy-policy"
+        class="hover:text-accent underline decoration-dashed underline-offset-4"
+      >
+        privacy policy
+      </a>. The site sets no cookie and stores no identifier, so none of this
+      can be tied back to you or used to follow you from one page to the next.
+    </p>
+
+    <p
+      data-stats-state
+      aria-live="polite"
+      class="text-muted-foreground border-border mt-6 rounded-md border p-4 text-sm"
+    >
+      Loading the numbers…
+    </p>
+
+    <div data-stats-body hidden>
+      <dl class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <div class="border-border rounded-md border p-4">
+          <dt class="text-muted-foreground text-sm">Page views</dt>
+          <dd
+            data-stats-views
+            class="text-accent mt-1 text-2xl font-semibold tabular-nums"
+          >
+          </dd>
+        </div>
+        <div class="border-border rounded-md border p-4">
+          <dt class="text-muted-foreground text-sm">Quizzes finished</dt>
+          <dd
+            data-stats-completions
+            class="text-accent mt-1 text-2xl font-semibold tabular-nums"
+          >
+          </dd>
+        </div>
+        <div class="border-border rounded-md border p-4">
+          <dt class="text-muted-foreground text-sm">Average quiz score</dt>
+          <dd
+            data-stats-average
+            class="text-accent mt-1 text-2xl font-semibold tabular-nums"
+          >
+          </dd>
+        </div>
+      </dl>
+
+      <p class="text-muted-foreground mt-3 text-sm">
+        <span data-stats-events class="tabular-nums"></span> visits recorded since{
+          " "
+        }<span data-stats-since></span>. Audience data is deleted after 25
+        months, in line with the cap set by the CNIL.
+      </p>
+
+      {
+        tables.map(table => (
+          <section data-stats-section={table.key} class="mt-10">
+            <h2 class="text-xl font-semibold tracking-wide">{table.title}</h2>
+            <p class="text-muted-foreground mt-1 max-w-prose text-sm">
+              {table.note}
+            </p>
+            <div class="mt-3 overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-border border-b text-left">
+                    {table.columns.map((column, index) => (
+                      <th
+                        scope="col"
+                        class:list={[
+                          "py-2 font-medium",
+                          { "text-right tabular-nums": index > 0 },
+                        ]}
+                      >
+                        {column}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody data-stats-rows={table.key} />
+              </table>
+            </div>
+            <p data-stats-empty class="text-muted-foreground mt-3 text-sm">
+              Nothing recorded yet.
+            </p>
+          </section>
+        ))
+      }
+    </div>
+  </Main>
+
+  <Footer />
+</Layout>
+
+<script>
+  type Bucket = { name: string; count: number; percent: number };
+  type Question = {
+    path: string;
+    question: number;
+    attempts: number;
+    wrongPercent: number;
+  };
+  type Stats = {
+    views: number;
+    events: number;
+    since: string | null;
+    pages: { path: string; views: number }[];
+    referrers: Bucket[];
+    countries: Bucket[];
+    devices: Bucket[];
+    quiz: {
+      completions: number;
+      averagePercent: number;
+      questions: Question[];
+    };
+  };
+
+  const nf = new Intl.NumberFormat();
+
+  const state = document.querySelector<HTMLElement>("[data-stats-state]");
+  const body = document.querySelector<HTMLElement>("[data-stats-body]");
+
+  const set = (selector: string, value: string) => {
+    document
+      .querySelectorAll<HTMLElement>(selector)
+      .forEach(el => (el.textContent = value));
+  };
+
+  // built with textContent and a guarded href: the values come from the
+  // database, so they are never trusted as markup
+  const cell = (value: string, align = false, href?: string) => {
+    const td = document.createElement("td");
+    td.className = align ? "py-2 text-right tabular-nums" : "py-2";
+    if (href && href.startsWith("/")) {
+      const link = document.createElement("a");
+      link.href = href;
+      link.className =
+        "text-accent hover:underline decoration-dashed underline-offset-4";
+      link.textContent = value;
+      td.append(link);
+    } else {
+      td.textContent = value;
+    }
+    return td;
+  };
+
+  const fill = (key: string, rows: HTMLTableCellElement[][]) => {
+    const tbody = document.querySelector<HTMLElement>(
+      `[data-stats-rows="${key}"]`
+    );
+    const section = document.querySelector<HTMLElement>(
+      `[data-stats-section="${key}"]`
+    );
+    if (!tbody || !section) return;
+
+    const empty = section.querySelector<HTMLElement>("[data-stats-empty]");
+    const table = section.querySelector<HTMLElement>("div");
+    if (empty) empty.hidden = rows.length > 0;
+    if (table) table.hidden = rows.length === 0;
+
+    tbody.replaceChildren(
+      ...rows.map(cells => {
+        const tr = document.createElement("tr");
+        tr.className = "border-border/60 border-b last:border-0";
+        tr.append(...cells);
+        return tr;
+      })
+    );
+  };
+
+  const bucketRows = (rows: Bucket[]) =>
+    rows.map(row => [
+      cell(row.name),
+      cell(nf.format(row.count), true),
+      cell(`${row.percent}%`, true),
+    ]);
+
+  function render(stats: Stats) {
+    set("[data-stats-views]", nf.format(stats.views));
+    set("[data-stats-events]", nf.format(stats.events));
+    set("[data-stats-completions]", nf.format(stats.quiz.completions));
+    set("[data-stats-average]", `${stats.quiz.averagePercent}%`);
+    set(
+      "[data-stats-since]",
+      stats.since
+        ? new Date(stats.since).toLocaleDateString(undefined, {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })
+        : "the first visit"
+    );
+
+    fill(
+      "pages",
+      stats.pages.map(page => [
+        cell(page.path, false, page.path),
+        cell(nf.format(page.views), true),
+      ])
+    );
+    fill("referrers", bucketRows(stats.referrers));
+    fill("countries", bucketRows(stats.countries));
+    fill("devices", bucketRows(stats.devices));
+    fill(
+      "questions",
+      stats.quiz.questions.map(row => [
+        cell(row.path, false, row.path),
+        cell(`#${row.question + 1}`, true),
+        cell(nf.format(row.attempts), true),
+        cell(`${row.wrongPercent}%`, true),
+      ])
+    );
+
+    if (state) state.hidden = true;
+    if (body) body.hidden = false;
+  }
+
+  fetch("/api/stats")
+    .then(response => (response.ok ? response.json() : Promise.reject()))
+    .then(render)
+    .catch(() => {
+      if (state) state.textContent = "The numbers are unavailable right now.";
+    });
+</script>

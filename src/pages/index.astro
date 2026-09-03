@@ -25,6 +25,7 @@ import {
   nixosCategories,
 } from "@/data/nixos";
 import { contributions } from "@/data/contributions";
+import { bio, starRune } from "@/data/profile";
 import { repoStatsFor } from "@/data/githubRepos";
 import config from "@/config";
 
@@ -83,13 +84,7 @@ const homePath = getRelativeLocaleUrl(locale, "");
         <span class="sr-only">RSS Feed</span>
       </a>
 
-      <p>
-        I'm Morgan Scholz, known as typovrak (typo + Dvorak), a developer
-        writing about Linux and the CLI tools I use daily. I write up what I've
-        had to work out myself: Arch and NixOS setups, terminal configuration,
-        web development, and how the parts of a stack behave once you look
-        closely.
-      </p>
+      <p>{bio}</p>
 
       <div class="mt-6">
         <GithubWall />
@@ -232,32 +227,28 @@ const homePath = getRelativeLocaleUrl(locale, "");
               d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.75.75 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z"
             ></path>
           </svg>
-          Star Rune
+          {starRune.name}
         </h2>
         <p class="text-muted-foreground mt-2 max-w-prose">
-          A typing game that teaches touch typing and chemistry through combat,
-          for all ages. I build its open-source website, starrune.net, as a
-          volunteer and typing enthusiast supporting the project.
+          {starRune.description}
         </p>
 
         <div class="mt-6 flex flex-wrap items-center gap-x-10 gap-y-4">
-          <div class="text-center">
-            <div class="text-accent text-3xl leading-none font-bold">
-              $15,772
-            </div>
-            <div class="text-muted-foreground mt-1 text-sm">raised</div>
-          </div>
-          <div class="text-center">
-            <div class="text-accent text-3xl leading-none font-bold">145</div>
-            <div class="text-muted-foreground mt-1 text-sm">backers</div>
-          </div>
-          <div class="text-center">
-            <div class="text-accent text-3xl leading-none font-bold">200+</div>
-            <div class="text-muted-foreground mt-1 text-sm">Discord</div>
-          </div>
+          {
+            starRune.figures.map(figure => (
+              <div class="text-center">
+                <div class="text-accent text-3xl leading-none font-bold">
+                  {figure.value}
+                </div>
+                <div class="text-muted-foreground mt-1 text-sm">
+                  {figure.label}
+                </div>
+              </div>
+            ))
+          }
           <div class="ms-auto flex flex-wrap items-center gap-3">
             <a
-              href="https://github.com/typovrak/star-rune-landing-page"
+              href={starRune.repo}
               target="_blank"
               rel="noopener noreferrer"
               class="focus-outline border-accent text-accent hover:bg-accent/10 inline-flex items-center gap-2 rounded-md border px-4 py-2 font-medium transition-colors"
@@ -276,12 +267,12 @@ const homePath = getRelativeLocaleUrl(locale, "");
               GitHub
             </a>
             <a
-              href="https://starrune.net"
+              href={starRune.site}
               target="_blank"
               rel="noopener noreferrer"
               class="focus-outline bg-accent text-accent-foreground inline-flex items-center gap-2 rounded-md px-4 py-2 font-medium transition-opacity hover:opacity-90"
             >
-              Visit starrune.net
+              Visit {starRune.site.replace(/^https?:\/\//, "")}
               <IconArrowRight class="rtl:-rotate-180" />
             </a>
           </div>

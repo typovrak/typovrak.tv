@@ -8,6 +8,12 @@ const owner = "https://github.com/typovrak";
 
 export const nixosRepoUrl = `${owner}/nixos`;
 
+export const nixosIntro =
+  "My NixOS setup is split into one module per tool, each in its own repo. The modules are grouped below by what they configure.";
+
+export const nixosCoreDescription =
+  "The umbrella config that ties every module below together: shell, desktop, development tools, window manager, audio, fonts and theming.";
+
 // NixOS release every module currently targets. Overridden per module only for
 // exceptions (see nixos below on each entry).
 export const nixosVersion = "26.05";
