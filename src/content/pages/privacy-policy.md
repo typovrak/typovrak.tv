@@ -41,12 +41,13 @@ The real aggregates behind these tables are published on the [stats page](/stats
 
 Every table below also stores when each row was written and an internal row number, except the totals, which is just a count per page. Those are left out of the examples to keep them readable.
 
-**Page views:** One row each time a page is opened. No IP address, no full user-agent, no identifier.
+**Page views:** One row each time a page is opened. No IP address, no full user-agent, no identifier. `referrer_host` is the host of the site you came from, `(internal)` when you followed a link inside this site, and empty when there was no referrer at all. `campaign` is filled only when the link you followed carried a `utm_source` that matches a name the publisher registered in advance; any other value is discarded and never stored.
 
-| path                         | referrer_host | country | device  |
-| ---------------------------- | ------------- | ------- | ------- |
-| /posts/arch-linux-2024-setup | google.com    | FR      | desktop |
-| /nixos                       | (none)        | DE      | mobile  |
+| path                         | referrer_host | campaign     | country | device  |
+| ---------------------------- | ------------- | ------------ | ------- | ------- |
+| /posts/arch-linux-2024-setup | google.com    |              | FR      | desktop |
+| /posts/arch-linux-2024-setup | reddit.com    | reddit-nixos | FR      | mobile  |
+| /nixos                       | (internal)    |              | FR      | desktop |
 
 **Page view totals:** A running count per page, so a page can show its view number without re-counting every visit.
 
@@ -154,4 +155,4 @@ This privacy policy may change to stay compliant with current law. The date belo
 
 ---
 
-**Date of last modification:** 3 September 2026
+**Date of last modification:** 4 September 2026

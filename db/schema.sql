@@ -2,7 +2,9 @@
 -- No migration tooling. Statements must stay idempotent.
 -- See the GDPR section in CLAUDE.md before adding a column here.
 
--- One row per view, append-only. The source of truth.
+-- One row per view, append-only. The source of truth. `referrer_host` holds the
+-- host of the referring site, '(internal)' for a navigation inside the site, or
+-- null for a direct arrival.
 -- `path` is the page path (`/`, `/about`, `/posts/my-post`). Pages live in
 -- git, not in Postgres, so there is no page table to reference.
 create table if not exists page_view_event (
@@ -13,6 +15,12 @@ create table if not exists page_view_event (
   country text,
   device text
 );
+
+-- Added after the table shipped, so it goes in as its own statement rather
+-- than in the create above. `campaign` is a utm_source from the closed list in
+-- src/data/campaigns.ts, so two links on the same host can be told apart. A
+-- value outside that list is dropped by the API, never stored here.
+alter table page_view_event add column if not exists campaign text;
 
 create index if not exists page_view_event_path_idx on page_view_event (path);
 create index if not exists page_view_event_viewed_at_idx on page_view_event (viewed_at);
@@ -33,6 +41,12 @@ create table if not exists page_view (
 -- insert into page_view (path, views)
 -- select path, count(*) from page_view_event group by path
 -- on conflict (path) do update set views = excluded.views;
+
+-- Where visits come from, campaigns included:
+-- select coalesce(campaign, '(none)') as campaign,
+--        coalesce(referrer_host, '(direct)') as referrer,
+--        count(*) as visits
+-- from page_view_event group by 1, 2 order by visits desc;
 
 -- Visitor-submitted requests for a new NixOS module. Stores the email so the
 -- publisher can reply; a ticked consent box is the legal basis, so the row

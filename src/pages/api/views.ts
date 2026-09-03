@@ -3,11 +3,13 @@ import { getSql } from "@/utils/db";
 import { getKnownPaths } from "@/utils/knownPaths";
 import { normalisePath } from "@/utils/paths";
 import {
+  campaignName,
   countryCode,
   deviceClass,
   isBot,
   referrerHost,
 } from "@/utils/requestInfo";
+import { campaigns } from "@/data/campaigns";
 
 export const prerender = false;
 
@@ -63,10 +65,17 @@ export const POST: APIRoute = async ({ request }) => {
     return Response.json({ views: await readViews(path) });
   }
 
+  // the tracker reads utm_source client-side: the server never sees it, since
+  // the path it posts has already lost the query string
+  const campaign = campaignName(
+    typeof body?.campaign === "string" ? body.campaign : null,
+    campaigns
+  );
+
   const sql = getSql();
   const [, bumped] = await sql.transaction([
     sql`
-      INSERT INTO page_view_event (path, referrer_host, country, device)
+      INSERT INTO page_view_event (path, referrer_host, country, device, campaign)
       VALUES (
         ${path},
         ${referrerHost(
@@ -74,7 +83,8 @@ export const POST: APIRoute = async ({ request }) => {
           new URL(request.url).hostname
         )},
         ${countryCode(request.headers.get("x-vercel-ip-country"))},
-        ${deviceClass(ua)}
+        ${deviceClass(ua)},
+        ${campaign}
       )
     `,
     sql`

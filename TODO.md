@@ -8,29 +8,6 @@
 - compléter le security.txt : il existe déjà dans `public/.well-known/`, conforme RFC 9116
   (`Contact`, `Expires`, `Canonical`), il lui manque `Policy` et `Acknowledgments`
 
-- mieux stocker la provenance des visiteurs, pour distinguer deux liens posés sur le même
-  domaine (deux subreddits, ou le lien en bio contre le lien en commentaire)
-  - aujourd'hui `page_view_event.referrer_host` ne garde que l'hôte, donc tout Reddit se
-    confond en `reddit.com`, et le trafic sans en-tête `referer` (applis mobiles, Discord,
-    clients mail) tombe en `null`, indiscernable du direct
-  - la seule forme acceptable : une colonne `campaign` alimentée par `utm_source`, validée
-    contre une liste fermée écrite en dur dans le code, sur le modèle de `countryCode()` dans
-    `requestInfo.ts`. Une valeur absente de la liste est jetée, pas stockée
-  - la query string brute est exclue définitivement : elle transporte des termes de recherche,
-    des jetons de session et des identifiants publicitaires comme `gclid`, ce qui ferait passer
-    le compteur du décompte au tracking
-  - RGPD : conforme uniquement à ces conditions, sinon on abandonne. Rien n'est lu ni écrit sur
-    l'appareil du visiteur, donc pas de bandeau de consentement (ePrivacy art. 5(3) hors champ).
-    Le jeton vient d'une liste fermée de noms de campagne, donc il ne décrit pas la personne et
-    ne peut pas devenir un identifiant. Il ne doit jamais servir à recouper deux visites entre
-    elles, et la liste ne doit jamais accueillir une valeur propre à une personne ou à un très
-    petit groupe. Rétention alignée sur le reste, purge manuelle à 25 mois
-  - piège : `PageViewTracker.astro` envoie `window.location.pathname`, qui supprime déjà la
-    query string. Il faudra lire `utm_source` côté client et le passer explicitement, la
-    provenance ne remontera pas toute seule côté serveur
-  - piège : mettre à jour la page de politique de confidentialité, elle doit lister ce qui est
-    collecté
-
 ---
 
 - diagrammes Mermaid rendus au build en SVG (via rehype, pas de JS client) : schémas d'archi

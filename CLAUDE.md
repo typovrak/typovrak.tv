@@ -403,13 +403,34 @@ Never store, whatever the temptation:
 - **Full user-agent string.** It is a fingerprinting vector. Coarse derivations (`mobile` vs
   `desktop`) are fine; the raw string is not.
 - **Full referrer URL.** Query strings carry search terms and private tokens. Keep the host only.
+- **The raw query string**, `utm_source` excepted and only against a closed list (see below).
 - Any stable per-visitor identifier, which would turn a counter into tracking.
+
+**Campaign tracking, the only allowed form.** `page_view_event.campaign` holds a `utm_source`
+**validated against the closed list in [campaigns.ts](src/data/campaigns.ts)** by `campaignName()`,
+the same shape as `countryCode()`. A value outside the list is dropped, never stored. That is what
+tells two links on the same host apart, one subreddit from another. Three rules make it a counter
+rather than tracking, and all three are load-bearing: the raw query string is never stored (it
+carries search terms, session tokens and `gclid`), the token comes from a list the publisher wrote
+so it cannot describe the visitor, and it must never be used to join two visits. Never add a value
+to that list that is specific to one person or to a group small enough to be one.
+
+`utm_source` has to be read client-side in [PageViewTracker.astro](src/components/PageViewTracker.astro)
+and passed explicitly: the tracker posts `location.pathname`, which has already lost the query
+string, so the server never sees it.
+
+**`referrer_host` has three states, not two.** The host of the referring site, `INTERNAL`
+(`(internal)`) for a navigation inside the site, and null for a direct arrival or a stripped
+referrer. Parentheses cannot occur in a hostname, so the token can never collide with a real one.
+The site has no client-side router, so every internal navigation sends a same-host referrer; without
+the token those are indistinguishable from direct traffic, which is what made the stats page read
+100% direct.
 
 **Publishing aggregates is fine, publishing a bucket of one is not.** The stats page exists
 because the rows carry no identifier; the small-group threshold is what keeps that true once the
 numbers are public.
 
-Safe to store: post slug, timestamp, referrer host, country (`x-vercel-ip-country` is coarse
+Safe to store: post slug, timestamp, referrer host, campaign name from the closed list, country (`x-vercel-ip-country` is coarse
 enough), and a coarse device class.
 
 Also required:

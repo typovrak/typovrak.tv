@@ -2,6 +2,7 @@ import type { APIRoute } from "astro";
 import { getSql } from "@/utils/db";
 import { bucketSmall, rankQuestions, withShare } from "@/utils/stats";
 import { percentOf } from "@/utils/quiz";
+import { INTERNAL } from "@/utils/requestInfo";
 
 export const prerender = false;
 
@@ -9,10 +10,24 @@ type Row = Record<string, unknown>;
 
 const num = (value: unknown) => Number(value ?? 0);
 
+// no referer header at all: a direct arrival, or a browser that stripped it.
+// INTERNAL, set by referrerHost, is a navigation inside the site.
+const DIRECT = "(direct)";
+
+const LABELS: Record<string, string> = {
+  [DIRECT]: "Direct or unknown",
+  [INTERNAL]: "Another page of this site",
+};
+
+const label = (name: string) => LABELS[name] ?? name;
+
 const buckets = (rows: Row[]) =>
   withShare(
     bucketSmall(
-      rows.map(row => ({ name: String(row.name), count: num(row.count) }))
+      rows.map(row => ({
+        name: label(String(row.name)),
+        count: num(row.count),
+      }))
     )
   );
 
@@ -21,46 +36,61 @@ const buckets = (rows: Row[]) =>
 export const GET: APIRoute = async () => {
   try {
     const sql = getSql();
-    const [totals, pages, referrers, countries, devices, quiz, questions] =
-      await sql.transaction([
-        sql`
+    const [
+      totals,
+      pages,
+      referrers,
+      countries,
+      devices,
+      quiz,
+      campaigns,
+      questions,
+    ] = await sql.transaction([
+      sql`
           SELECT (SELECT coalesce(sum(views), 0) FROM page_view)::int AS views,
                  count(*)::int AS events,
                  min(viewed_at) AS since
           FROM page_view_event
         `,
-        sql`
+      sql`
           SELECT path, views::int AS views
           FROM page_view
           ORDER BY views DESC, path
           LIMIT 12
         `,
-        sql`
-          SELECT coalesce(referrer_host, 'direct or unknown') AS name,
+      sql`
+          SELECT coalesce(referrer_host, ${DIRECT}) AS name,
                  count(*)::int AS count
           FROM page_view_event
           GROUP BY 1
           ORDER BY 2 DESC, 1
         `,
-        sql`
+      sql`
           SELECT coalesce(country, 'unknown') AS name, count(*)::int AS count
           FROM page_view_event
           GROUP BY 1
           ORDER BY 2 DESC, 1
         `,
-        sql`
+      sql`
           SELECT coalesce(device, 'unknown') AS name, count(*)::int AS count
           FROM page_view_event
           GROUP BY 1
           ORDER BY 2 DESC, 1
         `,
-        sql`
+      sql`
           SELECT count(*)::int AS completions,
                  coalesce(sum(correct), 0)::int AS sum_correct,
                  coalesce(sum(total), 0)::int AS sum_total
           FROM quiz_result
         `,
-        sql`
+      sql`
+          SELECT campaign AS name, count(*)::int AS count
+          FROM page_view_event
+          WHERE campaign IS NOT NULL
+          GROUP BY 1
+          ORDER BY 2 DESC, 1
+        `,
+      sql`
           SELECT path, question,
                  count(*)::int AS attempts,
                  (count(*) FILTER (WHERE NOT correct))::int AS wrong
@@ -70,7 +100,7 @@ export const GET: APIRoute = async () => {
                    count(*) DESC
           LIMIT 8
         `,
-      ]);
+    ]);
 
     return Response.json({
       views: num(totals[0]?.views),
@@ -81,6 +111,9 @@ export const GET: APIRoute = async () => {
         views: num(row.views),
       })),
       referrers: buckets(referrers),
+      // a campaign only ever lands on the page the link points at, so the
+      // counts are small on purpose and the same threshold applies
+      campaigns: buckets(campaigns),
       countries: buckets(countries),
       // two or three classes, so no bucket is small enough to hide anyone
       devices: withShare(

@@ -14,10 +14,19 @@
 
   function recordCurrent() {
     const current = document.querySelectorAll("[data-page-views]");
+    // the pathname drops the query string, so utm_source has to be read here
+    // and passed on its own. the server validates it against a closed list and
+    // stores nothing else from the url.
+    const campaign = new URLSearchParams(window.location.search).get(
+      "utm_source"
+    );
     fetch("/api/views", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ path: window.location.pathname }),
+      body: JSON.stringify({
+        path: window.location.pathname,
+        ...(campaign ? { campaign } : {}),
+      }),
     })
       .then(res => (res.ok ? res.json() : Promise.reject(res.status)))
       .then(({ views }) => {

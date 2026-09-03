@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { countryCode, deviceClass, isBot, referrerHost } from "./requestInfo";
+import {
+  campaignName,
+  countryCode,
+  deviceClass,
+  INTERNAL,
+  isBot,
+  referrerHost,
+} from "./requestInfo";
 
 const FIREFOX_LINUX =
   "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0";
@@ -53,10 +60,21 @@ describe("referrerHost", () => {
     ).toBe("www.google.com");
   });
 
-  it("ignores internal navigation", () => {
+  it("marks internal navigation instead of confusing it with a direct arrival", () => {
+    expect(referrerHost("https://typovrak.tv/posts/x", "typovrak.tv")).toBe(
+      INTERNAL
+    );
+    expect(referrerHost(null, "typovrak.tv")).toBeNull();
+  });
+
+  it("uses a token no hostname can produce, so the two can never collide", () => {
+    expect(INTERNAL).not.toMatch(/^[a-z0-9.-]+$/i);
+  });
+
+  it("keeps the path of an internal referrer out of the value", () => {
     expect(
-      referrerHost("https://typovrak.tv/posts/x", "typovrak.tv")
-    ).toBeNull();
+      referrerHost("https://typovrak.tv/posts/secret?q=private", "typovrak.tv")
+    ).toBe(INTERNAL);
   });
 
   it("handles a missing or malformed referrer", () => {
@@ -97,5 +115,37 @@ describe("countryCode", () => {
     expect(countryCode("FRA")).toBeNull();
     expect(countryCode("<script>alert(1)</script>")).toBeNull();
     expect(countryCode("'; DROP TABLE page_view; --")).toBeNull();
+  });
+});
+
+describe("campaignName", () => {
+  const allowed = ["reddit-nixos", "hn"];
+
+  it("accepts a source from the list, case-insensitively", () => {
+    expect(campaignName("reddit-nixos", allowed)).toBe("reddit-nixos");
+    expect(campaignName("Reddit-NixOS", allowed)).toBe("reddit-nixos");
+    expect(campaignName("  hn  ", allowed)).toBe("hn");
+  });
+
+  it("drops anything not on the list rather than storing it", () => {
+    expect(campaignName("reddit", allowed)).toBeNull();
+    expect(campaignName("gclid-abc123", allowed)).toBeNull();
+    expect(campaignName("user@example.com", allowed)).toBeNull();
+  });
+
+  it("drops a missing or empty value", () => {
+    expect(campaignName(null, allowed)).toBeNull();
+    expect(campaignName("", allowed)).toBeNull();
+  });
+
+  it("never returns markup or sql, since the value comes from a url", () => {
+    expect(campaignName("<script>alert(1)</script>", allowed)).toBeNull();
+    expect(
+      campaignName("'; DROP TABLE page_view_event; --", allowed)
+    ).toBeNull();
+  });
+
+  it("stores nothing at all when the list is empty", () => {
+    expect(campaignName("reddit-nixos", [])).toBeNull();
   });
 });
