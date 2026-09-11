@@ -21,6 +21,7 @@ import {
   transformerNotationWordHighlight,
 } from "@shikijs/transformers";
 import { transformerFileName } from "./src/utils/transformers/fileName";
+import { transformerConsoleSession } from "./src/utils/transformers/consoleSession";
 import { postSlugPath } from "./src/utils/postSlug";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -115,6 +116,7 @@ export default defineConfig({
       wrap: false,
       transformers: [
         transformerFileName({ style: "v2", hideDot: false }),
+        transformerConsoleSession(),
         transformerNotationHighlight(),
         transformerNotationWordHighlight(),
         transformerNotationDiff({ matchAlgorithm: "v3" }),

@@ -1,0 +1,294 @@
+---
+title: "Running freeCodeCamp on NixOS: the shell.nix Prisma needs"
+pubDatetime: 2026-09-15T00:00:00+02:00
+featured: true
+draft: false
+tags:
+  - nixos
+  - prisma
+  - open-source
+description: "Prisma ships no engine for NixOS, so pnpm i on freeCodeCamp dies in postinstall. A 16-line shell.nix fixes it, as long as the nixpkgs engine matches the Prisma version. A bot closed the PR."
+quiz:
+  - q: "Why does prisma generate fail on NixOS?"
+    options:
+      - "NixOS ships no Node.js"
+      - "Prisma has no precompiled engine for the linux-nixos target"
+      - "pnpm refuses to run postinstall scripts"
+      - "MongoDB is not packaged in nixpkgs"
+    correct: [1]
+    explain: "Prisma computes the binary target as linux-nixos, then tries to download an engine that was never published for it, so the fetch 404s."
+  - q: "Which nixpkgs attribute matches Prisma 6.19.3?"
+    options:
+      - "prisma"
+      - "prisma-engines"
+      - "prisma-engines_6"
+      - "prisma-engines_7"
+    correct: [2]
+    explain: "prisma-engines_6 is built from the 6.19.3 tag. The unsuffixed prisma-engines is 7.8.0, a different engine hash, and Prisma rejects it."
+  - q: "What does nix-shell do with the prisma-engines setup hook?"
+    options:
+      - "Nothing, hooks only run in a derivation build"
+      - "It exports the four PRISMA_* variables on its own"
+      - "It patches node_modules after the install"
+      - "It downloads the engines into the Nix store"
+    correct: [1]
+    explain: "Since June 2025, prisma-engines_6 ships nix-support/setup-hook, which nix-shell sources, so the four variables are already set before any shellHook runs."
+  - q: "Inside a Nix '' string, how do you write a literal shell variable?"
+    options:
+      - "$VAR"
+      - "\\${VAR}"
+      - "''${VAR}"
+      - "$$VAR"
+    correct: [2]
+    explain: "${...} is Nix interpolation even inside a '' string. Two single quotes escape it back to a plain shell variable."
+  - q: "What does pnpm --version print inside this shell?"
+    options:
+      - "11.9.0, the version nixpkgs installs"
+      - "10.33.3, the version pinned in package.json"
+      - "Whatever corepack last cached"
+      - "It errors on a version mismatch"
+    correct: [1]
+    explain: "nixpkgs ships pnpm 11.9.0, but pnpm reads the packageManager field and hands over to 10.33.3."
+  - q: "What happened to the freeCodeCamp issue and PR?"
+    multiple: true
+    options:
+      - "A bot closed the issue as not planned three hours after it was opened"
+      - "The same bot closed the PR eleven seconds later"
+      - "The reopen request got a reply from a maintainer"
+      - "Someone rejected the shell.nix on technical grounds"
+    correct: [0, 1]
+    explain: "camper-chan closed the issue at 18:37 UTC on 12 July 2026 and the PR eleven seconds later. Neither the reopen request nor the follow-up got a human reply, and nobody argued against the file itself."
+---
+
+import AsciinemaPlayer from "@/components/AsciinemaPlayer.astro";
+
+Prisma publishes no engine binary for NixOS, so `pnpm i` on [freeCodeCamp](https://github.com/freeCodeCamp/freeCodeCamp) dies in the `api` postinstall step before you have written a single line. The fix is a `shell.nix` at the root of the repo that hands Prisma the engines from nixpkgs, then `nix-shell` before `pnpm i`. Everything after that behaves like any other machine.
+
+I hit this on 12 July 2026 while setting up a freeCodeCamp checkout, worked it out, and opened [issue #68755](https://github.com/freeCodeCamp/freeCodeCamp/issues/68755) with the fix, plus [PR #68756](https://github.com/freeCodeCamp/freeCodeCamp/pull/68756) to put it in their troubleshooting docs. A bot closed both three hours later. So the fix lives here instead.
+
+Every command and every version below comes from my own machine: NixOS [26.05 (Yarara)](https://nixos.org/blog/announcements/2026/nixos-2605), nixpkgs at [8f0500b9](https://github.com/NixOS/nixpkgs/tree/8f0500b9660505dc3cb647775fe9a978a74b5283), freeCodeCamp on Prisma [6.19.3](https://github.com/prisma/orm/releases/tag/6.19.3).
+
+export const markers = [
+  [0.7, "pnpm i"],
+  [17.4, "Error: 404 Not Found"],
+  [21, "vim shell.nix"],
+  [26.5, "nix-shell"],
+  [30, "pnpm i"],
+  [40.5, "prisma --version"],
+];
+
+<AsciinemaPlayer
+  src="/casts/freecodecamp-prisma-nixos.cast"
+  caption="pnpm i dying on the 404, then the same install passing inside nix-shell."
+  thumbnail={{
+    src: "/img/posts/freecodecamp-on-nixos-prisma/pnpm-i-failing-on-the-prisma-404.avif",
+    width: 954,
+    height: 520,
+  }}
+  cols={87}
+  rows={23}
+  markers={markers}
+/>
+
+## Table of contents
+
+## Why does pnpm i fail on freeCodeCamp under NixOS?
+
+`api/package.json` runs `prisma generate` as its postinstall script, and Prisma has no engine build for the `linux-nixos` target. Run the CLI outside a Nix shell and it says so in three stages:
+
+```console
+$ node node_modules/prisma/build/index.js --version
+prisma:warn Prisma failed to detect the libssl/openssl version to use, and may not work as expected. Defaulting to "openssl-1.1.x".
+Please manually install OpenSSL and try installing Prisma again.
+Warning Precompiled engine files are not available for nixos, please provide the paths via environment variables, see https://pris.ly/d/custom-engines
+Error: Failed to fetch sha256 checksum at https://binaries.prisma.sh/all_commits/c2990dca591cba766e3b7ef5d9e8a84796e47ab7/linux-nixos/schema-engine.gz.sha256 - 404 Not Found
+```
+
+Read it backwards and the whole story is there. Prisma could not find a system OpenSSL, because on NixOS libraries do not sit in `/usr/lib`, they sit in the store. It then detected the platform as `nixos` and admitted it has no precompiled engine for it. Finally it tried to download one anyway, from a URL that has never existed, and got a 404.
+
+That commit hash, `c2990dca591cba766e3b7ef5d9e8a84796e47ab7`, is the engine revision pinned to Prisma 6.19.3. Keep it in mind, it is the reason the next section is fussy about versions.
+
+Nothing here is a freeCodeCamp bug. Any project with Prisma in its dependency tree fails the same way on NixOS.
+
+## What goes in the shell.nix?
+
+The file declares four packages and exports four environment variables. Drop this at the root of the repo as `shell.nix`:
+
+```nix
+{ pkgs ? import <nixpkgs> {} }:
+pkgs.mkShell {
+  buildInputs = [
+    pkgs.nodejs_24
+    pkgs.pnpm
+    pkgs.openssl
+    pkgs.prisma-engines_6
+  ];
+
+  shellHook = ''
+    export PRISMA_QUERY_ENGINE_LIBRARY="${pkgs.prisma-engines_6}/lib/libquery_engine.node"
+    export PRISMA_QUERY_ENGINE_BINARY="${pkgs.prisma-engines_6}/bin/query-engine"
+    export PRISMA_SCHEMA_ENGINE_BINARY="${pkgs.prisma-engines_6}/bin/schema-engine"
+    export PRISMA_FMT_BINARY="${pkgs.prisma-engines_6}/bin/prisma-fmt"
+  '';
+}
+```
+
+`nodejs_24` and `pnpm` come from what freeCodeCamp asks for in its root `package.json` (`"node": ">=24"`, `"pnpm": ">=10"`). `openssl` silences the libssl warning. `prisma-engines_6` is the Rust side of Prisma, built by nixpkgs from source, and it is the exact thing the CLI was trying to download.
+
+Each variable points at a real file in the store, and you can go and look at them:
+
+```console
+$ ls $(nix-build '<nixpkgs>' -A prisma-engines_6 --no-out-link)/{bin,lib}
+bin:
+prisma-fmt  query-engine  schema-engine
+
+lib:
+libquery_engine.node
+```
+
+Prisma documents all four in its [environment variables reference](https://www.prisma.io/docs/orm/v6/reference/environment-variables-reference#prisma_query_engine_library):
+
+| Variable                      | What it points at          | Used for                                                                      |
+| ----------------------------- | -------------------------- | ----------------------------------------------------------------------------- |
+| `PRISMA_QUERY_ENGINE_LIBRARY` | `lib/libquery_engine.node` | The Node-API engine `@prisma/client` loads at runtime to talk to the database |
+| `PRISMA_QUERY_ENGINE_BINARY`  | `bin/query-engine`         | The standalone query engine, used by the binary engine type and by Studio     |
+| `PRISMA_SCHEMA_ENGINE_BINARY` | `bin/schema-engine`        | Migrations, `db push`, introspection                                          |
+| `PRISMA_FMT_BINARY`           | `bin/prisma-fmt`           | Formatting and validating `schema.prisma`                                     |
+
+> [!TIP] Nix evaluates `${}` inside a `''` string
+> In the `shellHook` above, `${pkgs.prisma-engines_6}` is replaced by Nix with a store path before bash ever sees the line. For a shell variable in there, escape it as `''${HOME}`. Forgetting this is the classic first Nix bug, and the error message does not help.
+
+## Why prisma-engines_6 and not prisma-engines?
+
+The engine version has to match the Prisma version in the project, and the unsuffixed attribute is a different major. As of nixpkgs 26.05:
+
+| Attribute          | Version | Built from         |
+| ------------------ | ------- | ------------------ |
+| `prisma-engines`   | 7.8.0   | `refs/tags/7.8.0`  |
+| `prisma-engines_6` | 6.19.3  | `refs/tags/6.19.3` |
+| `prisma-engines_7` | 7.8.0   | `refs/tags/7.8.0`  |
+
+freeCodeCamp pins `prisma` and `@prisma/client` to 6.19.3 in `api/package.json`, so `prisma-engines_6` matches it to the patch. Reach for `prisma-engines` instead and you get 7.8.0, whose engine hash is not the `c2990dca...` the CLI wants. I tried it. Prisma ignores the mismatched engine and goes back to downloading:
+
+```console
+Warning Precompiled engine files are not available for nixos, please provide the paths via environment variables, see https://pris.ly/d/custom-engines
+Error: Failed to fetch sha256 checksum at https://binaries.prisma.sh/all_commits/c2990dca591cba766e3b7ef5d9e8a84796e47ab7/linux-nixos/libquery_engine.so.node.sha256 - 404 Not Found
+```
+
+It is the same 404 with the same hash. So the procedure is to read the `prisma` version in `package.json` and pick the nixpkgs attribute with the same major, then check on [search.nixos.org](https://search.nixos.org/packages?channel=unstable&query=prisma-engines) that the minor lines up too. When no attribute lines up, that project needs a nixpkgs pin.
+
+## Do you still need the shellHook?
+
+On nixpkgs 26.05 the `shellHook` is redundant. `prisma-engines_6` ships a setup hook that exports all four variables, and `nix-shell` sources it:
+
+```console
+$ cat $(nix-build '<nixpkgs>' -A prisma-engines_6 --no-out-link)/nix-support/setup-hook
+export PRISMA_SCHEMA_ENGINE_BINARY=".../bin/schema-engine"
+export PRISMA_QUERY_ENGINE_BINARY=".../bin/query-engine"
+export PRISMA_QUERY_ENGINE_LIBRARY=".../lib/libquery_engine.node"
+export PRISMA_FMT_BINARY=".../bin/prisma-fmt"
+```
+
+A `shell.nix` with nothing but `buildInputs = [ pkgs.prisma-engines_6 ];` gives you a shell with all four already set. The hook landed on 15 June 2025 ([#416928](https://github.com/NixOS/nixpkgs/pull/416928)) and reached the 25.05 release branch the same day, so every channel newer than that carries it. A nixpkgs pinned to an older revision does not. I only checked because I had been copying that `shellHook` between projects for months, assuming it was required.
+
+I still ship it. Four lines is a cheap price for a file that reads the same to someone who has never met a Nix setup hook, and it keeps working against a pin from before the hook existed.
+
+## How do you run it?
+
+Enter the shell first, install second. The order matters, because the postinstall script is what needs the engines:
+
+```bash
+nix-shell
+pnpm i
+```
+
+Then ask Prisma, from the `api` directory, whether it agrees:
+
+```console
+$ node node_modules/prisma/build/index.js --version
+prisma                  : 6.19.3
+@prisma/client          : 6.19.3
+Computed binaryTarget   : linux-nixos
+Node.js                 : v24.16.0
+Query Engine (Node-API) : libquery-engine 0000000000000000000000000000000000000000 (at ../../../../../nix/store/...-prisma-engines_6-6.19.3/lib/libquery_engine.node, resolved by PRISMA_QUERY_ENGINE_LIBRARY)
+Schema Engine           : schema-engine-cli 0000000000000000000000000000000000000000 (at ../../../../../nix/store/...-prisma-engines_6-6.19.3/bin/schema-engine, resolved by PRISMA_SCHEMA_ENGINE_BINARY)
+Default Engines Hash    : c2990dca591cba766e3b7ef5d9e8a84796e47ab7
+```
+
+`resolved by PRISMA_QUERY_ENGINE_LIBRARY` is the line that says it worked. The all-zero hashes are normal: nixpkgs builds from the release tag without stamping a git revision into the binary, and Prisma skips its hash check when you hand it an explicit path. The five `../` in front of the store path are Prisma printing it relative to `api/`, which looks odd and changes nothing.
+
+From here the rest of the [contributing guide](https://contribute.freecodecamp.org/) applies unchanged. Seed the database and run `pnpm develop`.
+
+![The freeCodeCamp client served from localhost:8000 after pnpm develop, with the banner that says the API has no user session yet](/img/posts/freecodecamp-on-nixos-prisma/freecodecamp-pnpm-develop-running-on-nixos.avif)
+
+> [!WARNING] Add shell.nix to your global gitignore
+> `shell.nix` is your environment, and freeCodeCamp's `.gitignore` has no reason to carry it. Put it in `~/.config/git/ignore` so it never shows up in `git status` on any repo you do this to.
+
+## Which pnpm actually runs?
+
+pnpm 10.33.3, the version freeCodeCamp pins, even though Nix installed 11.9.0. The root `package.json` sets `"packageManager": "pnpm@10.33.3"`, and pnpm 10 and up honour that field by fetching the pinned version and handing over to it:
+
+```console
+$ which pnpm
+/nix/store/gfrj5gwr59daw5qi72phra770mi0xvh1-pnpm-11.9.0/bin/pnpm
+$ pnpm --version
+[WARN] The "pnpm" field in package.json is no longer read by pnpm. The following keys were ignored: "pnpm.onlyBuiltDependencies". See https://pnpm.io/settings for the new home of each setting.
+10.33.3
+```
+
+The warning comes from pnpm 11, printed before it hands over, and the version number from pnpm 10.
+
+Knowing this saves you an evening of wondering why your carefully declared pnpm is not the one producing the lockfile. It also means one part of the install reaches outside the store, which dents the purity a NixOS user came for. pnpm 11 [removed the setting](https://github.com/pnpm/pnpm/releases/tag/v11.0.0) that used to switch the handover off. What remains is `pnpm with current`, which runs the Nix pnpm for a single command, at the cost of running a different version from every other contributor:
+
+```console
+$ pnpm with current --version
+11.9.0
+```
+
+![which pnpm, pnpm --version and pnpm with current in one shell, the handover from 11.9.0 down to 10.33.3 and back](/img/posts/freecodecamp-on-nixos-prisma/pnpm-11-from-nix-store-handing-over-to-pnpm-10.avif)
+
+## Why has Prisma not fixed this?
+
+The gap has been open for years and there is no sign of it closing. Three threads land on the same workaround:
+
+- [Running prisma on NixOS](https://github.com/prisma/orm/discussions/3120), the original discussion on Prisma's repository.
+- [Unable to use Prisma on NixOS](https://discourse.nixos.org/t/unable-to-use-prisma-on-nixos/54082) on the NixOS Discourse, which is where most people find the four variables.
+- [prisma/orm#29150](https://github.com/prisma/orm/issues/29150), opened 6 February 2026 and still open: Prisma 7 still tries to download Rust binaries on NixOS, and still needs a `shell.nix` to point at the engines.
+
+Prisma has since renamed its repository from `prisma/prisma` to `prisma/orm`, and the old issue URLs return a 404 rather than a redirect, so the links above are the new ones.
+
+![Issue #29150 on prisma/orm, open and still labelled unconfirmed, reporting the same libssl warning on Prisma 7.3.0](/img/posts/freecodecamp-on-nixos-prisma/github-prisma-orm-issue-29150-still-open.avif)
+
+The underlying reason is that Prisma distributes prebuilt engines per platform, and a "platform" for them means a libc plus an OpenSSL version at a known filesystem path. NixOS has neither at a predictable path, so it does not fit the matrix. Pointing at store paths is the only interface that design leaves open.
+
+The upside is that nixpkgs already builds those engines from source and keeps them versioned, so the work is done. It only has to be wired up per project.
+
+## What happened to the issue?
+
+`camper-chan`, a bot, closed it as not planned at 18:37 UTC on 12 July 2026, three hours after I opened it. The message is a form letter: the issue is not on the roadmap, request a reopen if you disagree. Eleven seconds later the same bot closed the PR with the matching letter, saying it had been reviewed and would not be merged. Twelve seconds after that, a GitHub Action locked the PR as resolved and limited the conversation to collaborators, so the close and the lock together took twenty-three seconds.
+
+Another Action had already flagged the PR minutes after it was opened, because its linked issue was not labelled as open for contribution. The linked issue was the one I had filed six minutes earlier.
+
+![Issue #68755 closed as not planned, the form letter sitting right under the pnpm i that had finished inside nix-shell](/img/posts/freecodecamp-on-nixos-prisma/github-freecodecamp-issue-68755-closed-as-not-planned-by-camper-chan.avif)
+
+![Pull request #68756, one commit and sixteen added lines, closed unmerged and then locked to collaborators](/img/posts/freecodecamp-on-nixos-prisma/github-freecodecamp-pr-68756-closed-by-camper-chan.avif)
+
+The issue itself was never locked, so that is where I disagreed, in writing, on 16 July 2026. I laid out the three upstream threads and explained that NixOS is declarative, with a dev shell as its way of declaring development dependencies. The proposed `shell.nix`, I pointed out, only declares binaries the project already needs. Then I asked a direct question: does freeCodeCamp want a frictionless setup for NixOS contributors, or is NixOS too niche to support, with contributors on their own?
+
+Either answer would have been fine. A project that size has to draw a line somewhere, and "we do not support NixOS" is a legitimate place to draw it, as long as somebody says it.
+
+Nobody did. On 17 July I followed up, pinging a maintainer by name, to ask whether a human had seen the thread at all, since I could not reopen it myself to make it visible. That went unanswered too. As I write this in September 2026, the issue and the PR are both closed and nothing has moved since 12 July.
+
+![The reopen request of 16 July and the follow-up of 17 July, the last two comments the thread ever got](/img/posts/freecodecamp-on-nixos-prisma/github-freecodecamp-issue-68755-reopen-request-unanswered.avif)
+
+freeCodeCamp is a charity with maintainers stretched thin, and triage bots exist because the alternative is a backlog nobody can read. Throughput explains the outcome better than malice does. It still leaves a gap: the bot can close but cannot judge, and a first patch that disappears into that gap teaches a contributor something discouraging about how contributing goes.
+
+The timing is the part that stings. The PR with the tested fix was open six minutes after the issue, and sat there for three hours before the bot closed both.
+
+## Where does the fix live now?
+
+The fix lives in this post, indexed and linkable, for the next person whose `pnpm i` explodes on a 404 for a file that was never built. A closed issue does not delete what you worked out to write it, and a page a search engine can reach does the job the troubleshooting section would have done.
+
+If you are on NixOS and something refuses to install, the answer usually has this shape. Work out what the installer wanted to download, then find the nixpkgs attribute that already builds it and point the tool at the store path. Write it down somewhere public, because the next person is going to hit the same 404.
+
+The diff is 16 lines, and it is still sitting in [the closed PR](https://github.com/freeCodeCamp/freeCodeCamp/pull/68756) if freeCodeCamp ever wants it.

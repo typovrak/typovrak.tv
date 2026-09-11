@@ -211,6 +211,15 @@ describe("renderTree", () => {
     expect(plainTree(tree)).toBe("Why these\n\nbecause");
   });
 
+  it("drops an html comment entirely, including a multi-line one", () => {
+    const tree = root(
+      para(text("before")),
+      { type: "html", value: "<!-- TODO screenshot\nof the 404 line -->" },
+      para(text("after"))
+    );
+    expect(plainTree(tree)).toBe("before\n\nafter");
+  });
+
   it("replaces the table of contents heading with the list of sections", () => {
     const h = (depth: number, value: string): Node => ({
       type: "heading",

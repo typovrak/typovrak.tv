@@ -19,4 +19,9 @@
   --muted: #313244; /* surface0 */
   --muted-foreground: #a6adc8; /* subtext0 */
   --border: #45475a; /* surface1 */
+
+  /* severity, only for terminal output in a console code block. not in
+     @theme inline: no ui element is meant to reach for them */
+  --warning: #f9e2af; /* yellow, 12.9:1 on background */
+  --danger: #f38ba8; /* red, 7.1:1 on background */
 }

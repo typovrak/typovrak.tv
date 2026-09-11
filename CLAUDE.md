@@ -275,6 +275,43 @@ generated automatically from the posts.
 
 Static pages (`about`) live in [src/content/pages/](src/content/pages/).
 
+### Images in posts
+
+Post images are **AVIF**, in `public/img/posts/<slug>/`, referenced by absolute path so they are
+served as they are rather than going through Astro's asset pipeline. Screenshots arrive from a
+full-screen browser capture at roughly 1890x950 and get two passes before they land there.
+
+**Trim the pale edge strips first.** A capture often carries a few pure-white rows or columns on
+its right and bottom edge, up to 6 pixels wide. They are invisible in Figma, whose canvas is
+light, and obvious on the site, where the image sits on the Mocha background inside the green
+`border-accent` frame [typography.css](src/styles/typography.css) puts on every post image. Find
+them by walking in from each edge while more than 95% of the line reads above 200 on all three
+channels, then crop the rest. A real line of a dark-theme screenshot never reaches that, so
+nothing of the content is at risk.
+
+**That test only holds on a dark capture.** A screenshot of a light page trips it on its own
+background and would lose real content: the freeCodeCamp client on localhost reads 99.9% pale on
+its bottom row, which is the page, not an artifact. On a light capture, look for pure white
+(above 248 on all three channels) instead, and skip the trim when there is none.
+
+**Then encode with sharp at `quality: 75, effort: 6`.** Quality 50 halves the file and pixelates
+small monospace text, which these screenshots are mostly made of, so 75 is the floor. That puts a
+1890x950 capture between 55 and 110 KB, against roughly 450 KB as a JPEG. Raising it further buys
+little: 85 adds another 20% for no visible gain. Change the number here if that trade ever looks
+wrong, rather than deciding it again per post.
+
+sharp is a transitive dependency, so a one-off script has to import it by path:
+`node_modules/.pnpm/sharp@<version>/node_modules/sharp/dist/index.mjs`.
+
+**The alt text is shown to the reader.** [rehypeImageCaptions](src/utils/rehypeImageCaptions.ts)
+wraps a standalone image in `<figure>` and copies its alt into a visible `<figcaption>`, and the
+terminal renderer prints it as `[image: alt]`. Write it as prose under the rules above, not as
+bare accessibility text: a noun phrase of 12 to 20 words carrying one concrete detail, with no
+final period. A `#wNNN` suffix on the src caps the figure width and is stripped off.
+
+Look at every screenshot before writing its caption. The alt text has to describe what is
+actually in the frame, and a frame regularly holds something the prose has not accounted for.
+
 ## Site configuration
 
 [astro-paper.config.ts](astro-paper.config.ts) is the single source of truth for identity,

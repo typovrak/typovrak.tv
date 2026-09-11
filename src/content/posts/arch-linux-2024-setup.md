@@ -108,7 +108,7 @@ yay -u
 
 One habit worth keeping: update weekly, not once a quarter. A three-month backlog is how you end up with five apps breaking at the same time.
 
-> [!bug] Docker sulks after a system update
+> [!BUG] Docker sulks after a system update
 > The fix is gloriously dumb: reboot and it behaves again.
 
 ![Docker daemon error after a system update, before a reboot](/img/posts/arch-2024-setup/docker-daemon-error-before-reboot.webp)
