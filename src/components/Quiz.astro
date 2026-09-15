@@ -35,7 +35,11 @@ const { questions } = Astro.props;
                 <span aria-hidden="true">#</span>
               </a>
             </legend>
-            <p class="text-muted-foreground mt-1 text-sm">
+            <p
+              id={`quiz-${qi + 1}-rule`}
+              data-quiz-rule
+              class="text-muted-foreground mt-1 text-sm"
+            >
               {question.multiple
                 ? "Select at least 2 answers"
                 : "Select one answer"}
@@ -64,7 +68,8 @@ const { questions } = Astro.props;
               type="button"
               data-quiz-validate
               hidden
-              class="focus-outline bg-accent text-accent-foreground mt-3 inline-flex w-fit items-center rounded-md px-3 py-1.5 text-sm font-medium transition-opacity hover:opacity-90"
+              aria-describedby={`quiz-${qi + 1}-rule`}
+              class="focus-outline bg-accent text-accent-foreground mt-3 inline-flex w-fit items-center rounded-md px-3 py-1.5 text-sm font-medium transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-75"
             >
               Validate
             </button>
@@ -120,6 +125,7 @@ const { questions } = Astro.props;
 <script>
   import {
     averagePercent,
+    canValidate,
     isAnswerCorrect,
     optionPercents,
     percentOf,
@@ -131,6 +137,13 @@ const { questions } = Astro.props;
 
   const picks = (question: HTMLElement) =>
     Array.from(question.querySelectorAll<HTMLInputElement>("input"));
+
+  // checkboxes mean multiple, so the flag needs no second copy in the dom
+  const isMultiple = (question: HTMLElement) =>
+    picks(question)[0]?.type === "checkbox";
+
+  const chosenCount = (question: HTMLElement) =>
+    picks(question).filter(input => input.checked).length;
 
   const correctOf = (question: HTMLElement) =>
     (question.dataset.correct ?? "")
@@ -287,12 +300,24 @@ const { questions } = Astro.props;
       );
       if (!validate) return;
 
+      const rule = question.querySelector<HTMLElement>("[data-quiz-rule]");
+
       question.addEventListener("change", () => {
         if (question.dataset.validated === "true") return;
-        validate.hidden = !picks(question).some(input => input.checked);
+        const chosen = chosenCount(question);
+        const ready = canValidate(chosen, isMultiple(question));
+        // visible but disabled, so the rule below reads as the reason
+        validate.hidden = chosen === 0;
+        validate.disabled = !ready;
+        rule?.classList.toggle("text-accent", chosen > 0 && !ready);
+        rule?.classList.toggle(
+          "text-muted-foreground",
+          !(chosen > 0 && !ready)
+        );
       });
 
       validate.addEventListener("click", () => {
+        if (!canValidate(chosenCount(question), isMultiple(question))) return;
         validate.hidden = true;
         void gradeQuestion(question).then(updateSummary);
       });
@@ -321,7 +346,13 @@ const { questions } = Astro.props;
         const validate = question.querySelector<HTMLButtonElement>(
           "[data-quiz-validate]"
         );
-        if (validate) validate.hidden = true;
+        if (validate) {
+          validate.hidden = true;
+          validate.disabled = false;
+        }
+        const rule = question.querySelector<HTMLElement>("[data-quiz-rule]");
+        rule?.classList.remove("text-accent");
+        rule?.classList.add("text-muted-foreground");
         const mark = question.querySelector<HTMLElement>("[data-quiz-mark]");
         if (mark) {
           mark.hidden = true;

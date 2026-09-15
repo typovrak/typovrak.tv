@@ -17,6 +17,11 @@ export function isAnswerCorrect(
   return selected.every(index => wanted.has(index));
 }
 
+// readers miss the at-least-2 label and pick one, so one pick cannot submit
+export function canValidate(selectedCount: number, multiple: boolean): boolean {
+  return selectedCount >= (multiple ? 2 : 1);
+}
+
 export function scoreQuiz(
   graded: { selected: number[]; correct: number[] }[]
 ): { correct: number; total: number; percent: number } {

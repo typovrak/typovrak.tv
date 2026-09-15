@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   averagePercent,
+  canValidate,
   isAnswerCorrect,
   optionPercents,
   percentOf,
@@ -30,6 +31,25 @@ describe("isAnswerCorrect", () => {
 
   it("treats no selection as wrong", () => {
     expect(isAnswerCorrect([], [0])).toBe(false);
+  });
+});
+
+describe("canValidate", () => {
+  it("lets a single-answer question through on one pick", () => {
+    expect(canValidate(1, false)).toBe(true);
+  });
+
+  it("blocks a multi-answer question on one pick", () => {
+    expect(canValidate(1, true)).toBe(false);
+  });
+
+  it("lets a multi-answer question through on two picks", () => {
+    expect(canValidate(2, true)).toBe(true);
+  });
+
+  it("blocks either kind on no pick at all", () => {
+    expect(canValidate(0, false)).toBe(false);
+    expect(canValidate(0, true)).toBe(false);
   });
 });
 
