@@ -18,10 +18,22 @@ const { questions } = Astro.props;
   <ol class="mt-6 flex list-none flex-col gap-10 p-0">
     {
       questions.map((question, qi) => (
-        <li data-quiz-question data-correct={question.correct.join(",")}>
+        <li
+          id={`quiz-${qi + 1}`}
+          data-quiz-question
+          data-correct={question.correct.join(",")}
+        >
           <fieldset class="m-0 border-0 p-0">
-            <legend class="font-medium">
+            <legend class="group font-medium">
               {qi + 1}. {question.q}
+              <a
+                href={`#quiz-${qi + 1}`}
+                aria-label={`Link to question ${qi + 1}`}
+                title={`Link to question ${qi + 1}`}
+                class="heading-link text-accent ms-2 no-underline opacity-75 md:opacity-0 md:group-hover:opacity-100 md:focus:opacity-100"
+              >
+                <span aria-hidden="true">#</span>
+              </a>
             </legend>
             <p class="text-muted-foreground mt-1 text-sm">
               {question.multiple

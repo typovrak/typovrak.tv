@@ -30,17 +30,17 @@ const currentYear = new Date().getFullYear();
       <span>{t.footer.copyright} &#169; {currentYear}</span>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <a
-        href={getRelativeLocaleUrl(locale, "legal-notices")}
-        class="hover:text-accent underline decoration-dashed underline-offset-4"
-      >
-        Legal notices
-      </a>
-      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
-      <a
         href={getRelativeLocaleUrl(locale, "stats")}
         class="hover:text-accent underline decoration-dashed underline-offset-4"
       >
         Stats
+      </a>
+      <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
+      <a
+        href={getRelativeLocaleUrl(locale, "legal-notices")}
+        class="hover:text-accent underline decoration-dashed underline-offset-4"
+      >
+        Legal notices
       </a>
       <span class="hidden sm:inline">&nbsp;|&nbsp;</span>
       <a

@@ -18,7 +18,7 @@ const tables = [
   {
     key: "pages",
     title: "Most read pages",
-    note: "Every page is counted, not just the articles.",
+    note: "Every page on the site is counted, posts and everything else.",
     columns: ["Page", "Views"],
   },
   {
@@ -274,7 +274,7 @@ const tables = [
     fill(
       "questions",
       stats.quiz.questions.map(row => [
-        cell(row.path, false, row.path),
+        cell(row.path, false, `${row.path}#quiz-${row.question + 1}`),
         cell(`#${row.question + 1}`, true),
         cell(nf.format(row.attempts), true),
         cell(`${row.wrongPercent}%`, true),
