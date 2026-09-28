@@ -1,0 +1,267 @@
+---
+title: "Serving a blog post to curl: ANSI text from a static Astro site"
+pubDatetime: 2026-10-01T00:00:00+02:00
+featured: true
+draft: false
+tags:
+  - astro
+  - cli
+  - web
+description: "curl typovrak.tv/posts/<slug> gets the post as coloured terminal text and a browser keeps the HTML. One Vercel rewrite on the user-agent, two prerendered text files per post, no function."
+quiz:
+  - q: "How does the site decide to send text instead of HTML?"
+    options:
+      - "It reads the Accept header"
+      - "A Vercel rewrite matches the user-agent against a closed list"
+      - "A serverless function sniffs the client"
+      - "A query string like ?format=txt"
+    correct: [1]
+    explain: "A route in the Build Output config carries a has condition on the user-agent header, with the regex (curl|[Ww]get|HTTPie|xh)/.*. Anything else, PowerShell included, gets the HTML."
+  - q: "Why are there two text files per post?"
+    options:
+      - "One for mobile, one for desktop"
+      - "One with ANSI colour for a terminal, one plain for redirecting into a file"
+      - "One is a cache of the other"
+      - "The .txt is for search engines"
+    correct: [1]
+    explain: "Escape codes pollute a file the moment you redirect the output, so the plain .txt stays reachable by its own url and the .ansi.txt is what the rewrite serves."
+  - q: "Where does the renderer get the markdown tree from?"
+    options:
+      - "It parses the html back into markdown"
+      - "A separate markdown parser with its own rules"
+      - "A remark plugin that captures the tree from Astro's own processor"
+      - "The file is read raw and split on newlines"
+    correct: [2]
+    explain: "parsePostBody builds Astro's processor with createMarkdownProcessor and slips in a plugin whose only job is to keep a reference to the root, so tables and callouts parse exactly as on the site."
+  - q: "Why does the ANSI palette use only the 16 standard colours?"
+    options:
+      - "Vercel strips 256-colour codes"
+      - "The terminal's own theme then picks the shade, so a light background stays readable"
+      - "curl cannot display more"
+      - "less -R supports nothing else"
+    correct: [1]
+    explain: "Code 32 means whatever green the terminal theme defines. A truecolour value would look right on one background and unreadable on another."
+  - q: "Which of these does the terminal text pipeline also produce?"
+    multiple: true
+    options:
+      - "/llms-full.txt"
+      - "The RSS feed"
+      - "/posts/<slug>.txt as markdown"
+      - "The OG images"
+    correct: [0, 2]
+    explain: "The plain palette emits valid markdown, so the same renderer writes the .txt variant and the body of every post in llms-full.txt. RSS and OG images have their own code."
+---
+
+`curl typovrak.tv/posts/github-workflow-in-the-terminal` prints the post as coloured text, 80 columns wide, with its headings, tables, callouts and code blocks intact. A browser asking for the same URL gets the HTML. The switch is one rewrite rule in the Vercel config, keyed on the user-agent, in front of two prerendered text files per post. No function runs and no JavaScript is involved.
+
+I shipped it on 2 September 2026 in [one commit](https://github.com/typovrak/typovrak.tv/commit/c6493703c8c4a5251d2b837dc1cc913432a8400e) of 1,201 lines, about half of them tests. The switch is two of those lines. Everything else is the renderer, which is the part that decides whether the output is worth reading.
+
+Versions below are Astro [7.0.3](https://github.com/withastro/astro/releases/tag/astro@7.0.3) with `@astrojs/vercel` [11.0.3](https://github.com/withastro/astro/releases/tag/@astrojs/vercel@11.0.3), checked against the live site on 15 September 2026.
+
+{/* TODO asciinema. Record one take of:
+     curl typovrak.tv
+     curl typovrak.tv/posts/github-workflow-in-the-terminal | less -R
+     scroll through a table and a callout, then q
+     curl -A Mozilla/5.0 typovrak.tv/posts/github-workflow-in-the-terminal | head -3
+   Save it as /casts/curl-typovrak-tv.cast and the thumbnail frame as
+   /img/posts/serving-a-blog-to-curl/curl-post-in-terminal-ansi.avif, then
+   uncomment the block below, move the import line up under the frontmatter and
+   leave a blank line after it, or acorn parses the prose as JavaScript. The
+   marker times and cols/rows come from the recording, the numbers here are
+   placeholders. Every alt text in this file is written blind and has to be
+   checked against the real capture before it ships.
+
+import AsciinemaPlayer from "@/components/AsciinemaPlayer.astro";
+
+export const markers = [
+  [0.0, "curl typovrak.tv"],
+  [0.0, "curl a post | less -R"],
+  [0.0, "a table and a callout, as text"],
+  [0.0, "browser user-agent, html comes back"],
+];
+
+<AsciinemaPlayer
+  src="/casts/curl-typovrak-tv.cast"
+  caption="The same two URLs in a terminal, then the html coming back for a browser user-agent."
+  thumbnail={{
+    src: "/img/posts/serving-a-blog-to-curl/curl-post-in-terminal-ansi.avif",
+    width: 1070,
+    height: 658,
+  }}
+  cols={87}
+  rows={23}
+  markers={markers}
+/>
+*/}
+
+## Table of contents
+
+## What does curl get from this site?
+
+The post as text with colour, followed by three lines telling you where else it lives:
+
+```console
+$ curl typovrak.tv/posts/github-workflow-in-the-terminal
+From issue to merge in the terminal: the git and gh workflow
+1 Sep, 2026 · 5 min read · CLI, git, GitHub, Open source
+
+The issue-to-merge loop is nine commands in git and gh. The catch: the branch
+linked to an issue does not close it, only a Closes keyword in the PR body does.
+
+────────────────────────────────────────────────────────────────────────────────
+
+Filing an issue, branching, opening the pull request and merging it all run in
+git and gh, with no browser tab open. The whole loop is nine commands.
+...
+────────────────────────────────────────────────────────────────────────────────
+Online: https://typovrak.tv/posts/github-workflow-in-the-terminal
+Plain text: https://typovrak.tv/posts/github-workflow-in-the-terminal.txt
+Read from the top: curl -s https://typovrak.tv/posts/github-workflow-in-the-terminal | less -R
+```
+
+{/* TODO screenshot: that command in your terminal, the green title with a table and a callout in the same frame. Doubles as the cast thumbnail.
+![curl on a typovrak.tv post in a terminal, title in bold green, a table and a callout rendered as text](/img/posts/serving-a-blog-to-curl/curl-post-in-terminal-ansi.avif) */}
+
+That footer is there because a terminal drops you at the end of the output, so the last line is the first one you read. It hands you the command that pages the same thing from the top.
+
+The colour in it is ANSI escape codes. The terminal reads `ESC[1;32m` as an instruction, bold green until further notice, and eats the `ESC` byte instead of drawing it. Anything that is not a terminal sees only the bytes, which is why `less` needs `-R` to pass them through: without the flag you read a literal `ESC[1;32m` where the title should be. They cost something too, since the same post is 8.5 KB plain and 11 KB in colour.
+
+The root does the same for the post list:
+
+```console
+$ curl typovrak.tv
+typovrak
+Notes on Arch Linux, NixOS, CLI tooling and web development, written up from
+problems I had to solve myself.
+
+Posts
+
+1 Sep, 2026   From issue to merge in the terminal: the git and gh workflow
+              5 min read https://typovrak.tv/posts/github-workflow-in-the-terminal
+...
+```
+
+Text costs 11 KB where the HTML of the same post costs 110 KB, and none of the 110 is needed to read it.
+
+## How does the server tell curl from a browser?
+
+By the `User-Agent` header, matched against a closed list. The whole mechanism is one route in Vercel's [Build Output config](https://vercel.com/docs/build-output-api/configuration), added after the build by [scripts/terminal-routes.mjs](https://github.com/typovrak/typovrak.tv/blob/main/scripts/terminal-routes.mjs):
+
+```js
+const terminalClient = [
+  { type: "header", key: "user-agent", value: "(curl|[Ww]get|HTTPie|xh)/.*" },
+];
+
+const routes = [
+  { src: "^/$", has: terminalClient, dest: "/index.ansi.txt" },
+  { src: "^/posts/([^./]+)$", has: terminalClient, dest: "/posts/$1.ansi.txt" },
+];
+```
+
+`has` is a condition on the request, so the route only fires when the header matches. `dest` is a rewrite, so the URL in the terminal stays `/posts/<slug>` while the file served is `/posts/<slug>.ansi.txt`. The dot in `[^./]+` is what keeps `/posts/<slug>.txt` out of the rewrite, so the plain files stay reachable by their own URLs.
+
+Four clients are on the list, [curl](https://curl.se/docs/manpage.html), [wget](https://www.gnu.org/software/wget/), [HTTPie](https://httpie.io/) and [xh](https://github.com/ducaale/xh), because their default user-agent is a bare `name/version`. A regex in someone else's matcher is a regex whose semantics you have not read, so I checked it against production:
+
+| User-agent sent                       | Served       | What it shows                                              |
+| ------------------------------------- | ------------ | ---------------------------------------------------------- |
+| `curl/8.12.1`                         | `text/plain` | The normal case                                            |
+| `curl/1.0 foo`                        | `text/plain` | The trailing `.*` covers anything after the version        |
+| `foo curl/1.0`                        | `text/html`  | The match is anchored at the start of the header           |
+| `CURL/8.0`, `WGET/1.0`                | `text/plain` | Vercel compares case-insensitively, so `[Ww]` is redundant |
+| `curl` alone, `PowerShell/7.4`, empty | `text/html`  | No slash, or not on the list, so the HTML                  |
+
+> [!TIP] Why the user-agent and not the Accept header
+> `curl` sends `Accept: */*` and so does `wget`, so content negotiation has nothing to negotiate on. The user-agent is the only header a command-line client sends that says what it is, and a script that wants the HTML anyway overrides it in one flag, `curl -A Mozilla/5.0`.
+
+{/* TODO screenshot: the browser and the terminal side by side on the same URL, the address bar and the prompt both readable.
+![The same post URL open in Firefox and in a terminal, html on one side and green text on the other](/img/posts/serving-a-blog-to-curl/same-url-in-a-browser-and-in-a-terminal.avif) */}
+
+## Why two text files per post?
+
+Because escape codes are the right output for a terminal and the wrong output for a file: `curl -o post.md` on the coloured version writes `ESC[1;32m` in front of every heading. So each post is built twice, by two [static endpoints](https://docs.astro.build/en/guides/endpoints/#static-file-endpoints) whose `.txt` filename is also what makes Vercel serve them as `text/plain`:
+
+| URL                             | Palette | For                                                |
+| ------------------------------- | ------- | -------------------------------------------------- |
+| `/posts/<slug>.ansi.txt`        | `ansi`  | What the rewrite serves to a terminal              |
+| `/posts/<slug>.txt`             | `plain` | `curl -o post.md`, a pager without `-R`, or an LLM |
+| `/index.ansi.txt`, `/index.txt` | both    | The post list, same split                          |
+
+All four are live for the post above: [the coloured one](https://typovrak.tv/posts/github-workflow-in-the-terminal.ansi.txt), [the plain one](https://typovrak.tv/posts/github-workflow-in-the-terminal.txt), and the list as [index.ansi.txt](https://typovrak.tv/index.ansi.txt) and [index.txt](https://typovrak.tv/index.txt). Open the coloured one in a browser and the codes come back as text, a `[1;32m` sitting in front of every heading with the `ESC` byte drawn as nothing, which is the whole argument for keeping the plain one.
+
+{/* TODO screenshot: the .ansi.txt url open in a browser, scrolled to a heading so the codes are visible as text.
+![The ansi text file opened in a browser, a bare [1;32m sitting in front of every heading](/img/posts/serving-a-blog-to-curl/ansi-txt-opened-in-a-browser.avif) */}
+
+My first plan, written in a TODO before any code, was one file and a `?raw` query string to switch the colour off. That cannot work on a static host, because a query string never reaches a file on disk. Two files cost nothing at build time and each one gets a stable URL, so that is what shipped.
+
+## How does the markdown become terminal text?
+
+By walking the same tree Astro walks. Its `render()` hands back HTML and nothing else, and HTML has already dropped the structure a terminal needs, while parsing the markdown a second time with my own parser would work right up to the day a table or a callout parsed differently from the site. So [postTree.ts](https://github.com/typovrak/typovrak.tv/blob/main/src/utils/postTree.ts) builds the processor Astro builds, and slips in a remark plugin whose only job is to hold on to the root:
+
+```ts
+let tree: Node | undefined;
+const capture = () => (root: Node) => {
+  tree = stripMdx(root);
+};
+const processor = await createMarkdownProcessor({
+  gfm: true,
+  smartypants: false,
+  syntaxHighlight: false,
+  remarkPlugins: options.mdx ? [remarkMdx, capture] : [capture],
+});
+await processor.render(body);
+```
+
+`smartypants: false` is not cosmetic. With it on, a `--rebase` in prose becomes an en dash, and a reader pasting that command out of their terminal gets a broken command. `remarkMdx` is in the chain for `.mdx` files only: the MDX grammar reads `{braces}` in prose as a JavaScript expression, and one of my `.md` posts carries `${pkgs.prisma-engines_6}` in a Nix snippet.
+
+From there [terminal.ts](https://github.com/typovrak/typovrak.tv/blob/main/src/utils/terminal.ts) walks the tree with no `astro:*` import, which is what keeps it under vitest. The parts that took more than one attempt:
+
+- Paragraphs wrap at 80 columns and a word keeps its style across the break. Code blocks never wrap, so a long command scrolls sideways instead of being sawn in half.
+- Tables are padded to their widest cell, measured after stripping the escape codes, or a coloured cell throws the column out of line.
+- A `> [!TIP]` callout becomes a labelled quote under a `│` bar, and the `## Table of contents` heading becomes the list of headings that follow it.
+
+{/* TODO screenshot: the plain .txt of a post open in Neovim, on a fenced code block and a table.
+![The .txt variant of a post open in Neovim, plain markdown with fenced code blocks and a GFM table](/img/posts/serving-a-blog-to-curl/plain-txt-variant-is-markdown-in-neovim.avif) */}
+
+Two test files, 455 lines for 590 lines of renderer, and I broke each rule in turn to watch its test go red. The rewrite is the one thing they cannot reach, since only Vercel reads that config, so it gets checked on a preview deploy with a browser and `curl` on the same URL.
+
+## Why only sixteen colours?
+
+Because the reader's own terminal theme should pick the shade. The palette is nine [SGR codes](https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters) and nothing from the 256-colour or truecolour ranges:
+
+| Element                 | Code   | Meaning          |
+| ----------------------- | ------ | ---------------- |
+| Title, `h1`, `h2`       | `1;32` | bold, green      |
+| `h3` and deeper, strong | `1`    | bold             |
+| Emphasis                | `3`    | italic           |
+| Inline code             | `36`   | cyan             |
+| Link                    | `4;32` | underline, green |
+| Metadata, URLs, rules   | `2`    | dim              |
+| Callout label           | `32`   | green            |
+| Warning label           | `33`   | yellow           |
+
+{/* TODO screenshot: the same curl output twice, one terminal on Mocha and one on a light theme, same title visible in both.
+![The same curl output in two terminal themes, the green title readable on the dark and on the light background](/img/posts/serving-a-blog-to-curl/same-post-under-two-terminal-themes.avif) */}
+
+Code 32 leaves the shade to the theme, which is Catppuccin Mocha's on my machine and yours on yours. A truecolour value would reproduce the site's exact accent and then sit unreadable on somebody's light background.
+
+The plain palette maps those same slots to markdown instead, `#` for headings and fences for code, and that paid off a day later: [/llms.txt](https://typovrak.tv/llms.txt) and [/llms-full.txt](https://typovrak.tv/llms-full.txt) are the same renderer called with that palette, because its output was already valid markdown.
+
+## Who else does this?
+
+[wttr.in](https://wttr.in/) and [cheat.sh](https://cheat.sh/), both by Igor Chubin, are where I got the idea. Checked on 15 September 2026, each answers `text/plain` to a `curl/8.12.1` user-agent and `text/html` to a Firefox one on the same URL. [rate.sx](https://rate.sx/), same author, returned HTML to both when I tried.
+
+{/* TODO screenshot (optional): curl wttr.in in a terminal, one frame of the forecast.
+![curl wttr.in in a terminal, the three-day forecast drawn in 256 colours and ascii boxes](/img/posts/serving-a-blog-to-curl/curl-wttr-in-256-colours.avif) */}
+
+Those are services with a server behind them. A static site gets there with a rewrite rule and two extra files per page.
+
+## Try it
+
+```bash
+curl typovrak.tv
+curl typovrak.tv/posts/github-workflow-in-the-terminal | less -R
+curl -o post.md typovrak.tv/posts/github-workflow-in-the-terminal.txt
+curl -A Mozilla/5.0 typovrak.tv/posts/github-workflow-in-the-terminal | head -3
+```
+
+The first two read in the terminal. The third saves the markdown without a single escape code. The fourth is how a script gets the HTML back, since the switch is keyed on nothing but the user-agent.

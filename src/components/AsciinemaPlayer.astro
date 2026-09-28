@@ -92,6 +92,8 @@ const {
         const player = create(el.dataset.asciinema!, el, {
           fit: "width",
           autoPlay: true,
+          // the default "auto" hides the bar after 2s, even once the cast has ended
+          controls: true,
           cols: num(el.dataset.cols),
           rows: num(el.dataset.rows),
           idleTimeLimit: num(el.dataset.idleTimeLimit),

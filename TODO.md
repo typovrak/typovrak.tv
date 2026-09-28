@@ -1,4 +1,8 @@
+- lorsqu'une vidéo asciinema se finit, il n'y a aucune indication, j'ai attendu 10 secondes la suite avant de voir que c'était fini. Il faut mettre en place un moyen pour s'en rendre compte. Comme afficher les contrôles de la vidéo.
+
 - mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
+
+[ ] créer une page 404
 
 - ajouter un composant en début d'article pour les variables faisant que dans l'article et le code, cela sera les bonnes valeurs comme à la place de <USER> -> typovrak pour des commandes cli sur mon utilisateur
   - et ajouter des paramètres tel que remplacer "vim" par "nano" dans les commandes par exemple
@@ -18,6 +22,8 @@
 ---
 
 ARTICLES :
+- [ ] faire un article sur les noms de marque tech comme GitHub, Docker, Neovim
+
 - [ ] sur .git/info/exclude pour exclure des fichiers sans passer par le git ignore (très utile avec NixOS et son fichier shell.nix qui lui est si particulier)
 - [ ] sur mon matériel
 - [ ] sur mon clavier
@@ -25,6 +31,5 @@ ARTICLES :
 - [ ] sur data-appear, un composant version natif/react et autres frameworks
 - [ ] sur mon premier paquet NPM, webcam-in-terminal-cli
 - [ ] sur comment faire sa première contribution
-- [ ] sur comment lancer le projet freeCodeCamp sous NixOS : écrit (`freecodecamp-on-nixos-prisma.md`), encore en `draft: true`, reste à publier
 - [ ] Star Rune, comment j'ai aidé un jeu de dactylographie à lever plus de 15 000 $
 - [ ] Créer un article se basant sur toutes les lois de atomic habite afin de devenir un développeur freelance
