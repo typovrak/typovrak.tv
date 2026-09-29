@@ -1,8 +1,10 @@
 // Post-build: send terminal clients to the text rendering of a page. Runs
 // after security-headers.mjs (see the build script in package.json).
 //
-// `curl typovrak.tv/posts/<slug>` gets the ANSI text the endpoints prerender
-// at /posts/<slug>.ansi.txt, and `curl typovrak.tv` the post list. Browsers
+// `curl https://typovrak.tv/posts/<slug>` gets the ANSI text the endpoints
+// prerender at /posts/<slug>.ansi.txt, and `curl https://typovrak.tv` the post
+// list. The scheme is not optional: without it curl asks for port 80 and reads
+// Vercel's 308 to https instead of the page, unless it is given -L. Browsers
 // keep the html: the rewrite only fires on a command-line user-agent, and the
 // plain /posts/<slug>.txt stays reachable by its own url for anyone piping the
 // output into a file. Static files only, so no function is involved.

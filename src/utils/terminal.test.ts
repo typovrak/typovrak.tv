@@ -19,6 +19,9 @@ const text = (value: string): Node => ({ type: "text", value });
 const para = (...children: Node[]): Node => ({ type: "paragraph", children });
 const root = (...children: Node[]): Node => ({ type: "root", children });
 
+const osc8 = (url: string, body: string) =>
+  `\x1b]8;;${url}\x1b\\${body}\x1b]8;;\x1b\\`;
+
 const plainTree = (tree: Node, width?: number) =>
   renderTree(tree, { palette: plain, site: SITE, width });
 const ansiTree = (tree: Node, width?: number) =>
@@ -192,12 +195,75 @@ describe("renderTree", () => {
     );
   });
 
+  it("puts the target on the label itself in ansi, never in the prose", () => {
+    const link = (url: string, label: string): Node => ({
+      type: "link",
+      url,
+      children: [text(label)],
+    });
+    const out = ansiTree(root(para(link("/posts/a", "a post"))));
+    expect(out).toBe(osc8(`${SITE}/posts/a`, ansi.link("a post")));
+    expect(out).not.toContain(`(${SITE}/posts/a)`);
+    // an anchor has no target, so there is nothing to hang a hyperlink on
+    expect(ansiTree(root(para(link("#toc", "top"))))).toBe(ansi.link("top"));
+  });
+
+  it("keeps a table column aligned when a cell holds a hyperlink", () => {
+    const cell = (child: Node): Node => ({
+      type: "tableCell",
+      children: [child],
+    });
+    const tree = root({
+      type: "table",
+      align: [null, null],
+      children: [
+        {
+          type: "tableRow",
+          children: [cell(text("Name")), cell(text("Flag"))],
+        },
+        {
+          type: "tableRow",
+          children: [
+            cell({ type: "link", url: "/posts/a", children: [text("a post")] }),
+            cell(text("--rebase")),
+          ],
+        },
+      ],
+    });
+    const bare = (line: string) =>
+      line
+        .replace(/\x1b\]8;;[^\x1b]*\x1b\\/g, "")
+        .replace(/\x1b\[[0-9;]*m/g, "");
+    const bars = ansiTree(tree)
+      .split("\n")
+      .map(line => bare(line).indexOf("|"));
+    expect(bars).toEqual([bars[0], bars[0], bars[0]]);
+    expect(bars[0]).toBeGreaterThan(0);
+  });
+
   it("describes an image rather than dropping it", () => {
     const tree = root(
       para({ type: "image", url: "/img/a.avif", alt: "the shell" })
     );
     expect(plainTree(tree)).toBe(
       "[image: the shell] (https://typovrak.tv/img/a.avif)"
+    );
+    expect(ansiTree(tree)).toBe(
+      osc8(`${SITE}/img/a.avif`, ansi.dim("[image: the shell]"))
+    );
+  });
+
+  it("announces a recording with the command that plays it", () => {
+    const tree = root({
+      type: "asciinemaCast",
+      url: "/casts/a.cast",
+      alt: "The whole loop in one terminal",
+    });
+    expect(plainTree(tree)).toBe(
+      "[recording: The whole loop in one terminal]\nPlay it: asciinema play https://typovrak.tv/casts/a.cast"
+    );
+    expect(ansiTree(tree)).toContain(
+      ansi.code("asciinema play https://typovrak.tv/casts/a.cast")
     );
   });
 
@@ -266,6 +332,10 @@ describe("helpers", () => {
 
   it("measures text without its escape codes", () => {
     expect(visibleLength(ansi.strong("abc") + " d")).toBe(5);
+    // a hyperlink is width the terminal never draws
+    expect(visibleLength(osc8("https://x.y/long/path", ansi.link("abc")))).toBe(
+      3
+    );
   });
 
   it("strips tags and decodes the entities a post can carry", () => {

@@ -12,15 +12,37 @@ import type { Node } from "./terminal";
 const DROP = new Set(["mdxjsEsm", "mdxFlowExpression", "mdxTextExpression"]);
 const UNWRAP = new Set(["mdxJsxFlowElement", "mdxJsxTextElement"]);
 
+// The asciinema player is the one jsx element carrying something a terminal
+// reader would otherwise never hear about, so it becomes a node of its own
+// instead of being unwrapped into nothing.
+type JsxNode = Node & {
+  name?: string;
+  attributes?: { name?: string; value?: unknown }[];
+};
+
+function castNode(node: Node): Node | undefined {
+  const jsx = node as JsxNode;
+  if (jsx.name !== "AsciinemaPlayer") return undefined;
+  const attribute = (name: string) => {
+    const found = jsx.attributes?.find(a => a.name === name);
+    return typeof found?.value === "string" ? found.value : undefined;
+  };
+  const url = attribute("src");
+  if (!url) return undefined;
+  return { type: "asciinemaCast", url, alt: attribute("caption") ?? null };
+}
+
 export function stripMdx(node: Node): Node {
   if (!node.children) return node;
   node.children = node.children
     .filter(child => !DROP.has(child.type))
-    .flatMap(child =>
-      UNWRAP.has(child.type)
+    .flatMap(child => {
+      const cast = castNode(child);
+      if (cast) return [cast];
+      return UNWRAP.has(child.type)
         ? (stripMdx(child).children ?? [])
-        : [stripMdx(child)]
-    );
+        : [stripMdx(child)];
+    });
   return node;
 }
 

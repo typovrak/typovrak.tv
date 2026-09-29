@@ -38,12 +38,21 @@ export type Palette = {
   pager: (url: string, plainUrl: string) => string;
   bullet: string;
   bar: string;
+  // whether a link is an OSC 8 hyperlink on its label rather than the url
+  // spelled out after it
+  hyperlink: boolean;
 };
 
 const identity = (text: string) => text;
 
 const sgr = (codes: string) => (text: string) =>
   text === "" ? "" : `\x1b[${codes}m${text}\x1b[0m`;
+
+// OSC 8 puts the target on the label itself, so prose reads without a url in
+// the middle of it. A terminal that does not know the sequence drops it and
+// the url with it, which is what the plain variant is there for.
+const osc8 = (url: string, text: string) =>
+  `\x1b]8;;${url}\x1b\\${text}\x1b]8;;\x1b\\`;
 
 // Standard 16-colour codes, so the terminal's own theme decides the exact
 // shade and a light background stays readable.
@@ -64,6 +73,7 @@ export const ansi: Palette = {
   pager: url => `curl -s ${url} | less -R`,
   bullet: "•",
   bar: "│",
+  hyperlink: true,
 };
 
 // Safe to redirect into a file: no escape codes, and the block markers stay
@@ -84,12 +94,13 @@ export const plain: Palette = {
   pager: (_url, plainUrl) => `curl -s ${plainUrl} | less`,
   bullet: "-",
   bar: ">",
+  hyperlink: false,
 };
 
 export const WIDTH = 80;
 
 type Style = "text" | "strong" | "em" | "code" | "link" | "dim";
-type Segment = { text: string; style: Style };
+type Segment = { text: string; style: Style; href?: string };
 
 type Context = {
   palette: Palette;
@@ -149,12 +160,17 @@ function inline(node: Node, ctx: Context, style: Style = "text"): Segment[] {
       const target = absoluteUrl(node.url ?? "", ctx.site);
       const labelText = label.map(segment => segment.text).join("");
       if (!target || labelText === target) return label;
+      if (ctx.palette.hyperlink)
+        return label.map(segment => ({ ...segment, href: target }));
       return [...label, { text: ` (${target})`, style: "dim" }];
     }
     case "image": {
       const target = absoluteUrl(node.url ?? "", ctx.site);
       const alt = node.alt ? `[image: ${node.alt}]` : "[image]";
-      return [{ text: target ? `${alt} (${target})` : alt, style: "dim" }];
+      if (!target) return [{ text: alt, style: "dim" }];
+      if (ctx.palette.hyperlink)
+        return [{ text: alt, style: "dim", href: target }];
+      return [{ text: `${alt} (${target})`, style: "dim" }];
     }
     default:
       return childrenOf(node).flatMap(child => inline(child, ctx, style));
@@ -162,7 +178,9 @@ function inline(node: Node, ctx: Context, style: Style = "text"): Segment[] {
 }
 
 export function visibleLength(text: string): number {
-  return text.replace(/\x1b\[[0-9;]*m/g, "").length;
+  return text
+    .replace(/\x1b\]8;;[^\x1b]*\x1b\\/g, "")
+    .replace(/\x1b\[[0-9;]*m/g, "").length;
 }
 
 // Greedy word wrap that keeps each word's style. Whitespace collapses to one
@@ -190,13 +208,13 @@ export function wrap(segments: Segment[], width: number): Segment[][] {
       }
       if (/^\s+$/.test(token)) {
         if (used > 0 && !line[line.length - 1]?.text.endsWith(" ")) {
-          line.push({ text: " ", style: segment.style });
+          line.push({ text: " ", style: segment.style, href: segment.href });
           used += 1;
         }
         continue;
       }
       if (used > 0 && used + token.length > width) flush();
-      line.push({ text: token, style: segment.style });
+      line.push({ text: token, style: segment.style, href: segment.href });
       used += token.length;
     }
   }
@@ -208,7 +226,8 @@ function paint(segments: Segment[], palette: Palette): string {
   const merged: Segment[] = [];
   for (const segment of segments) {
     const last = merged[merged.length - 1];
-    if (last && last.style === segment.style) last.text += segment.text;
+    if (last && last.style === segment.style && last.href === segment.href)
+      last.text += segment.text;
     else merged.push({ ...segment });
   }
   const styles: Record<Style, (text: string) => string> = {
@@ -219,7 +238,12 @@ function paint(segments: Segment[], palette: Palette): string {
     link: palette.link,
     dim: palette.dim,
   };
-  return merged.map(segment => styles[segment.style](segment.text)).join("");
+  return merged
+    .map(segment => {
+      const styled = styles[segment.style](segment.text);
+      return segment.href ? osc8(segment.href, styled) : styled;
+    })
+    .join("");
 }
 
 function paragraph(node: Node, ctx: Context): string[] {
@@ -405,6 +429,21 @@ function block(node: Node, ctx: Context): string[] {
       return table(node, ctx);
     case "thematicBreak":
       return [ctx.palette.rule(Math.min(ctx.width, 40))];
+    // the site plays a recording here, so a terminal reader gets the command
+    // that plays the same one rather than nothing at all
+    case "asciinemaCast": {
+      const { palette } = ctx;
+      const label = node.alt ? `[recording: ${node.alt}]` : "[recording]";
+      const lines = wrap([{ text: label, style: "dim" }], ctx.width).map(line =>
+        paint(line, palette)
+      );
+      const url = absoluteUrl(node.url ?? "", ctx.site);
+      if (!url) return lines;
+      return [
+        ...lines,
+        `${palette.dim("Play it:")} ${palette.code(`asciinema play ${url}`)}`,
+      ];
+    }
     case "html": {
       const text = stripTags(node.value ?? "");
       return text

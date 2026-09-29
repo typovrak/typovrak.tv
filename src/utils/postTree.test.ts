@@ -80,6 +80,22 @@ describe("parsePostBody", () => {
     );
   });
 
+  it("turns the asciinema player into the command that plays the cast", async () => {
+    const mdx = `import AsciinemaPlayer from "@/components/AsciinemaPlayer.astro";
+
+<AsciinemaPlayer
+  src="/casts/a.cast"
+  caption="The whole loop in one terminal."
+  thumbnail={{ src: "/img/a.avif", width: 10 }}
+/>
+`;
+    const tree = await parsePostBody(mdx, { mdx: true });
+    const out = renderTree(tree, { palette: plain, site: SITE });
+    expect(out).toBe(
+      "[recording: The whole loop in one terminal.]\nPlay it: asciinema play https://typovrak.tv/casts/a.cast"
+    );
+  });
+
   it("does not use smart quotes, which would rewrite commands", async () => {
     const tree = await parsePostBody(`Run "this" and 'that'.`, { mdx: false });
     expect(textOf(tree)).toBe(`Run "this" and 'that'.`);

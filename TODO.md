@@ -1,8 +1,4 @@
-- lorsqu'une vidéo asciinema se finit, il n'y a aucune indication, j'ai attendu 10 secondes la suite avant de voir que c'était fini. Il faut mettre en place un moyen pour s'en rendre compte. Comme afficher les contrôles de la vidéo.
-
 - mettre en place websocket le fait de voir le curseur des personnes connecté sur le site sur la page ?
-
-[ ] créer une page 404
 
 - ajouter un composant en début d'article pour les variables faisant que dans l'article et le code, cela sera les bonnes valeurs comme à la place de <USER> -> typovrak pour des commandes cli sur mon utilisateur
   - et ajouter des paramètres tel que remplacer "vim" par "nano" dans les commandes par exemple
