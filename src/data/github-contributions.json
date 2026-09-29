@@ -1,5 +1,5 @@
 {
-  "total": 4276,
+  "total": 4354,
   "weeks": [
     {
       "days": [
@@ -2019,13 +2019,13 @@
         },
         {
           "date": "2026-09-25",
-          "count": 2,
+          "count": 18,
           "level": 1
         },
         {
           "date": "2026-09-26",
-          "count": 0,
-          "level": 0
+          "count": 2,
+          "level": 1
         }
       ]
     },
@@ -2033,11 +2033,16 @@
       "days": [
         {
           "date": "2026-09-27",
-          "count": 0,
-          "level": 0
+          "count": 16,
+          "level": 1
         },
         {
           "date": "2026-09-28",
+          "count": 44,
+          "level": 1
+        },
+        {
+          "date": "2026-09-29",
           "count": 0,
           "level": 0
         }
