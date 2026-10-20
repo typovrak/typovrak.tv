@@ -34,6 +34,11 @@
     "forks": 0,
     "archived": false
   },
+  "nixos-ccburn": {
+    "stars": 0,
+    "forks": 0,
+    "archived": false
+  },
   "nixos-fastfetch": {
     "stars": 0,
     "forks": 0,
@@ -165,8 +170,8 @@
     "archived": false
   },
   "freeCodeCamp/freeCodeCamp": {
-    "stars": 457450,
-    "forks": 49619,
+    "stars": 457537,
+    "forks": 49718,
     "archived": false
   },
   "Racketlon17/2d-collision-simulator": {
