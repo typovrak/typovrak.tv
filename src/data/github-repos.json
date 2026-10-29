@@ -1,7 +1,7 @@
 {
   "nixos": {
     "stars": 5,
-    "forks": 2,
+    "forks": 3,
     "archived": false
   },
   "nixos-alacritty": {
@@ -16,7 +16,7 @@
   },
   "nixos-bash": {
     "stars": 1,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-bat": {
@@ -26,7 +26,7 @@
   },
   "nixos-btop": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-cava": {
@@ -41,7 +41,7 @@
   },
   "nixos-fastfetch": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-flatpak": {
@@ -51,7 +51,7 @@
   },
   "nixos-fonts": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-gh": {
@@ -76,7 +76,7 @@
   },
   "nixos-htop": {
     "stars": 2,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-i3": {
@@ -106,7 +106,7 @@
   },
   "nixos-locale": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-nemo": {
@@ -136,7 +136,7 @@
   },
   "nixos-projects": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-screenkey": {
@@ -146,7 +146,7 @@
   },
   "nixos-ssh": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-stylus": {
@@ -166,12 +166,12 @@
   },
   "nixos-zsh": {
     "stars": 2,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "freeCodeCamp/freeCodeCamp": {
-    "stars": 458062,
-    "forks": 48691,
+    "stars": 458139,
+    "forks": 48720,
     "archived": false
   },
   "Racketlon17/2d-collision-simulator": {
