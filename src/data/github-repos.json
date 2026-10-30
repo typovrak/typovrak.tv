@@ -56,7 +56,7 @@
   },
   "nixos-gh": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-ghostty": {
@@ -66,7 +66,7 @@
   },
   "nixos-git": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-gtk": {
@@ -96,7 +96,7 @@
   },
   "nixos-lazygit": {
     "stars": 0,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-lightdm": {
@@ -121,7 +121,7 @@
   },
   "nixos-nvim": {
     "stars": 1,
-    "forks": 0,
+    "forks": 1,
     "archived": false
   },
   "nixos-pavucontrol": {
@@ -170,8 +170,8 @@
     "archived": false
   },
   "freeCodeCamp/freeCodeCamp": {
-    "stars": 458139,
-    "forks": 48720,
+    "stars": 458203,
+    "forks": 48726,
     "archived": false
   },
   "Racketlon17/2d-collision-simulator": {
